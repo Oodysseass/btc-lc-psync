@@ -1,0 +1,213 @@
+\section{Model}
+\label{sec.model}
+
+We work in the static synchronous setting of~\cite{gkl24} and we keep some of
+its notation. This section fixes the notation, states the assumptions, and
+restates the facts about typical executions that the analysis uses.
+
+\paragraph{Validators}
+
+There are $n$ parties, called validators, $t$ of which may be Byzantine, that
+is, they may arbitrarily deviate from the protocol.
+
+\paragraph{Random Oracle}
+
+We assume access to a random oracle $H \colon \{0,1\}^* \to \{0,1\}^\kappa$,
+where $\kappa$ is the security parameter.  Each validator is allowed $q$ queries
+to the random oracle $H$ per round. The adversary is allowed $tq$ queries. A
+query is successful if its output is below the target $T$. A single query is
+successful with probability $p=T/2^\kappa$.
+
+\paragraph{Adversary}
+
+We assume a \emph{Byzantine, rushing} adversary, which may corrupt up to $t$
+parties. A rushing adversary sees every message sent by an honest validator
+before it is delivered to any other party.
+
+\paragraph{Rounds}
+
+Time proceeds in rounds. Rounds are numbered $1,2,\dots$. For $r \leq s$, we
+write $[r,s]$ for the set of rounds $\{r,\dots,s\}$, and $[r,s]=\emptyset$ when
+$s<r$.
+
+\paragraph{Network}
+
+We assume a synchronous network among the validators. A message sent by an
+honest validator at round $i$ is received by every other validator at the
+beginning of round $i+1$. The adversary can see the messages of honest parties
+at any point of a round. At the end of each round it fixes the order in which
+messages are delivered in the next round; it may reorder messages, spoof their
+source or add messages of its own, but it cannot drop a message.
+
+\paragraph{Protocol}
+
+Validators run the Bitcoin backbone protocol of~\cite{gkl24}. Every validator
+keeps a local chain, initialized with the genesis block $\gen$. At round $i$ a
+validator runs $\fn{maxvalid}$ on its local chain and on the chains it received
+at the beginning of round $i$. Function $\fn{maxvalid}$ returns the longest
+valid chain among its arguments and breaks ties towards the local chain. The
+validator then makes its $q$ queries. On success it appends the new block to the
+chain returned by $\fn{maxvalid}$. The resulting chain becomes its local chain
+and is sent to all validators. Following~\cite{gkl24}, we say that a validator
+\emph{has a chain at round $i$} if this was the local chain it started the round
+with. The validator \emph{adopts a chain at round $i$} if this was the return
+value of $\fn{maxvalid}$ at round $i$. The chain a validator adopts at round
+$i$ is at least as long as the chain it has at round $i$. The chain it has at
+round $i+1$ is the chain it adopted at round $i$, extended by at most one block
+if the validator was successful at round $i$.
+
+\paragraph{Clients}
+
+Clients do not mine. A client may join at any round and asks for a chain to
+adopt. We assume no synchrony between clients and validators. A client does not
+know whether it is connected to an honest validator, nor how long it must wait
+for an honest message. We model this by letting the adversary choose which
+chains a client receives and when.
+
+\paragraph{Chains and the block tree}
+
+A chain is a sequence of blocks, each of which contains the hash of its
+predecessor. Every chain begins with the genesis block $\gen$. We write $\ch[i]$
+for the $i$-th block of $\ch$, counting from $\ch[0]=\gen$, and we say that
+$\ch[i]$ is at height $i$. We write $\ch[i{:}j]$ for the subsequence of $\ch$
+at heights $i,\dots,j-1$. We omit $i$ when the range starts at the beginning
+of $\ch$, and $j$ when it extends to the end. Negative indices count from the
+end. So $\head{\ch}$ is the last block of $\ch$, its \emph{tip}, and
+$\prune{\ch}{k}$ is $\ch$ without its $k$ last blocks. When $k\ge\len{\ch}-1$,
+$\prune{\ch}{k}$ is the chain consisting of the genesis block alone. We write
+$\len{\ch}$ to denote the length of $\ch$, which is the number of blocks of
+$\ch$ including the genesis block. The height of $\ch$ is the height of its tip,
+$\len{\ch}-1$. We write $\ch_1\preceq\ch_2$ when $\ch_1$ is a prefix of $\ch_2$.
+That is, $\ch_1 \preceq \ch_2 \iff \ch_2[{:}\len{\ch_1}] = \ch_1$. Every
+validator has a chain of length $1$ at round $1$. A block is honest if it was
+computed by an honest validator and adversarial otherwise. We regard the genesis
+block as an honest block computed at round $0$.
+
+\begin{definition}[Block tree]\label{def.tree}
+    The block tree at round $r$, denoted $\bt_r$, is the set of all blocks
+    computed in a round of $[0,r]$. Its edges are the hash references between
+    these blocks. A block computed by the adversary belongs to $\bt_r$ whether or
+    not it was sent. A chain $\ch$ is in $\bt_r$ if all of its blocks are in
+    $\bt_r$.
+\end{definition}
+
+No copies occur in a typical execution, which we define below. So every block
+of $\bt_r$ has a unique height and $\bt_r$ is a tree.
+
+\begin{remark}\label{rem.membership}
+    Every chain held by a client at round $r$ is in $\bt_r$, because the blocks
+    of that chain exist at round $r$. Every chain adopted by an honest validator
+    at round $r$ is in $\bt_{r-1}$. Indeed, let $B$ be a block of that chain other than the genesis block.
+    Either the validator received $B$ at a round at most $r$, and then $B$ was
+    sent at round $r-1$ at the latest, or the validator computed $B$ itself. In
+    the second case $B$ was computed at a round at most $r-1$, because a
+    validator adopts before it queries the oracle.
+\end{remark}
+
+\begin{lemma}[Fork choice]\label{lem.fork}
+    Let $B$ be an honest block at height $\ell$, computed at round $i$. Then
+    some honest validator has a chain of length greater than $\ell$ at round
+    $i+1$. Every honest validator adopts a chain of length greater than $\ell$
+    at every round $w>i$.
+\end{lemma}
+\begin{proof}
+    If $B$ is the genesis block, then $\ell=i=0$, every validator has a chain of
+    length $1$ at round $1$, and every chain has length at least $1$. Otherwise
+    the honest validator that computed $B$ appended $B$ at round $i$ to the
+    chain it adopted at round $i$, made the result its local chain, and sent it.
+    The result has length $\ell+1$, so that validator has a chain of length
+    greater than $\ell$ at round $i+1$. Every honest validator receives the
+    result at the beginning of round $i+1$, so it is an argument of
+    $\fn{maxvalid}$. Hence the chain adopted at round $i+1$ has length greater
+    than $\ell$. We claim that the same holds at every round $w>i+1$. The chain a validator has at round $w$ is the chain it adopted at round
+    $w-1$, possibly extended by one block. By induction on $w$ it has length
+    greater than $\ell$. The chain adopted at round $w$ is at least as long.
+\end{proof}
+
+\begin{definition}[Common prefix of two chains]\label{def.meet}
+    For chains $\ch_1$ and $\ch_2$, let $\ch_1\meet\ch_2$ be the longest chain
+    that is a prefix of both.
+\end{definition}
+
+Because a block determines all of its ancestors, $\ch_1$ and $\ch_2$ share a
+block at height $i$ if and only if $i<\len{\ch_1\meet\ch_2}$. The quantity
+$\len{\ch_1\meet\ch_2}$ is therefore the number of blocks the two chains have in
+common.
+
+\begin{definition}[Height schedule]\label{def.schedule}
+    A height schedule is a non-dec{\allowbreak}reasing function
+    $\hgt\colon\mathbb{N}\to\mathbb{N}$.
+\end{definition}
+
+\paragraph{Random variables}
+
+Fix a round $i$. Let $X_i=1$ if some honest validator computes a block at
+round $i$, and $X_i=0$ otherwise. Let $Y_i=1$ if exactly one honest validator
+computes a block at round $i$, and $Y_i=0$ otherwise. Let $Z_i$ be the number
+of successful adversarial queries at round $i$. A round with $X_i=1$ is successful
+and a round with $Y_i=1$ is a convergence opportunity. For a set of rounds $S$ we
+write $X(S)=\sum_{i\in S}X_i$ and define $Y(S)$ and $Z(S)$ in the same way. We
+set $X_0=Y_0=Z_0=0$, so that a set of rounds containing the index $0$ contributes
+nothing at that index. The parameter $f=\mathbb{E}[X_i]$ is the probability that
+a round is successful.
+
+\paragraph{Assumptions}
+
+We write $\advr=t/(n-t)$ for the ratio of the adversarial to the honest query
+budget, and we note that $1+\advr=n/(n-t)$.
+
+\begin{assumption}[Honest majority]\label{asm.majority}
+    There exist $\epsilon,\delta,f\in(0,1]$ such that $t\le(1-\delta)(n-t)$ and
+    $4f+4\epsilon<\delta$.
+\end{assumption}
+
+We call $\delta$ the honest majority advantage.
+\Cref{asm.majority} is the honest majority assumption of~\cite{gkl24} with the
+condition $3f+3\epsilon<\delta$ replaced by $4f+4\epsilon<\delta$. The
+strengthening is used only in \Cref{lem.rho}. Every consequence of the original
+assumption that we cite remains available.
+
+\paragraph{Typical executions}
+
+Let $\lambda\ge2/f$ be an integer. An execution is $(\epsilon,\lambda)$-typical
+if two conditions hold. First, the bounds of \Cref{lem.typical} hold for every
+set $S$ of at least $\lambda$ consecutive rounds. Second, no insertion, copy,
+prediction or guess occurs, in the sense of~\cite[Definition 4.3]{gkl24}. An
+execution fails to be typical with probability at most
+\[
+    \typ=4L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}.
+\]
+Here $L$ is the total run time of the system, $Q$ bounds the number of oracle
+queries, and $\nu$ is the min-entropy of the input contribution function. For
+$\lambda=\Omega(\log^2\kappa)$ this probability is negligible in $\kappa$. All
+statements below are about typical executions. The following facts are
+restated from~\cite{gkl24} without proof.
+
+\begin{lemma}[{\cite[Lemma 4.6]{gkl24}}]\label{lem.typical}
+    For every set $S$ of at least $\lambda$ consecutive rounds of a typical
+    execution,
+    \[
+        \begin{gathered}
+            (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
+            \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
+            Z(S) < \left(\frac{\advr}{1-f}+\epsilon\right)f|S| .
+        \end{gathered}
+    \]
+\end{lemma}
+
+\begin{lemma}[{Pairing Lemma, \cite[Lemma 4.1]{gkl24}}]\label{lem.unique}
+    Let $B$ be the block at height $j$ of a chain $\ch$, computed by an honest
+    validator in a convergence opportunity. Then the block at height $j$ of
+    any chain is either $B$ or adversarial.
+\end{lemma}
+
+\begin{lemma}[{Chain Growth Lemma, \cite[Lemma 4.2]{gkl24}}]\label{lem.growth}
+    If at round $v$ an honest validator has a chain of length $m$, then at every
+    round $w\ge v$ every honest validator adopts a chain of length at least
+    $m+\sum_{i=v}^{w-1}X_i$.
+\end{lemma}
+
+\begin{lemma}[{\cite[Lemma 4.8]{gkl24}}]\label{lem.span}
+    In a typical execution, any $k\ge2\lambda f$ consecutive blocks of a chain
+    have been computed in more than $k/(2f)$ consecutive rounds.
+\end{lemma}

@@ -1,0 +1,12 @@
+\section{Introduction}
+
+\paragraph{Problem}
+
+Fix a non-decreasing height schedule $\hgt$. Let $\ch$ be a chain of the block
+tree at round $r$ of height $\hgt(r)$, and let $\ch'$ be a chain adopted by an
+honest validator at round $r$. Write $\ch\meet\ch'$ for the longest common
+prefix of the two chains. We look for the largest function $\pref$ such that
+$\ch\meet\ch'$ has height at least $\pref(r)$ with overwhelming probability, for
+every such pair $\ch,\ch'$. We write $\prn(r)=\hgt(r)-\pref(r)$ for the pruning
+depth.
+

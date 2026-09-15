@@ -1,0 +1,133 @@
+\section{Tightness}
+\label{sec.tightness}
+
+\Cref{thm.prefix} bounds the pruning depth by $\advrtwo/(1-\advrtwo)$ times the
+length deficit plus an additive term. This section shows that the coefficient
+is the best possible. We exhibit an adversary and a pair of chains $\ch,\ch'$
+whose fork depth $\len{\ch}-\len{\ch\meet\ch'}$ is at least
+$\advr/(1-\advr)=t/(n-2t)$ times the length deficit, up to lower order terms.
+A client must prune at least the fork depth, because every block of $\ch$
+beyond $\ch\meet\ch'$ is off the honest chain. So no rule that prunes a smaller
+multiple of the deficit is sound. We make no claim about the additive term.
+
+\begin{definition}[Private fork]\label{def.private}
+    The strategy $\pipriv$ with parameters $r_0\ge1$ and $r>r_0$ is the
+    following. The adversary is idle until round $r_0$. From round $r_0+1$ on
+    it spends every query on a private branch rooted at the tip of a longest
+    chain adopted by an honest validator at round $r_0$. It sends nothing.
+    At round $r$ it hands the branch to the client.
+\end{definition}
+
+The adversary may extend within a round a block it computed in the same round.
+\Cref{lem.length} already allows this.
+
+\begin{theorem}\label{thm.attack}
+    Let $r_0\ge1$, let $s\ge\lambda$, let $r=r_0+s$ and let
+    $\epsilon'\in(0,1)$. Consider an execution against $\pipriv$ with
+    parameters $r_0$ and $r$. With probability at least
+    $1-2e^{-\Omega(\epsilon'^2\advr fs)}$ there are a chain $\ch\in\bt_r$ and a
+    chain $\ch'$ adopted by an honest validator at round $r$ such that
+    \[
+        \begin{gathered}
+            \len{\ch}-\len{\ch\meet\ch'} > (1-\epsilon')\advr fs,\\
+            \len{\ch'}-\len{\ch} < \left[(1+\epsilon')-(1-\epsilon')\advr\right]fs+1 .
+        \end{gathered}
+    \]
+\end{theorem}
+\begin{proof}
+    Let $\ch_0$ be a longest chain adopted by an honest validator at round
+    $r_0$ and let $\ell_0=\len{\ch_0}$. Let $S_2=[r_0+1,r]$. Let $\ch$ be
+    $\ch_0$ followed by the private branch. The branch has $Z(S_2)$ blocks, so
+    $\len{\ch}=\ell_0+Z(S_2)$. Let $\ch'$ be any chain adopted by an honest
+    validator at round $r$.
+
+    We first bound the fork depth. No block of the private branch is ever
+    delivered to a validator. So no block of the branch lies on $\ch'$, and
+    $\ch\meet\ch'$ is a prefix of $\ch_0$. Hence
+    $\len{\ch}-\len{\ch\meet\ch'}\ge\len{\ch}-\ell_0=Z(S_2)$.
+
+    We next bound the length deficit. The adversary makes no queries before
+    round $r_0+1$ and sends nothing after it. So every block of $\ch'$ is
+    honest. From \Cref{lem.honestone}, the blocks of $\ch'[1{:}]$ were computed
+    in distinct rounds. Each of these rounds is successful, so
+    $\len{\ch'}-1\le X([1,r])$. Every honest validator has a chain of length
+    $1$ at round $1$. From \Cref{lem.growth} with $v=1$ and $w=r_0$,
+    $\ell_0-1\ge X([1,r_0-1])$. Subtracting,
+    \[
+        \len{\ch'}-\ell_0 \le X([r_0,r]) \le X(S_2)+1 ,
+    \]
+    and therefore $\len{\ch'}-\len{\ch}\le X(S_2)-Z(S_2)+1$.
+
+    It remains to bound $X(S_2)$ from above and $Z(S_2)$ from below. $X(S_2)$
+    is a sum of $s$ independent Bernoulli trials with success probability $f$,
+    so $\mathbb{E}[X(S_2)]=fs$. $Z(S_2)$ is the number of successful
+    adversarial queries in the rounds of $S_2$. It is a sum of $tqs$
+    independent Bernoulli trials with success probability $p$, so
+    $\mathbb{E}[Z(S_2)]=pqts$, and $pqts\ge\advr fs$ because $pq(n-t)>f$. By
+    the Chernoff bound, $X(S_2)\ge(1+\epsilon')fs$ has probability at most
+    $e^{-\Omega(\epsilon'^2fs)}$, and $Z(S_2)\le(1-\epsilon')\advr fs$ has
+    probability at most $e^{-\Omega(\epsilon'^2\advr fs)}$. Outside these two
+    events both inequalities of the statement hold.
+\end{proof}
+
+\begin{corollary}\label{cor.tight}
+    In the setting of \Cref{thm.attack}, if moreover $\len{\ch'}>\len{\ch}$,
+    then
+    \[
+        \frac{\len{\ch}-\len{\ch\meet\ch'}}{\len{\ch'}-\len{\ch}}
+        > \frac{(1-\epsilon')\advr}{(1+\epsilon')-(1-\epsilon')\advr+1/(fs)} .
+    \]
+    The right-hand side tends to $\advr/(1-\advr)=t/(n-2t)$ as $\epsilon'\to0$
+    and $fs\to\infty$.
+\end{corollary}
+
+The condition $\len{\ch'}>\len{\ch}$ holds with overwhelming probability once
+$fs$ is large. The validator that adopted $\ch_0$ at round $r_0$ has a chain
+of length at least $\ell_0$ at round $r_0+1$. From \Cref{lem.growth} with
+$v=r_0+1$ and $w=r$, $\len{\ch'}\ge\ell_0+X([r_0+1,r-1])\ge\ell_0+X(S_2)-1$.
+Hence $\len{\ch'}-\len{\ch}\ge X(S_2)-Z(S_2)-1$. We have
+$\mathbb{E}[Z(S_2)]=pqts<\frac{\advr}{1-f}fs$, because
+$pq(n-t)<\frac{f}{1-f}$. By the Chernoff bound, $X(S_2)>(1-\epsilon')fs$ and
+$Z(S_2)<(1+\epsilon')\frac{\advr}{1-f}fs$ hold with probability at least
+$1-2e^{-\Omega(\epsilon'^2\advr fs)}$. From \Cref{lem.rho},
+$\frac{\advr}{1-f}<1$. Choose $\epsilon'$ with
+$1-\epsilon'>(1+\epsilon')\frac{\advr}{1-f}$. Then $X(S_2)-Z(S_2)$ grows
+linearly in $fs$, and $\len{\ch'}>\len{\ch}$ once $fs$ is large enough.
+
+Consider an execution against $\pipriv$ that is typical and in which the event
+of \Cref{thm.attack} occurs. This happens with probability at least
+$1-\typ-2e^{-\Omega(\epsilon'^2\advr fs)}$. \Cref{thm.prefix} bounds the fork
+depth from above by $\frac{\advrtwo}{1-\advrtwo}$ times the length deficit plus
+a constant. \Cref{cor.tight} bounds it from below by the length deficit times a
+coefficient that tends to $\frac{\advr}{1-\advr}$. As $f$, $\epsilon$ and
+$\epsilon'$ tend to $0$, both coefficients tend to $t/(n-2t)$.
+
+\begin{remark}\label{rem.roundtight}
+    A variant of $\pipriv$ matches the coefficient of \Cref{cor.round}. It
+    needs the tie-breaking convention of~\cite[Theorem 4.13]{gkl24}: the
+    adversary is rushing, and an honest validator prefers an adversarial chain
+    to its own chain of the same length. In the rounds of $[1,r_0]$ the
+    adversary appends every block it computes to the honest chain and sends it
+    immediately. The honest chain then advances by $\max(X_i,Z_i)$ blocks per
+    round, and
+    \[
+        \mathbb{E}\left[\max(X_i,Z_i)\right] \ge 1-(1-f)(1-p)^{qt} \ge (1+\advr)f-O(f^2).
+    \]
+    By round $r_0$ the honest chain has height $(1+\advr)fr_0$ up to a relative
+    correction of order $f$. This is the upper end of the band of
+    \Cref{lem.length}. From round $r_0+1$ the adversary follows $\pipriv$ for
+    $s=r-r_0$ rounds. Let $\hgt$ be the height of $\ch$. Then
+    $\hgt=(1+\advr)fr_0+\advr fs=(1+\advr)fr-fs$, so $fs=(1+\advr)fr-\hgt$, and
+    the fork depth is
+    \[
+        \advr fs = \advr\left[(1+\advr)fr-\hgt\right]
+        = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right).
+    \]
+    This is the limiting form of \Cref{cor.round}. The inflation costs the
+    adversary the blocks it publishes. For a fixed pair $(\hgt,r)$ it moves the
+    fork point lower. It is therefore the stronger attack against the round
+    form, and the weaker one against the deficit form of \Cref{thm.prefix}. In
+    the deficit form both variants give the ratio $t/(n-2t)$. We verify only
+    the rates. The concentration argument is the one of \Cref{thm.attack}, and
+    we omit it.
+\end{remark}

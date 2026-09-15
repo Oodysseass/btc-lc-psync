@@ -1,0 +1,21 @@
+# Build output
+output/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
+*.toc
+
+# macOS
+.DS_Store
+
+# Local, not for the repository
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+resources/

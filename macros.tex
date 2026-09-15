@@ -1,0 +1,44 @@
+%%% Theorem environments %%%
+%% llncs predefines theorem, lemma, corollary, definition, remark and proof,
+%% each numbered with its own counter. We add assumption in the same style
+%% and register its name with cleveref. The proof environment of llncs prints
+%% no end mark, so we append one.
+\spnewtheorem{assumption}{Assumption}{\bfseries}{\itshape}
+\crefname{assumption}{assumption}{assumptions}
+\Crefname{assumption}{Assumption}{Assumptions}
+\let\llncsendproof\endproof
+\renewcommand{\endproof}{\qed\llncsendproof}
+
+%%% Function names and variables %%%
+\newcommand{\fn}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand{\var}[1]{\ensuremath{\mathsf{#1}}}
+
+%%% Chains and the block tree %%%
+\newcommand{\ch}{\mathcal{C}}
+\newcommand{\bt}{\mathcal{T}}
+\newcommand{\len}[1]{\lvert #1\rvert}
+\newcommand{\head}[1]{#1[{-}1]}
+\newcommand{\prune}[2]{#1[{:}{-}#2]}
+\newcommand{\meet}{\cap}
+\newcommand{\gen}{G}
+
+%%% Rates and schedules %%%
+\newcommand{\advr}{\rho}
+\newcommand{\advrone}{\rho_1}
+\newcommand{\advrtwo}{\rho_2}
+\newcommand{\maxr}{A}
+\newcommand{\slack}{\eta}
+\newcommand{\hgt}{\alpha}
+\newcommand{\hln}{\beta}
+\newcommand{\pref}{\zeta}
+\newcommand{\prn}{\gamma}
+\newcommand{\typ}{\epsilon_{\mathrm{typ}}}
+\newcommand{\pos}{\ell^{*}}
+\newcommand{\rst}{r^{*}}
+\newcommand{\bst}{B^{*}}
+\newcommand{\pipriv}{\pi_{\mathrm{private}}}
+
+%%% Author notes %%%
+\newcommand{\odysseas}[1]{{\color{blue}[Odysseas: #1]}}
+\newcommand{\giorgos}[1]{{\color{violet}[Giorgos: #1]}}
+\newcommand{\todo}[1]{{\color{brown}[TODO: #1]}}

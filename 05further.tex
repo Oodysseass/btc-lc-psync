@@ -1,0 +1,55 @@
+\section{Remarks}
+\label{sec.further}
+
+\paragraph{Threshold at one third}
+
+The coefficient $t/(n-2t)$ equals $1$ at $t=n/3$. Below one third it is
+smaller than $1$, and pruning the length deficit $\len{\ch'}-\len{\ch}$ is
+sound but wasteful. Between one third and one half it exceeds $1$, and pruning
+the length deficit is unsound. The backbone protocol has common prefix, chain
+quality and chain growth throughout that range. The reason is an
+exchange rate. A private branch of $d$ blocks costs the adversary $d$ blocks. It costs the
+honest validators only $\frac{n-2t}{t}d$ blocks of length advantage, because
+they produce blocks at rate $f$ while the adversary produces them at rate
+$\frac{t}{n-t}f$.
+
+\paragraph{Admissible schedules}
+
+In the limit, the prefix certified by \Cref{cor.round} has height
+$\pref(r)=\frac{n}{n-t}\left(\hgt(r)-\frac{t}{n-t}fr\right)$. This
+is non-decreasing in $r$ exactly when
+$\hgt(r_2)-\hgt(r_1)\ge\frac{t}{n-t}f(r_2-r_1)$ for all $r_1<r_2$, that is,
+when the schedule advances at average rate at least $\frac{t}{n-t}f$. A client
+whose chain stalls loses guarantee, because the adversary gains time to mine a
+private branch of that height. A schedule advancing at the guaranteed honest
+rate $(1-\epsilon)f$ gives
+\begin{align*}
+    \pref(r_2)-\pref(r_1) &= \frac{n}{n-t}\left((1-\epsilon)-\frac{t}{n-t}\right)f\,(r_2-r_1)\\
+    &< (1-\epsilon)f\,(r_2-r_1),
+\end{align*}
+so the certified prefix advances strictly more slowly than the honest chain.
+At the ends of the band, a schedule with $\hgt(r)\ge\maxr fr$ is not
+realizable at round $r$ by \Cref{lem.length}, and a schedule with
+$\hgt(r)\le\frac{t}{n-t}fr$ carries no guarantee by \Cref{cor.round}.
+
+\paragraph{Use by a client}
+
+A client holding several chains applies \Cref{cor.prune} to the longest one,
+because the pruning depth of \Cref{cor.round} decreases with $\len{\ch}$. The
+bound is a deterministic consequence of typicality and holds at once for every
+chain of $\bt_r$, so no union bound over chains is needed. \Cref{cor.prune} is
+the statement a client uses. After pruning $\prn(r)$ blocks, what remains is a
+prefix of the chain of every honest validator, at round $r$ and at every later
+round.
+
+\paragraph{Open ends}
+
+Three questions are open. First, we do not claim that the additive terms of
+\Cref{thm.prefix,cor.round} are optimal. They are of order $\lambda f$, the
+order of the common prefix parameter of~\cite{gkl24}, and $\pipriv$ says
+nothing about them. Second, the analysis is for the
+synchronous validator network of~\cite{gkl24}. In the bounded delay model of~\cite{gkl24,pss16} the rate $f$ is replaced by
+a rate that accounts for the delay $\Delta$. We expect $t/(n-2t)$ to be
+replaced by the corresponding ratio of rates, but we have not checked this. Third, the analysis assumes a
+static population and a fixed target $T$. Variable difficulty changes the
+relation between height and round on which \Cref{cor.round} rests.
