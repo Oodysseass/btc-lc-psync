@@ -4,25 +4,33 @@
 Throughout this section the execution is $(\epsilon,\lambda)$-typical and
 \Cref{asm.majority} holds. We use the constants
 \begin{gather*}
-    \advrone = \frac{\advr}{1-f}+f+3\epsilon,\qquad
-    \advrtwo = \frac{\advrone}{1-\epsilon},\\
-    \slack = 2\epsilon+\frac{\advr f}{1-f},\qquad
-    \maxr = 1+\advr+\slack,
+    \advrone = \frac{\advr}{1-f} + \frac{f_2}{f} + 2\epsilon, \qquad
+    \advrtwo = \frac{\advrone}{1-\epsilon}, \\
+    \slack = 2\epsilon + \frac{\advr f}{1-f}, \qquad
+    \maxr = 1 + \advr + \slack,
 \end{gather*}
-and we write $k_0=2(\lambda+2)f$. Since $\lambda\ge2/f$ we have
-$2\lambda f\le k_0\le4\lambda f$, so $k_0$ is of the same order as the common
-prefix parameter of~\cite{gkl24}. As $f$ and $\epsilon$ tend to $0$, $\advrone$ and $\advrtwo$ tend to $\advr$,
-and $\maxr$ tends to $1+\advr=n/(n-t)$.
+and we write $k_0 = 2(\lambda + 2)f$. Since $\lambda \geq 2 / f$ we have
+$2\lambda f \leq k_0 \leq 4\lambda f$, so $k_0$ is of the same order as the
+common prefix parameter of~\cite{gkl24}. As $f$ and $\epsilon$ tend to $0$,
+$\advrone$ and $\advrtwo$ tend to $\advr$, since $f_2/f<f/(2(1-f)^2)$, and $\maxr$
+tends to $1 + \advr = n / (n - t)$.
 
 \begin{lemma}\label{lem.rho}
     $\advrtwo<1$.
 \end{lemma}
 \begin{proof}
     By definition, $\advrtwo<1$ is equivalent to
-    $\frac{\advr}{1-f}<1-f-4\epsilon$. From \Cref{asm.majority},
-    $\advr\le1-\delta$, so it suffices to show
-    $1-\delta<(1-f)(1-f-4\epsilon)=1-2f-4\epsilon+f^2+4\epsilon f$. This follows
-    from $2f+4\epsilon\le4f+4\epsilon<\delta$.
+    $\frac{\advr}{1-f}+\frac{f_2}{f}<1-3\epsilon$. From \Cref{asm.majority},
+    $\advr\le1-\delta$ and $f<1/3$, and $f_2/f<f/(2(1-f)^2)$. So it suffices to
+    show
+    \[
+        \frac{1-\delta}{1-f}+\frac{f}{2(1-f)^2} < 1-3\epsilon .
+    \]
+    Multiplying by $(1-f)^2$, this is
+    $1-\tfrac{f}{2}-\delta(1-f)<(1-3\epsilon)(1-f)^2$, that is,
+    $\delta(1-f)>\tfrac{3f}{2}-f^2+3\epsilon(1-f)^2$. Since $f<1/3$, the right
+    side is at most $(1-f)(2f+3\epsilon)$. So $\delta>2f+3\epsilon$ suffices,
+    and it follows from $3f+3\epsilon<\delta$.
 \end{proof}
 
 \begin{lemma}\label{lem.honestone}
@@ -34,9 +42,9 @@ and $\maxr$ tends to $1+\advr=n/(n-t)$.
     both honest and both computed at round $i$. The honest validator that
     computed $\ch[j']$ extended at round $i$ the chain it adopted at round $i$.
     A block determines all of its ancestors, so that chain is $\ch[{:}j']$, and
-    it contains $\ch[j]$. From \Cref{rem.membership}, $\ch[{:}j']\in\bt_{i-1}$,
-    so $\ch[j]$ was computed at a round at most $i-1$, which is a
-    contradiction.
+    it contains $\ch[j]$. From \Cref{lem.membership}, $\ch[{:}j']\in\bt_{i-1}$,
+    so $\ch[j]$ was computed at a round at most $i-1$. This contradicts the
+    assumption that $\ch[j]$ was computed at round $i$.
 \end{proof}
 
 \begin{lemma}\label{lem.length}
@@ -82,13 +90,17 @@ $\ch\in\bt_r$ and let $\ch'$ be a chain adopted by an honest validator at round
 $r$. Let $\bst$ be the last honest block of $\ch\meet\ch'$, let $\pos$ be its
 height and let $\rst$ be the round at which it was computed, so
 $\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
+\Cref{lem.rounds} locates the rounds in which the blocks of $\ch[\pos+1{:}]$
+and $\ch'[\pos+1{:}]$ were computed, \Cref{lem.honestlen} bounds
+$\len{\ch'[\pos+1{:}]}$ from below, and \Cref{lem.count} bounds
+$\len{\ch[\pos+1{:}]}$ from above.
 
 \begin{lemma}\label{lem.rounds}
     $\rst\le r-1$. Every block of $\ch[\pos+1{:}]$ and every block of
     $\ch'[\pos+1{:}]$ was computed in a round of $S'$.
 \end{lemma}
 \begin{proof}
-    From \Cref{def.tree} and \Cref{rem.membership}, every block of $\ch$ was
+    From \Cref{def.tree} and \Cref{lem.membership}, every block of $\ch$ was
     computed in a round of $[0,r]$ and every block of $\ch'$ in a round of
     $[0,r-1]$. The block $\bst$ lies on $\ch'$ and was computed at round
     $\rst$, so $\rst\le r-1$. No predictions occur, so along a chain the round
@@ -111,8 +123,12 @@ $\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
     $\len{\ch'[\pos+1{:}]}=\len{\ch'}-\pos-1\ge X(S)$.
 \end{proof}
 
+In words, every block of $\ch[\pos+1{:}]$ is adversarial, or is paired with a
+distinct adversarial block of $\ch'$, or is one of at most $W(S)+1$ remaining
+honest blocks.
+
 \begin{lemma}\label{lem.count}
-    $\len{\ch[\pos+1{:}]}\le Z(S')+X(S)-Y(S)+1$.
+    $\len{\ch[\pos+1{:}]}\le Z(S')+W(S)+1$.
 \end{lemma}
 \begin{proof}
     Split the blocks of $\ch[\pos+1{:}]$ into three classes: $a$ adversarial
@@ -123,12 +139,15 @@ $\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
     From \Cref{lem.rounds}, every honest block of $\ch[\pos+1{:}]$ was
     computed in a round of $S'$. None was computed at round $\rst$: the block
     $\bst$ is honest and was computed at round $\rst$, and by
-    \Cref{lem.honestone} a chain has at most one honest block per round. So its round lies in
-    $S\cup\{r\}$. The $h_2$ blocks are the honest ones whose round is $r$ or a
-    successful round of $S$ that is not a convergence opportunity. From \Cref{lem.honestone} again, they occupy distinct rounds. So at most one
-    of them is at round $r$, and at most $X(S)-Y(S)$ of them are in successful
-    rounds of $S$ that are not convergence opportunities. Hence
-    $h_2\le X(S)-Y(S)+1$.
+    \Cref{lem.honestone} a chain has at most one honest block per round. So
+    every honest block of $\ch[\pos+1{:}]$ was computed in a round of
+    $S\cup\{r\}$. The $h_2$ blocks are the honest blocks of $\ch[\pos+1{:}]$
+    computed at round $r$ or in a successful round of $S$ that is not a
+    convergence opportunity. From \Cref{lem.honestone} again, they were
+    computed in distinct rounds. So at most one of them was computed at round
+    $r$, and at most $W(S)$ of them were computed in successful rounds of $S$
+    that are not convergence opportunities. Hence
+    $h_2\le W(S)+1$.
 
     We claim that $a+h_1\le Z(S')$. Define a map from the $a+h_1$ blocks of the
     first two classes to adversarial blocks computed in rounds of $S'$. An adversarial $\ch[j]$ is mapped to itself. It was computed in a round of
@@ -140,8 +159,11 @@ $\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
     maximality of $\pos$, so $\ch'[j]$ is adversarial by \Cref{lem.unique}. It lies on $\ch'[\pos+1{:}]$, so
     from \Cref{lem.rounds} it was computed in a round of $S'$. The map is injective: two blocks at distinct heights of one chain are
     distinct, and $\ch[j]=\ch'[j']$ would force $j=j'$ since no copies occur,
-    with $\ch[j]$ adversarial and $\ch[j']$ honest. Hence $a+h_1\le Z(S')$, and
-    $\len{\ch[\pos+1{:}]}=a+h_1+h_2\le Z(S')+X(S)-Y(S)+1$.
+    with $\ch[j]$ adversarial and $\ch[j']$ honest. Each adversarial block is
+    the output of a distinct successful adversarial query, and $Z(S')$ counts
+    the successful adversarial queries in the rounds of $S'$. Hence
+    $a+h_1\le Z(S')$, and
+    $\len{\ch[\pos+1{:}]}=a+h_1+h_2\le Z(S')+W(S)+1$.
 \end{proof}
 
 \subsection{Main statement}
@@ -170,12 +192,10 @@ $\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
     From \Cref{lem.count,lem.typical},
     \[
         d < \left(\frac{\advr}{1-f}+\epsilon\right)f(|S|+2)
-        + \left[(1+\epsilon)-(1-\epsilon)(1-f)\right]f|S| + 1 .
+        + \left(\frac{f_2}{f}+\epsilon\right)f|S| + 1 .
     \]
     From \Cref{lem.rho}, $\frac{\advr}{1-f}+\epsilon<1$, so the first term is
-    smaller than $\left(\frac{\advr}{1-f}+\epsilon\right)f|S|+2f$. The bracket
-    in the second term equals $2\epsilon+f-\epsilon f$ and is smaller than
-    $2\epsilon+f$. Therefore
+    smaller than $\left(\frac{\advr}{1-f}+\epsilon\right)f|S|+2f$. Therefore
     \begin{equation}\label{eq.upper}
         d < \advrone f|S| + 2f + 1 .
     \end{equation}
@@ -207,7 +227,7 @@ dependence on $\len{\ch'}$. The price is the width of the band of
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
         \len{\ch\meet\ch'} > \len{\ch} - \max\left\{k_0,\
-        \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{1-f-\epsilon}\right\}.
+        \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{1-f_2/f}\right\}.
     \]
 \end{corollary}
 \begin{proof}
@@ -234,17 +254,20 @@ dependence on $\len{\ch'}$. The price is the width of the band of
         d < \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{\maxr-\advrone},
     \]
     and the definitions of $\maxr$ and $\advrone$ give
-    $\maxr-\advrone=1-f-\epsilon$.
+    $\maxr-\advrone=1-f_2/f$.
 \end{proof}
 
 Let $\hgt(r)$ be the height of $\ch$ and write $\pref(r)=\hgt(r)-\prn(r)$ for
-the height of the prefix that remains after pruning $\prn(r)$ blocks. As $f$
-and $\epsilon$ tend to $0$ the bound of \Cref{cor.round} becomes
+the height of the prefix that remains after pruning $\prn(r)$ blocks. The
+second term of the maximum in \Cref{cor.round} contains the additive terms
+$\advrone\maxr f\lambda$ and $\maxr(2f+1)$, both of order $\lambda f$. Dropping
+them and letting $f$ and $\epsilon$ tend to $0$, the bound of \Cref{cor.round}
+becomes
 \begin{gather*}
     \prn(r) = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt(r)\right),\\
     \pref(r) = \frac{n}{n-t}\left(\hgt(r)-\frac{t}{n-t}fr\right) .
 \end{gather*}
-Two regimes are worth naming. If $\hgt(r)\le\frac{t}{n-t}fr$, then
+Two regimes of this limiting form are worth naming. If $\hgt(r)\le\frac{t}{n-t}fr$, then
 $\pref(r)\le0$: the chain is no longer than what the adversary alone can mine
 in $r$ rounds, and nothing beyond the genesis block is certified. If $\hgt(r)\ge\frac{n}{n-t}fr-\frac{n-t}{t}k_0$, then $\prn(r)=k_0$. By
 \Cref{lem.length} the chain is within $\frac{n-t}{t}k_0$ blocks of the longest
@@ -278,7 +301,8 @@ that drops the client's prefix, and then to the client's chain.
 \begin{proof}
     Write $P=\prune{\ch}{k}$. If $k\ge\len{\ch}-1$ then $P$ is the genesis
     chain and there is nothing to prove, so assume $k<\len{\ch}-1$, which gives
-    $\len{P}=\len{\ch}-k$. Suppose the claim fails. Let $s>r$ be the first
+    $\len{P}=\len{\ch}-k$. Suppose, towards a contradiction, that the claim
+    fails. Let $s>r$ be the first
     round at which an honest validator $V$ adopts a chain $\ch_s$ with
     $P\not\preceq\ch_s$, and let $\ch_A$ be the chain $V$ adopted at round
     $s-1$. Then $P\preceq\ch_A$: by hypothesis if $s-1=r$, by the choice of $s$
@@ -289,7 +313,7 @@ that drops the client's prefix, and then to the client's chain.
     First compare $\ch_s$ with $\ch_A$. Both $P$ and $\ch_s\meet\ch_A$ are
     prefixes of $\ch_A$ and $P\not\preceq\ch_s$, so
     $\len{\ch_s\meet\ch_A}<\len{P}$. On the other hand, $\ch_s\in\bt_{s-1}$ by
-    \Cref{rem.membership} and $\len{\ch_s}\ge\len{\ch_A}$, so \Cref{eq.longer}
+    \Cref{lem.membership} and $\len{\ch_s}\ge\len{\ch_A}$, so \Cref{eq.longer}
     at round $s-1$ gives $\len{\ch_s\meet\ch_A}>\len{\ch_s}-k_1\ge\len{\ch_s}-k$.
     Hence $\len{\ch_s}-k<\len{\ch}-k$, that is, $\len{\ch_s}<\len{\ch}$.
 
