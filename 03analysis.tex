@@ -2,7 +2,10 @@
 \label{sec.analysis}
 
 Throughout this section the execution is $(\epsilon,\lambda)$-typical and
-\Cref{asm.majority} holds. We use the constants
+\Cref{asm.majority} holds. This section bounds the number of blocks a client
+must prune, first in terms of the length of an honest chain
+(\Cref{thm.prefix}) and then in terms of the round alone (\Cref{cor.round}).
+We use the constants
 \begin{gather*}
     \advrone = \frac{\advr}{1-f} + \frac{f_2}{f} + 2\epsilon, \qquad
     \advrtwo = \frac{\advrone}{1-\epsilon}, \\
@@ -13,7 +16,10 @@ and we write $k_0 = 2(\lambda + 2)f$. Since $\lambda \geq 2 / f$ we have
 $2\lambda f \leq k_0 \leq 4\lambda f$, so $k_0$ is of the same order as the
 common prefix parameter of~\cite{gkl24}. As $f$ and $\epsilon$ tend to $0$,
 $\advrone$ and $\advrtwo$ tend to $\advr$, since $f_2/f<f/(2(1-f)^2)$, and $\maxr$
-tends to $1 + \advr = n / (n - t)$.
+tends to $1 + \advr = n / (n - t)$. The constants $\advrone$ and $\advrtwo$
+exceed $\advr$ by the rate $f_2/f$ of rounds with two or more honest blocks
+and by multiples of $\epsilon$, and $\maxr f$ is an upper bound on the growth
+rate of any chain, from \Cref{lem.length}.
 
 \begin{lemma}\label{lem.rho}
     $\advrtwo<1$.
@@ -39,8 +45,8 @@ tends to $1 + \advr = n / (n - t)$.
 \end{lemma}
 \begin{proof}
     Suppose towards a contradiction that $\ch[j]$ and $\ch[j']$ with $j<j'$ are
-    both honest and both computed at round $i$. The honest validator that
-    computed $\ch[j']$ extended at round $i$ the chain it adopted at round $i$.
+    both honest and both computed at round $i$. Only the genesis block was
+    computed at round $0$, so $i\ge1$. The honest validator that computed $\ch[j']$ extended at round $i$ the chain it adopted at round $i$.
     A block determines all of its ancestors, so that chain is $\ch[{:}j']$, and
     it contains $\ch[j]$. From \Cref{lem.membership}, $\ch[{:}j']\in\bt_{i-1}$,
     so $\ch[j]$ was computed at a round at most $i-1$. This contradicts the
@@ -61,7 +67,7 @@ tends to $1 + \advr = n / (n - t)$.
     were computed in rounds of $[1,w]$. From \Cref{lem.honestone}, the honest
     ones were computed in distinct rounds, each of them successful. So there
     are at most $X([1,w])$ honest blocks, and at most $Z([1,w])$ adversarial
-    ones. Since $w\ge\lambda$, \Cref{lem.typical} applies and
+    ones. Since $w\ge\lambda$, \Cref{def.typical} applies and
     \[
         \len{\ch}-1 = \len{\ch[1{:}]} <
             (1+\epsilon)fw+\left(\frac{\advr}{1-f}+\epsilon\right)fw = \maxr f w,
@@ -70,17 +76,17 @@ tends to $1 + \advr = n / (n - t)$.
     This proves the first item. For the second, every honest validator has a
     chain of length $1$ at round $1$. From \Cref{lem.growth}, every honest
     validator adopts at round $v$ a chain of length at least $1+X([1,v-1])$.
-    Since $v-1\ge\lambda$, \Cref{lem.typical} gives
-    $X([1,v-1])>(1-\epsilon)f(v-1)$.
+    Since $v-1\ge\lambda$, \Cref{def.typical} gives $X([1,v-1])>(1-\epsilon)f(v-1)$,
+    and hence $\len{\ch}-1>(1-\epsilon)f(v-1)$.
 \end{proof}
 
-Let $r\ge\lambda$. The first item bounds every chain of $\bt_r$ from above:
+Let $r>\lambda$. The first item bounds every chain of $\bt_r$ from above:
 $\len{\ch}-1<\maxr fr$, whether or not any honest validator ever adopted $\ch$.
 The second item bounds only the chains adopted by honest validators from below:
 $\len{\ch}-1>(1-\epsilon)f(r-1)$. A chain that a client holds has no lower
 bound, since the adversary may deliver a chain of any length. It does have an
-upper bound. In particular, a height schedule with $\hgt(r)\ge\maxr fr$ for some
-$r$ is not realizable at round $r$ in a typical execution.
+upper bound. In particular, a client cannot receive at round $r$ a chain of
+height $\maxr fr$ or more.
 
 \subsection{Counting lemmas}
 \label{sec.counting}
@@ -184,10 +190,10 @@ $\len{\ch[\pos+1{:}]}$ from above.
     of $d$ consecutive blocks of $\ch$, so from \Cref{lem.span} they were
     computed in more than $d/(2f)\ge\lambda+2$ consecutive rounds. From
     \Cref{lem.rounds}, all these rounds lie in $S'=[\rst,r]$, which has $|S|+2$
-    elements. Hence $|S|>\lambda$, and \Cref{lem.typical} applies to $S$ and to
+    elements. Hence $|S|>\lambda$, and \Cref{def.typical} applies to $S$ and to
     $S'$.
 
-    From \Cref{lem.count,lem.typical},
+    From \Cref{lem.count,def.typical},
     \[
         d < \left(\frac{\advr}{1-f}+\epsilon\right)f(|S|+2)
         + \left(\frac{f_2}{f}+\epsilon\right)f|S| + 1 .
@@ -197,7 +203,7 @@ $\len{\ch[\pos+1{:}]}$ from above.
     \begin{equation}\label{eq.upper}
         d < \advrone f|S| + 2f + 1 .
     \end{equation}
-    From \Cref{lem.honestlen,lem.typical},
+    From \Cref{lem.honestlen,def.typical},
     $\len{\ch'}-\pos-1\ge X(S)>(1-\epsilon)f|S|$, so
     $f|S|<(\len{\ch'}-\pos-1)/(1-\epsilon)$ and
     \[
@@ -256,8 +262,10 @@ removes this dependence. The cost is the gap between the two bounds of
     $\maxr-\advrone=1-f_2/f$.
 \end{proof}
 
-Let $\hgt(r)$ be the height of $\ch$ and write $\pref(r)=\hgt(r)-\prn(r)$ for
-the height of the prefix that remains after pruning $\prn(r)$ blocks. The
+Let $\prn(r)$ be the maximum in \Cref{cor.round} for $\ch$ and $r$, the
+pruning depth, let $\hgt(r)$ be the height of $\ch$, and let
+$\pref(r)=\hgt(r)-\prn(r)$ be the certified height, the height of the prefix
+that remains after pruning $\prn(r)$ blocks. The
 second term of the maximum in \Cref{cor.round} contains the additive terms
 $\advrone\maxr f\lambda$ and $\maxr(2f+1)$, both of order $\lambda f$. Dropping
 them and letting $f$ and $\epsilon$ tend to $0$, the bound of \Cref{cor.round}
@@ -303,7 +311,7 @@ earlier, which shows that it is shorter than the client's chain. It is then
 compared with the client's chain, which shows that it contains the certified
 prefix after all.
 
-For the constant to be $k_0$, we assume from here on that
+For the constant to be $k_0$, we assume for the rest of this subsection that
 $\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$, so that
 $k_0=2(\lambda+2)f\ge\frac{2f+1}{1-\advrtwo}$. If $\ch\in\bt_r$, $\ch'$ is
 adopted by an honest validator at round $r$ and $\len{\ch}\ge\len{\ch'}$, then
@@ -316,7 +324,7 @@ In words, a chain at least as long as an honest chain forks from it by fewer
 than $k_0$ blocks.
 
 \begin{lemma}\label{lem.persist}
-    Let $r$ be a round, let $\ch\in\bt_r$ and let $k\ge k_0$. If
+    Let $r$ be a round, let $\ch\in\bt_r$ and let $k\ge k_0$ be an integer. If
     $\prune{\ch}{k}\preceq\ch'$ for every chain $\ch'$ adopted by an honest
     validator at round $r$, then $\prune{\ch}{k}\preceq\ch''$ for every chain
     $\ch''$ adopted by an honest validator at a round $r''>r$.
@@ -370,9 +378,9 @@ than $k_0$ blocks.
     Let $\ch$ be the chain received at round $r$, so $P=\prune{\ch}{\prn(r)}$
     and $\ch\in\bt_r$ by \Cref{lem.membership}. For $r''=r$, \Cref{cor.round}
     gives $\len{\ch\meet\ch''}>\len{\ch}-\prn(r)\ge\len{P}$, and both $P$ and
-    $\ch\meet\ch''$ are prefixes of $\ch$, so $P\preceq\ch''$. For $r''>r$,
-    $\prn(r)\ge k_0$, so \Cref{lem.persist} with $k=\prn(r)$ gives
-    $P\preceq\ch''$.
+    $\ch\meet\ch''$ are prefixes of $\ch$, so $P\preceq\ch''$. For $r''>r$, the integer $\lceil\prn(r)\rceil$ is at least $k_0$ and
+    $P=\prune{\ch}{\lceil\prn(r)\rceil}$, so \Cref{lem.persist} with
+    $k=\lceil\prn(r)\rceil$ gives $P\preceq\ch''$.
 \end{proof}
 
 \begin{corollary}[Growth]\label{cor.growth}
@@ -389,14 +397,14 @@ than $k_0$ blocks.
 \begin{proof}
     Let $\ch$ be the chain received, so $\hgt=\len{\ch}-1$, and the height of
     $P=\prune{\ch}{\prn(r)}$ is $\hgt-\lceil\prn(r)\rceil\ge\hgt-\prn(r)-1$.
-    Write $\prn(r)=\max\{k_0,T\}$ with
+    Write $\prn(r)=\max\{k_0,M\}$ with
     \[
-        T=\frac{\advrone\left(\maxr f(r+\lambda)-\hgt\right)+\maxr(2f+1)}{1-f_2/f}.
+        M=\frac{\advrone\left(\maxr f(r+\lambda)-\hgt\right)+\maxr(2f+1)}{1-f_2/f}.
     \]
-    Then $\hgt-\prn(r)=\min\{\hgt-k_0,\hgt-T\}$. Since
+    Then $\hgt-\prn(r)=\min\{\hgt-k_0,\hgt-M\}$. Since
     $1-f_2/f+\advrone=\maxr$,
     \[
-        \hgt-T=\frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}.
+        \hgt-M=\frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}.
     \]
     This proves the first item. For the second, the pruned blocks
     $\ch[\len{P}{:}]$ are $\lceil\prn(r)\rceil\ge k_0\ge2\lambda f$ consecutive

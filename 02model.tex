@@ -21,9 +21,9 @@ $s<r$.
 We assume a synchronous network among the validators. A message sent by an
 honest validator at round $i$ is received by every other validator at the
 beginning of round $i+1$. The adversary can see the messages of honest parties
-at any point of a round. At the end of each round it fixes the order in which
-messages are delivered in the next round; it may reorder messages, spoof their
-source or add messages of its own, but it cannot drop a message.
+at any point of a round. At the end of each round it fixes the messages delivered in the next round
+and their order. It may reorder messages, spoof their source or add messages
+of its own, but it cannot drop a message.
 
 \paragraph{Adversary}
 
@@ -31,7 +31,7 @@ We assume a \emph{Byzantine, rushing} adversary, which may corrupt up to $t$
 parties. A rushing adversary sees every message sent by an honest validator
 before it is delivered to any other party.
 
-\paragraph{Random Oracle}
+\paragraph{Random oracle}
 
 We assume access to a random oracle $H \colon \{0,1\}^* \to \{0,1\}^\kappa$,
 where $\kappa$ is the security parameter.  Each validator is allowed $q$ queries
@@ -59,8 +59,7 @@ if the validator was successful at round $i$.
 
 \paragraph{Clients}
 
-Clients do not mine. A client may join at any round and asks for a chain to
-adopt. We assume no synchrony between clients and validators. A client does not
+Clients do not mine. A client may join at any round and asks for a chain to keep. We assume no synchrony between clients and validators. A client does not
 know whether it is connected to an honest validator, nor how long it must wait
 for an honest message. We model this by letting the adversary choose which
 chains a client receives and when.
@@ -104,11 +103,11 @@ of $\bt_r$ has a unique height and $\bt_r$ is a tree.
     The blocks of a chain held by a client at round $r$ exist at round $r$, so
     each was computed in a round of $[0,r]$. For the second claim, let $B$ be a
     block of a chain adopted by an honest validator at round $r$, other than the
-    genesis block. Either the validator received $B$ at a round at most $r$, and
-    then $B$ was sent at round $r-1$ at the latest and computed at a round at
-    most $r-1$, or the validator computed $B$ itself. In the second case $B$ was
-    computed at a round at most $r-1$, because a validator adopts before it
-    queries the oracle.
+    genesis block. If the validator received $B$, it received it at a round at
+    most $r$, so $B$ was sent, and hence computed, at a round at most $r-1$.
+    Otherwise the validator computed $B$ itself, at a round at most $r-1$,
+    because a validator adopts before it queries the oracle. So every block of
+    the chain is in $\bt_{r-1}$.
 \end{proof}
 
 \begin{lemma}[Fork choice]\label{lem.fork}
@@ -140,11 +139,6 @@ Because a block determines all of its ancestors, $\ch_1$ and $\ch_2$ share a
 block at height $i$ if and only if $i<\len{\ch_1\meet\ch_2}$. The quantity
 $\len{\ch_1\meet\ch_2}$ is therefore the number of blocks the two chains have in
 common.
-
-\begin{definition}[Height schedule]\label{def.schedule}
-    A height schedule is a non-dec{\allowbreak}reasing function
-    $\hgt\colon\mathbb{N}\to\mathbb{N}$.
-\end{definition}
 
 \paragraph{Random variables}
 
@@ -184,10 +178,26 @@ honest majority assumption of~\cite{gkl24}.
 
 \paragraph{Typical executions}
 
-Let $\lambda\ge2/f$ be an integer. An execution is $(\epsilon,\lambda)$-typical
-if two conditions hold. First, the bounds of \Cref{lem.typical} hold for every
-set $S$ of at least $\lambda$ consecutive rounds. Second, no insertion, copy,
-prediction or guess occurs, in the sense of~\cite[Definition 4.3]{gkl24}.
+Let $\lambda\ge2/f$ be an integer.
+
+\begin{definition}[Typical execution]\label{def.typical}
+    An execution is $(\epsilon,\lambda)$-typical if two conditions hold.
+    First, every set $S$ of at least $\lambda$ consecutive rounds satisfies
+    \[
+        \begin{gathered}
+            (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
+            \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
+            Z(S) < \left(\frac{\advr}{1-f}+\epsilon\right)f|S|,
+            \qquad W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
+        \end{gathered}
+    \]
+    Second, no insertion, copy, prediction or guess occurs, in the sense
+    of~\cite[Definition 4.3]{gkl24}.
+\end{definition}
+
+The upper bounds also hold for a set $[0,s]$ with $s\ge\lambda$, because
+$X([0,s])=X([1,s])$, and likewise for $Y$, $Z$ and $W$, while the right-hand
+sides increase with $|S|$.
 
 An execution fails to be typical with probability at most
 \[
@@ -197,7 +207,8 @@ Here $L$ is the total run time of the system, $Q$ bounds the number of oracle
 queries, and $\nu$ is the min-entropy of the input contribution function. For
 $\lambda=\Omega(\log^2\kappa)$ the probability $\typ$ is negligible in $\kappa$.
 
-This definition is the one of~\cite[Definition 4.4]{gkl24} with one bound added,
+This definition is the one of~\cite[Definition 4.4]{gkl24}, in the form
+of~\cite[Lemma 4.6]{gkl24}, with one bound added,
 the bound on $W(S)$, and $\typ$ is the bound of~\cite[Theorem 4.5]{gkl24}
 adjusted for it. The added bound is a Chernoff bound. $W(S)$ is a sum of $|S|$ independent
 Bernoulli trials with mean $\mu=f_2|S|$, the $W_i$ of distinct rounds being
@@ -216,19 +227,6 @@ coefficient is $5$ rather than the $4$ of~\cite{gkl24}.
 
 All statements below are about typical executions. The remaining facts of this
 section are restated from~\cite{gkl24} without proof.
-
-\begin{lemma}\label{lem.typical}
-    For every set $S$ of at least $\lambda$ consecutive rounds of a typical
-    execution,
-    \[
-        \begin{gathered}
-            (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
-            \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
-            Z(S) < \left(\frac{\advr}{1-f}+\epsilon\right)f|S|,
-            \qquad W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
-        \end{gathered}
-    \]
-\end{lemma}
 
 \begin{lemma}[{Pairing Lemma, \cite[Lemma 4.1]{gkl24}}]\label{lem.unique}
     Let $B$ be the block at height $j$ of a chain $\ch$, computed by an honest

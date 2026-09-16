@@ -59,9 +59,10 @@ $S_1=[1,r_0]$ and $S_2=[r_0+1,r]$, let $\ch_0$ and $\ch$ be as in
     honest validator adopts at round $i$ a chain of length
     $L_i=1+X([1,i-1])+Z([1,i-1])$, and that the longest chain among the
     genesis chain and the chains sent by round $i-1$ has length $L_i$. Both
-    hold at round $1$. Assume both at a round $i\le r_0$. Honest validators
-    send at round $i$ chains of length at most $L_i+X_i$, so the longest
-    chain sent before the adversary acts has length $L_i+X_i$. The adversary
+    hold at round $1$. Assume both at a round $i\le r_0$. Honest validators send at round $i$ chains of length at most $L_i+X_i$,
+    and one of length $L_i+1$ if $X_i=1$. So, before the adversary acts, the
+    longest chain among the genesis chain and the chains sent at rounds up to
+    $i$ has length $L_i+X_i$. The adversary
     extends it by $Z_i$ blocks and sends the result, of length $L_{i+1}$. At
     round $i+1$ every honest validator receives it, and the chain it has is
     at most $L_i+X_i$ long, so it adopts a chain of length $L_{i+1}$. The
@@ -77,8 +78,8 @@ $S_1=[1,r_0]$ and $S_2=[r_0+1,r]$, let $\ch_0$ and $\ch$ be as in
     $\len{\ch}-\len{\ch\meet\ch'}\ge\len{\ch}-\ell_0=Z(S_2)$. The blocks of
     $\ch'$ computed in rounds of $S_2$ are honest and, by \Cref{lem.honestone},
     at most $X(S_2)$ in number. The other blocks of $\ch'$ form a prefix of
-    $\ch'$, since no predictions occur. This prefix is the genesis chain or
-    was sent at the round its tip was computed, so it has length at most
+    $\ch'$, since no predictions occur. This prefix is the genesis chain or a prefix of a chain sent at the round
+    its tip was computed, so it has length at most
     $\ell_0$ by the first item. Hence $\len{\ch'}\le\ell_0+X(S_2)$. For the
     lower bound, if $s=1$ then $\len{\ch'}=\ell_0$ by the first item and
     $X(S_2)\le1$. If $s\ge2$, some honest validator has a chain of length at
@@ -89,7 +90,7 @@ $S_1=[1,r_0]$ and $S_2=[r_0+1,r]$, let $\ch_0$ and $\ch$ be as in
 
 \begin{theorem}[Private mining]\label{thm.attack}
     Let $\epsilon'\in(0,1)$ and consider an execution against $\pipriv$. Except
-    with probability at most $\typ+3e^{-\epsilon'^2\advr fs/3}$, every chain
+    with probability at most $\typ+4e^{-\epsilon'^2\advr fs/3}$, every chain
     $\ch'$ adopted by an honest validator at round $r$ satisfies
     \begin{gather}
         \len{\ch}-\len{\ch\meet\ch'} > (1-\epsilon')\advr fs,
@@ -99,40 +100,44 @@ $S_1=[1,r_0]$ and $S_2=[r_0+1,r]$, let $\ch_0$ and $\ch$ be as in
         \len{\ch'}-\len{\ch} > \left[(1-\epsilon')-(1+\epsilon')\frac{\advr}{1-f}\right]fs-1.
             \label{eq.attlower}
     \end{gather}
-    Except with a further probability at most $2e^{-\epsilon'^2\advr fr_0/2}$,
+    Except with a further probability at most $4e^{-\epsilon'^2\advr fr_0/3}$,
     moreover
     \begin{equation}\label{eq.attheight}
-        \len{\ch}-1 > (1-\epsilon')\left[(1+\advr)fr_0+\advr fs\right].
+        \begin{gathered}
+            (1-\epsilon')\left[(1+\advr)fr_0+\advr fs\right] < \len{\ch}-1 \\
+            < (1+\epsilon')\left[\Big(1+\frac{\advr}{1-f}\Big)fr_0+\frac{\advr}{1-f}fs\right].
+        \end{gathered}
     \end{equation}
 \end{theorem}
 \begin{proof}
     $X(S_1)$ and $X(S_2)$ are sums of $r_0$ and $s$ independent Bernoulli
     trials with success probability $f$. $Z(S_1)$ and $Z(S_2)$ are sums of
     $tqr_0$ and $tqs$ independent Bernoulli trials with success probability
-    $p$, and \Cref{eq.rates} gives $\advr fr_0<pqtr_0$ and
-    $\advr fs<pqts<\frac{\advr}{1-f}fs$. By the Chernoff bounds,
-    \begin{align*}
-        \Pr\left[X(S_2)\ge(1+\epsilon')fs\right] &\le e^{-\epsilon'^2fs/3},\\
-        \Pr\left[Z(S_2)\le(1-\epsilon')\advr fs\right] &\le e^{-\epsilon'^2\advr fs/2},\\
-        \Pr\left[Z(S_2)\ge(1+\epsilon')\tfrac{\advr}{1-f}fs\right] &\le e^{-\epsilon'^2\advr fs/3},
-    \end{align*}
-    and $X(S_1)\le(1-\epsilon')fr_0$ and $Z(S_1)\le(1-\epsilon')\advr fr_0$
-    each have probability at most $e^{-\epsilon'^2\advr fr_0/2}$. Since
-    $\advr<1$, the first three bounds are at most $e^{-\epsilon'^2\advr fs/3}$.
-    By a union bound, except with probability
-    $\typ+3e^{-\epsilon'^2\advr fs/3}$ the execution is typical and none of
-    the first three events occurs, and then the third item of
-    \Cref{lem.attack} gives \Cref{eq.attfork,eq.attupper,eq.attlower}. If
-    moreover neither of the last two events occurs, the first two items of
-    \Cref{lem.attack} give
-    $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)>(1-\epsilon')[(1+\advr)fr_0+\advr fs]$.
+    $p$, and \Cref{eq.rates} gives $\advr fr_0<pqtr_0<\frac{\advr}{1-f}fr_0$
+    and $\advr fs<pqts<\frac{\advr}{1-f}fs$. By the Chernoff bounds and
+    $\advr<1$, each of the events
+    \[
+        \begin{gathered}
+            X(S_2)\le(1-\epsilon')fs,\qquad X(S_2)\ge(1+\epsilon')fs,\\
+            Z(S_2)\le(1-\epsilon')\advr fs,\qquad
+            Z(S_2)\ge(1+\epsilon')\tfrac{\advr}{1-f}fs
+        \end{gathered}
+    \]
+    has probability at most $e^{-\epsilon'^2\advr fs/3}$, and each of the four
+    corresponding events for $X(S_1)$ and $Z(S_1)$, with $r_0$ in place of
+    $s$, has probability at most $e^{-\epsilon'^2\advr fr_0/3}$. By a union
+    bound, except with probability $\typ+4e^{-\epsilon'^2\advr fs/3}$ the
+    execution is typical and none of the first four events occurs, and then
+    the third item of \Cref{lem.attack} gives
+    \Cref{eq.attfork,eq.attupper,eq.attlower}. If moreover none of the other
+    four events occurs, the first two items of \Cref{lem.attack} give
+    \Cref{eq.attheight}, since $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)$.
 \end{proof}
 
 \begin{corollary}[Tightness]\label{cor.tight}
     Let $0\le c<t/(n-2t)$ and $b\ge0$. There are $\epsilon'\in(0,1)$ and
     $s_0$, depending only on $c$, $b$, $\advr$ and $f$, such that for every
-    $r_0\ge1$ and $s\ge s_0$, in an execution against $\pipriv$, except with
-    probability at most $\typ+3e^{-\epsilon'^2\advr fs/3}$, every chain
+    $r_0\ge1$ and $s\ge s_0$, in an execution against $\pipriv$, except with probability at most $\typ+4e^{-\epsilon'^2\advr fs/3}$, every chain
     $\ch'$ adopted by an honest validator at round $r$ satisfies
     $\len{\ch'}>\len{\ch}$ and
     \[
