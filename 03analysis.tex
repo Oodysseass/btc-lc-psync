@@ -85,7 +85,7 @@ $r$ is not realizable at round $r$ in a typical execution.
 \subsection{Counting lemmas}
 \label{sec.counting}
 
-The next three lemmas are the technical core. Throughout this subsection, let
+Throughout this subsection, let
 $\ch\in\bt_r$ and let $\ch'$ be a chain adopted by an honest validator at round
 $r$. Let $\bst$ be the last honest block of $\ch\meet\ch'$, let $\pos$ be its
 height and let $\rst$ be the round at which it was computed, so
@@ -123,10 +123,6 @@ $\len{\ch[\pos+1{:}]}$ from above.
     $\len{\ch'[\pos+1{:}]}=\len{\ch'}-\pos-1\ge X(S)$.
 \end{proof}
 
-In words, every block of $\ch[\pos+1{:}]$ is adversarial, or is paired with a
-distinct adversarial block of $\ch'$, or is one of at most $W(S)+1$ remaining
-honest blocks.
-
 \begin{lemma}\label{lem.count}
     $\len{\ch[\pos+1{:}]}\le Z(S')+W(S)+1$.
 \end{lemma}
@@ -150,25 +146,27 @@ honest blocks.
     $h_2\le W(S)+1$.
 
     We claim that $a+h_1\le Z(S')$. Define a map from the $a+h_1$ blocks of the
-    first two classes to adversarial blocks computed in rounds of $S'$. An adversarial $\ch[j]$ is mapped to itself. It was computed in a round of
-    $S'$ by \Cref{lem.rounds}. An honest $\ch[j]$ computed in a convergence
+    first two classes to adversarial blocks computed in rounds of $S'$. An
+    adversarial $\ch[j]$ is mapped to itself. It was computed in a round of $S'$
+    by \Cref{lem.rounds}. An honest $\ch[j]$ computed in a convergence
     opportunity $u\in S$ is mapped to $\ch'[j]$. We check that $\ch'[j]$ is such
     a block. The honest validator that computed $\ch[j]$ sent a chain of length
     $j+1$ at round $u\le r-1$, so from \Cref{lem.fork} $\len{\ch'}>j$ and
-    $\ch'[j]$ exists. Since $j>\pos$ and $\ch[j]$ is honest, $\ch'[j]\ne\ch[j]$ by the
-    maximality of $\pos$, so $\ch'[j]$ is adversarial by \Cref{lem.unique}. It lies on $\ch'[\pos+1{:}]$, so
-    from \Cref{lem.rounds} it was computed in a round of $S'$. The map is injective: two blocks at distinct heights of one chain are
-    distinct, and $\ch[j]=\ch'[j']$ would force $j=j'$ since no copies occur,
-    with $\ch[j]$ adversarial and $\ch[j']$ honest. Each adversarial block is
-    the output of a distinct successful adversarial query, and $Z(S')$ counts
-    the successful adversarial queries in the rounds of $S'$. Hence
-    $a+h_1\le Z(S')$, and
+    $\ch'[j]$ exists. Since $j>\pos$ and $\ch[j]$ is honest, $\ch'[j]\ne\ch[j]$
+    by the maximality of $\pos$, so $\ch'[j]$ is adversarial by
+    \Cref{lem.unique}. It lies on $\ch'[\pos+1{:}]$, so from \Cref{lem.rounds}
+    it was computed in a round of $S'$. The map is injective: two blocks at
+    distinct heights of one chain are distinct, and $\ch[j]=\ch'[j']$ would
+    force $j=j'$ since no copies occur, with $\ch[j]$ adversarial and $\ch[j']$
+    honest. Each adversarial block is the output of a distinct successful
+    adversarial query, and $Z(S')$ counts the successful adversarial queries in
+    the rounds of $S'$. Hence $a+h_1\le Z(S')$, and
     $\len{\ch[\pos+1{:}]}=a+h_1+h_2\le Z(S')+W(S)+1$.
 \end{proof}
 
 \subsection{Main statement}
 
-\begin{theorem}\label{thm.prefix}
+\begin{theorem}[Prefix agreement]\label{thm.prefix}
     In a typical execution, for every round $r$, every chain $\ch\in\bt_r$ and
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
@@ -210,19 +208,20 @@ honest blocks.
     \Cref{lem.rho}, so $d<\frac{\advrtwo(\len{\ch'}-\len{\ch})+2f+1}{1-\advrtwo}$.
 \end{proof}
 
-We call $\len{\ch'}-\len{\ch}$ the length deficit of $\ch$. \Cref{thm.prefix}
-bounds the pruning depth by $\frac{\advrtwo}{1-\advrtwo}$ times the length
-deficit plus the constant $\frac{2f+1}{1-\advrtwo}$. As $f$ and $\epsilon$ tend
-to $0$ the coefficient of the length deficit tends to
+The quantity $\len{\ch}-\len{\ch\meet\ch'}$ is the number of blocks of $\ch$
+that are not on $\ch'$. Once it exceeds $k_0$, \Cref{thm.prefix} bounds it by
+$\frac{\advrtwo}{1-\advrtwo}(\len{\ch'}-\len{\ch})$ plus the constant
+$\frac{2f+1}{1-\advrtwo}$. As $f$ and $\epsilon$ tend to $0$ the coefficient
+tends to
 \[
     \frac{\advr}{1-\advr} = \frac{t}{n-2t}.
 \]
-The bound is stated in terms
-of $\len{\ch'}$, which a client does not know. The next corollary removes the
-dependence on $\len{\ch'}$. The price is the width of the band of
+\Cref{sec.tightness} shows that no smaller coefficient is possible. The bound
+depends on $\len{\ch'}$, which a client does not know. The next corollary
+removes this dependence. The cost is the gap between the two bounds of
 \Cref{lem.length}.
 
-\begin{corollary}\label{cor.round}
+\begin{corollary}[Round form]\label{cor.round}
     In a typical execution, for every round $r$, every chain $\ch\in\bt_r$ and
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
@@ -267,33 +266,57 @@ becomes
     \prn(r) = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt(r)\right),\\
     \pref(r) = \frac{n}{n-t}\left(\hgt(r)-\frac{t}{n-t}fr\right) .
 \end{gather*}
-Two regimes of this limiting form are worth naming. If $\hgt(r)\le\frac{t}{n-t}fr$, then
-$\pref(r)\le0$: the chain is no longer than what the adversary alone can mine
-in $r$ rounds, and nothing beyond the genesis block is certified. If $\hgt(r)\ge\frac{n}{n-t}fr-\frac{n-t}{t}k_0$, then $\prn(r)=k_0$. By
-\Cref{lem.length} the chain is within $\frac{n-t}{t}k_0$ blocks of the longest
-chain possible at round $r$. So at most that many blocks mined by round $r$ lie
-off it, and the client prunes only the common prefix parameter $k_0$.
+The limiting form has two regimes. If $\hgt(r)\le\frac{t}{n-t}fr$, then
+$\pref(r)\le0$. The chain has at most as many blocks as the adversary alone
+computes in $r$ rounds in expectation, so every block of the chain other than
+the genesis block could be adversarial, and nothing beyond the genesis block
+is certified. If $\hgt(r)\ge\frac{n}{n-t}fr-\frac{n-t}{t}k_0$, then the
+limiting form gives $\prn(r)\le k_0$, and the pruning depth of
+\Cref{cor.round} is its first term $k_0$. The reason is that $\prn(r)$ is
+$\frac{t}{n-t}$ times the difference between $\frac{n}{n-t}fr$, the upper
+bound of \Cref{lem.length} on the height of every chain of $\bt_r$, and the
+height $\hgt(r)$ of the chain. When this difference is at most
+$\frac{n-t}{t}k_0$, the client prunes $k_0$ blocks, a number of the order of
+the common prefix parameter of~\cite{gkl24}.
 
-\subsection{Later rounds}
+\subsection{Client construction}
+\label{sec.client}
 
-\Cref{cor.round} compares the client's chain with the honest chains of a
-single round. A client that wakes up at round $r$ needs more: the prefix it
-keeps must remain a prefix of every honest chain at every later round. The tool
-is \Cref{thm.prefix} with the deficit at most $0$. Put
-\[
-    k_1 = \max\Big\{k_0,\ \frac{2f+1}{1-\advrtwo}\Big\}.
-\]
-If $\ch\in\bt_r$, $\ch'$ is adopted by an honest validator at round $r$ and
-$\len{\ch}\ge\len{\ch'}$, then \Cref{thm.prefix} gives
+A client that joins at round $r$ receives a chain and keeps a prefix of it.
+\Cref{cor.round} says which prefix is a prefix of every honest chain at round
+$r$. The prefix the client keeps must also be a prefix of every honest chain at
+every later round. This subsection states the construction, proves that it is
+safe, and bounds the height and the age of its output.
+
+\Cref{cor.round} certifies a prefix at round $r$ only. Applied at a later
+round $r''$ to the same chain $\ch$, it prunes more, because the term
+$\maxr f(r''+\lambda)$ grows while $\len{\ch}$ is fixed. So it does not show
+that the prefix certified at round $r$ is a prefix of the honest chains of
+later rounds.
+
+We use \Cref{thm.prefix} instead, for a chain at least as long as an honest
+chain. Then $\len{\ch'}-\len{\ch}\le0$, and the pruning depth of
+\Cref{thm.prefix} is a constant that does not depend on the round.
+\Cref{lem.persist} applies this twice. The first honest chain that drops the
+certified prefix is compared with the chain its validator adopted one round
+earlier, which shows that it is shorter than the client's chain. It is then
+compared with the client's chain, which shows that it contains the certified
+prefix after all.
+
+For the constant to be $k_0$, we assume from here on that
+$\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$, so that
+$k_0=2(\lambda+2)f\ge\frac{2f+1}{1-\advrtwo}$. If $\ch\in\bt_r$, $\ch'$ is
+adopted by an honest validator at round $r$ and $\len{\ch}\ge\len{\ch'}$, then
+the second term of the maximum in \Cref{thm.prefix} is at most
+$\frac{2f+1}{1-\advrtwo}\le k_0$, and \Cref{thm.prefix} gives
 \begin{equation}\label{eq.longer}
-    \len{\ch\meet\ch'} > \len{\ch}-k_1 .
+    \len{\ch\meet\ch'} > \len{\ch}-k_0 .
 \end{equation}
 In words, a chain at least as long as an honest chain forks from it by fewer
-than $k_1$ blocks. The next lemma applies this twice: to the first honest chain
-that drops the client's prefix, and then to the client's chain.
+than $k_0$ blocks.
 
 \begin{lemma}\label{lem.persist}
-    Let $r$ be a round, let $\ch\in\bt_r$ and let $k\ge k_1$. If
+    Let $r$ be a round, let $\ch\in\bt_r$ and let $k\ge k_0$. If
     $\prune{\ch}{k}\preceq\ch'$ for every chain $\ch'$ adopted by an honest
     validator at round $r$, then $\prune{\ch}{k}\preceq\ch''$ for every chain
     $\ch''$ adopted by an honest validator at a round $r''>r$.
@@ -314,30 +337,90 @@ that drops the client's prefix, and then to the client's chain.
     prefixes of $\ch_A$ and $P\not\preceq\ch_s$, so
     $\len{\ch_s\meet\ch_A}<\len{P}$. On the other hand, $\ch_s\in\bt_{s-1}$ by
     \Cref{lem.membership} and $\len{\ch_s}\ge\len{\ch_A}$, so \Cref{eq.longer}
-    at round $s-1$ gives $\len{\ch_s\meet\ch_A}>\len{\ch_s}-k_1\ge\len{\ch_s}-k$.
+    at round $s-1$ gives $\len{\ch_s\meet\ch_A}>\len{\ch_s}-k_0\ge\len{\ch_s}-k$.
     Hence $\len{\ch_s}-k<\len{\ch}-k$, that is, $\len{\ch_s}<\len{\ch}$.
 
     Now compare $\ch$ with $\ch_s$. Since $\ch\in\bt_s$ and
     $\len{\ch}>\len{\ch_s}$, \Cref{eq.longer} at round $s$ gives
-    $\len{\ch\meet\ch_s}>\len{\ch}-k_1\ge\len{\ch}-k=\len{P}$. Both $P$ and
+    $\len{\ch\meet\ch_s}>\len{\ch}-k_0\ge\len{\ch}-k=\len{P}$. Both $P$ and
     $\ch\meet\ch_s$ are prefixes of $\ch$, so
     $P\preceq\ch\meet\ch_s\preceq\ch_s$. This contradicts the choice of
     $\ch_s$.
 \end{proof}
 
-\begin{corollary}\label{cor.prune}
-    Let $r$ be a round, let $\ch\in\bt_r$ and let $\prn(r)$ be the maximum
-    appearing in \Cref{cor.round} for $\ch$ and $r$. If $\prn(r)\ge k_1$, then
-    in a typical execution $\prune{\ch}{\prn(r)}\preceq\ch''$ for every chain
-    $\ch''$ adopted by an honest validator at a round $r''\ge r$.
+\begin{definition}[Pruning client]\label{def.client}
+    The pruning client is the following.
+    \begin{enumerate}
+        \item The client asks for a chain and waits until it receives one. Let
+            $\ch$ be the chain received and let $r$ be the round of receipt.
+        \item The client computes $\prn(r)$, the maximum in \Cref{cor.round}
+            for $\ch$ and $r$.
+        \item If $\prune{\ch}{\prn(r)}$ has more than one block, the client
+            outputs it. Otherwise it outputs $\bot$.
+    \end{enumerate}
+\end{definition}
+
+\begin{corollary}[Safety]\label{cor.prune}
+    In a typical execution, if the client of \Cref{def.client} receives its
+    chain at round $r$ and outputs a chain $P\ne\bot$, then $P\preceq\ch''$ for
+    every chain $\ch''$ adopted by an honest validator at every round
+    $r''\ge r$.
 \end{corollary}
 \begin{proof}
-    For $r''=r$ this is \Cref{cor.round}:
-    $\len{\ch\meet\ch''}>\len{\ch}-\prn(r)=\len{\prune{\ch}{\prn(r)}}$, and both
-    are prefixes of $\ch$. For $r''>r$ it is \Cref{lem.persist} with
-    $k=\prn(r)$.
+    Let $\ch$ be the chain received at round $r$, so $P=\prune{\ch}{\prn(r)}$
+    and $\ch\in\bt_r$ by \Cref{lem.membership}. For $r''=r$, \Cref{cor.round}
+    gives $\len{\ch\meet\ch''}>\len{\ch}-\prn(r)\ge\len{P}$, and both $P$ and
+    $\ch\meet\ch''$ are prefixes of $\ch$, so $P\preceq\ch''$. For $r''>r$,
+    $\prn(r)\ge k_0$, so \Cref{lem.persist} with $k=\prn(r)$ gives
+    $P\preceq\ch''$.
 \end{proof}
 
-Since $\prn(r)\ge k_0$, the condition $\prn(r)\ge k_1$ holds whenever
-$k_0\ge\frac{2f+1}{1-\advrtwo}$, that is, whenever
-$\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$. We assume this from here on.
+\begin{corollary}[Growth]\label{cor.growth}
+    In a typical execution, let the client of \Cref{def.client} receive at
+    round $r$ a chain of height $\hgt$ and output a chain $P\ne\bot$. Then
+    \begin{enumerate}
+        \item $\len{P}-1\ge\min\left\{\hgt-k_0,\
+            \frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}\right\}-1$,
+            and
+        \item every block of $P$ was computed at a round earlier than
+            $r-\frac{\prn(r)}{2f}+1$.
+    \end{enumerate}
+\end{corollary}
+\begin{proof}
+    Let $\ch$ be the chain received, so $\hgt=\len{\ch}-1$, and the height of
+    $P=\prune{\ch}{\prn(r)}$ is $\hgt-\lceil\prn(r)\rceil\ge\hgt-\prn(r)-1$.
+    Write $\prn(r)=\max\{k_0,T\}$ with
+    \[
+        T=\frac{\advrone\left(\maxr f(r+\lambda)-\hgt\right)+\maxr(2f+1)}{1-f_2/f}.
+    \]
+    Then $\hgt-\prn(r)=\min\{\hgt-k_0,\hgt-T\}$. Since
+    $1-f_2/f+\advrone=\maxr$,
+    \[
+        \hgt-T=\frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}.
+    \]
+    This proves the first item. For the second, the pruned blocks
+    $\ch[\len{P}{:}]$ are $\lceil\prn(r)\rceil\ge k_0\ge2\lambda f$ consecutive
+    blocks of $\ch$. From \Cref{lem.span} they were computed in more than
+    $\prn(r)/(2f)$ consecutive rounds, the last of them at a round at most
+    $r$. So the first of them was computed at a round earlier than
+    $r-\prn(r)/(2f)+1$. No predictions occur, so every block of $P$ was
+    computed at a round at most that of the first pruned block.
+\end{proof}
+
+The first item says how much of the chain the client keeps. Suppose the chain
+received is at least as long as a chain adopted by an honest validator at
+round $r>\lambda$. From \Cref{lem.length}, $\hgt>(1-\epsilon)f(r-1)$, so the
+second term of the minimum exceeds
+\[
+    \frac{\maxr\left((1-\epsilon)-\advrone\right)f\,r
+        -\advrone\maxr f\lambda-\maxr(1-\epsilon)f-\maxr(2f+1)}{1-f_2/f}.
+\]
+From \Cref{lem.rho}, $\advrone=(1-\epsilon)\advrtwo<1-\epsilon$, so the
+coefficient of $r$ is positive and the height of the output grows linearly in
+$r$. As $f$ and $\epsilon$ tend to $0$ the coefficient tends to
+$(1+\advr)(1-\advr)f=\left(1-\frac{t^2}{(n-t)^2}\right)f$. The second item
+says how old the kept blocks are. Since $\prn(r)\ge k_0$, the newest block of
+$P$ is more than $\lambda+1$ rounds old. For a chain of height $gr$ with
+$g<\maxr f$, the second term of the maximum defining $\prn(r)$ is
+$\advrone(\maxr f-g)r/(1-f_2/f)$ plus a term of order $\lambda f$, so the
+newest block of $P$ is a number of rounds old that grows linearly in $r$.
