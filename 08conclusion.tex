@@ -1,0 +1,24 @@
+\section{Conclusion}
+\label{sec.conclusion}
+
+The $k$-deep rule is a theorem about validators. A validator is synchronised
+with the other validators, so the chain it holds is never far behind the
+longest honest chain, and a constant $k$ suffices for it. A client has no such
+guarantee. The chain it receives can be short, and how short is exactly how
+much of it the adversary could have built alone.
+
+This paper gives the rule a client should use instead. It prunes
+$\frac{t}{n-t}$ of the gap between the height of the chain it received and the
+tallest height any chain can have reached by the current round. The output is a
+prefix of every chain held by an honest validator from that round onwards, the
+outputs of any two clients are prefixes of one another, and the output grows at
+rate $\left(1-\frac{t^2}{(n-t)^2}\right)f$. None of this needs a bound on the
+delay of the client's own link, and a client that never hears an honest
+message is still safe. Private mining attains the coefficient, and no constant
+depth is sound.
+
+The price is a confirmation lag of $\frac{t^2}{(n-t)^2}$ of the age of the
+chain, paid even by a client that receives an honest chain in the round it was
+adopted. That is the cost of not being able to tell that the peer is honest.
+The main question we leave open is the same rule under variable difficulty,
+where height is no longer a proxy for work.

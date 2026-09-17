@@ -59,10 +59,30 @@ if the validator was successful at round $i$.
 
 \paragraph{Clients}
 
-Clients do not mine. A client may join at any round and asks for a chain to keep. We assume no synchrony between clients and validators. A client does not
+Clients do not mine. A client may join at any round and asks for a chain to
+keep. The link between a client and the validators is under the control of the
+adversary. The adversary chooses which chains a client receives and at which
+round, and it may withhold every chain for ever. There is no bound on the delay
+of this link and no round after which one applies. A client therefore does not
 know whether it is connected to an honest validator, nor how long it must wait
-for an honest message. We model this by letting the adversary choose which
-chains a client receives and when.
+for an honest message. We say that a client \emph{receives a chain at round
+$r$} when the adversary delivers that chain to it during round $r$.
+
+This link is weaker than a partially synchronous one, which grants a delay
+bound from some round onwards. It is also weaker than the link of a sleeping
+party in~\cite{sleepy}, which on waking receives every message it would have
+received while asleep. In the terminology of~\cite{cuamdr} our client is
+silent, since it only listens, and it is not sleepy, since it reads the round
+number at every round.
+
+\paragraph{Client knowledge}
+
+The client knows the round. It also knows the genesis block $\gen$ and the
+parameters $n$, $t$, $f$, $\epsilon$ and $\lambda$. It does not know the length
+of any chain held by a validator. It does not know a delay bound for its own
+link, and it cannot test whether the validator it speaks to is honest. The
+construction of \Cref{sec.construction} uses the round of receipt and the chain
+received, and nothing else.
 
 \paragraph{Chains and the block tree}
 
@@ -73,8 +93,8 @@ $\ch[i]$ is at height $i$. We write $\ch[i{:}j]$ for the subsequence of $\ch$
 at heights $i,\dots,j-1$. We omit $i$ when the range starts at the beginning
 of $\ch$, and $j$ when it extends to the end. Negative indices count from the
 end. So $\head{\ch}$ is the last block of $\ch$, its \emph{tip}, and
-$\prune{\ch}{k}$ is $\ch$ without its $k$ last blocks. When $k\ge\len{\ch}-1$,
-$\prune{\ch}{k}$ is the chain consisting of the genesis block alone. For a real
+$\prune{\ch}{k}$ is $\ch$ without its $k$ last blocks. When $k\ge\len{\ch}$,
+$\prune{\ch}{k}=[]$. For a real
 number $x$ we write $\prune{\ch}{x}$ for $\prune{\ch}{\lceil x\rceil}$. We write
 $\len{\ch}$ to denote the length of $\ch$, which is the number of blocks of
 $\ch$ including the genesis block. The height of $\ch$ is the height of its tip,
@@ -159,9 +179,12 @@ block at round $i$ and $0$ otherwise. Let $f_2=\mathbb{E}[W_i]$, and for a set
 of rounds $S$ let $W(S)=\sum_{i\in S}W_i=X(S)-Y(S)$, with $W_0=0$. Two or
 more of the $q(n-t)$ honest queries succeed with probability at most
 $\binom{q(n-t)}{2}p^2\le(pq(n-t))^2/2$, so by \Cref{eq.rates}
-\[
+\begin{equation}\label{eq.fsq}
     f_2 < \frac{f^2}{2(1-f)^2} .
-\]
+\end{equation}
+So $f_2$ is of order $f^2$ and is small compared with $f$. It is the rate at
+which honest validators collide, and it is the only quantity through which the
+analysis pays for such collisions.
 
 \paragraph{Assumptions}
 
@@ -238,6 +261,12 @@ section are restated from~\cite{gkl24} without proof.
     If at round $v$ an honest validator has a chain of length $m$, then at every
     round $w\ge v$ every honest validator adopts a chain of length at least
     $m+\sum_{i=v}^{w-1}X_i$.
+\end{lemma}
+
+\begin{lemma}[{Common Prefix, \cite[Theorem 4.10]{gkl24}}]\label{lem.commonprefix}
+    Let $\ch_1$ and $\ch_2$ be chains adopted by honest validators at rounds
+    $r_1$ and $r_2$ with $r_1\le r_2$. Then $\prune{\ch_1}{k}\preceq\ch_2$ for
+    every $k\ge2\lambda f$.
 \end{lemma}
 
 \begin{lemma}[{\cite[Lemma 4.8]{gkl24}}]\label{lem.span}

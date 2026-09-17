@@ -1,0 +1,128 @@
+\section{Construction}
+\label{sec.construction}
+
+A client receives a chain and keeps a prefix of it. This section says which
+prefix.
+
+The client cannot keep the whole chain. The chain it receives may fork from
+every chain held by an honest validator, and the blocks after the fork are on
+no honest chain. The client cannot locate the fork either, because it sees one
+chain and has nothing to compare it against. What it can do is bound how deep
+the fork is, from the height of the chain and the round.
+
+\paragraph{Two constraints}
+
+Let the client receive at round $r$ a chain of height $\hgt$, let $\rst$ be the
+round at which the fork point was computed, and let $d$ be the number of blocks
+after the fork point. Two facts bound $d$. First, no chain is taller than about
+$(1+\advr)f\rst$ at round $\rst$, so the fork point is at height at most about
+$(1+\advr)f\rst$ and
+\begin{equation}\label{eq.early}
+    \hgt \lesssim (1+\advr)f\rst + d .
+\end{equation}
+Second, the adversary computes about $\advr f$ blocks per round, and after a
+fork from an honest chain only adversarial blocks extend the fork, so
+\begin{equation}\label{eq.deep}
+    d \lesssim \advr f(r-\rst) .
+\end{equation}
+The two pull against each other. A shorter chain forces an earlier fork point,
+by \Cref{eq.early}, and an earlier fork point leaves more rounds in which to
+build the fork, by \Cref{eq.deep}. Eliminating $\rst$ between them gives
+\begin{equation}\label{eq.idealdepth}
+    d \lesssim \advr\left((1+\advr)fr - \hgt\right) .
+\end{equation}
+The client prunes \Cref{eq.idealdepth} blocks. We write $\prn(r)$ for the
+number of blocks it prunes and $\pref(r)=\hgt-\prn(r)$ for the height of what
+it keeps, the certified height. The rest of this section replaces the three
+approximations by the rates a typical execution guarantees, and
+\Cref{sec.analysis} proves the result sound.
+
+\paragraph{Normalised form}
+
+Write $\rate=\hgt/(fr)$ for the height of the received chain in units of the
+height an honest chain is expected to reach by round $r$. Dividing
+\Cref{eq.idealdepth} by $fr$ gives
+\begin{equation}\label{eq.normal}
+    \frac{d}{fr} \lesssim \advr\left(1+\advr-\rate\right),
+    \qquad\text{so}\qquad
+    \frac{\hgt-d}{fr} \gtrsim (1+\advr)\left(\rate-\advr\right) .
+\end{equation}
+One variable now carries the whole rule, and three of its values matter.
+At $\rate=1+\advr$ the chain is as tall as any chain can be, and the client
+prunes nothing. At $\rate=1$ the chain is as tall as an honest chain, and the
+client prunes an $\advr^2$ fraction of it. At $\rate=\advr$ the chain is no
+taller than what the adversary alone could have produced, and nothing is kept.
+\Cref{fig.certified} is the same statement drawn in the plane.
+\Cref{cor.limit} proves it.
+
+\input{figures/fig.certified}
+
+\paragraph{Pruning depth}
+
+The exact rule replaces the approximate rates of \Cref{eq.early,eq.deep} by
+bounds that hold in every typical execution. We use three constants. The first
+is
+\[
+    \maxr = 1 + \advr + 2\epsilon + \frac{\advr f}{1-f} ,
+\]
+and $\maxr f$ is an upper bound on the growth rate of every chain, from
+\Cref{lem.length}. It takes the place of $(1+\advr)f$ in \Cref{eq.early}. The
+second is
+\[
+    \advrone = \frac{\advr}{1-f} + \frac{f_2}{f} + 2\epsilon ,
+\]
+the rate per round at which the adversary lengthens a fork, from
+\Cref{eq.upper}. It takes the place of $\advr f$ in \Cref{eq.deep}. Both exceed $\advr$ only by the collision rate $f_2/f$ and by
+multiples of $\epsilon$, and both tend to $\advr$ as $f$ and $\epsilon$ tend to
+$0$, while $\maxr$ tends to $1+\advr=n/(n-t)$. The third is
+$k_0 = 2(\lambda+2)f$, the scale of the common prefix parameter
+of~\cite{gkl24}. Since $\lambda\ge2/f$ we have
+$2\lambda f\le k_0\le4\lambda f$.
+From \Cref{eq.fsq}, $f_2/f<f/(2(1-f)^2)$, and $f<1/3$ by
+\Cref{asm.majority}, so $f_2/f<1$ and the quantity
+\begin{equation}\label{eq.depth}
+    M(r,\ell)
+    = \frac{\advrone\left[\maxr f(r+\lambda)-\ell+1\right]+\maxr(2f+1)}{1-f_2/f}
+\end{equation}
+is well defined, and we set $\prn(r)=\max\{k_0,\ M(r,\len{\ch})\}$.
+
+\begin{definition}[Pruning client]\label{def.client}
+    The pruning client is the following.
+    \begin{enumerate}
+        \item The client asks for a chain and waits until it receives one. Let
+            $\ch$ be the chain received and let $r$ be the round of receipt.
+        \item The client computes $\prn(r)=\max\{k_0,\ M(r,\len{\ch})\}$.
+        \item If $\prune{\ch}{\prn(r)}$ has more than one block, the client
+            outputs it. Otherwise it outputs $\bot$.
+    \end{enumerate}
+\end{definition}
+
+\input{algorithms/alg.client}
+
+The client uses the round of receipt and the chain received. It does not use
+the length of any chain held by a validator, a delay bound for its own link, or
+any test of whether its peer is honest.
+
+\paragraph{Repeated confirmation}
+
+A client that stays online receives more than one chain. It runs
+\Cref{def.client} on each and keeps the longest output.
+
+\begin{definition}[Monotone client]\label{def.monotone}
+    The monotone client runs \Cref{def.client} on every chain it receives and
+    outputs the longest chain that any of these runs has returned, or $\bot$ if
+    every run returned $\bot$.
+\end{definition}
+
+\Cref{cor.monotone} shows that the outputs of \Cref{def.client} are nested, so
+the longest of them is well defined and the monotone client never retracts an
+output.
+
+\paragraph{Results}
+
+\Cref{cor.prune} shows that the output of \Cref{def.client} is a prefix of
+every chain adopted by an honest validator at the round of receipt and at every
+later round. \Cref{thm.consistency} shows that the outputs of any two clients
+are prefixes of one another. \Cref{thm.liveness} bounds how far the output
+trails the honest chain. \Cref{cor.tight} shows that no smaller pruning depth
+is sound.

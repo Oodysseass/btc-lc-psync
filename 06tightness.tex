@@ -11,7 +11,17 @@ $c<t/(n-2t)$ and every $b\ge0$, in a long enough execution and except with
 small probability, $\len{\ch}-\len{\ch\meet\ch'}>c(\len{\ch'}-\len{\ch})+b$
 for the chain $\ch$ sent to the client and every chain $\ch'$ adopted by an
 honest validator. \Cref{cor.roundtight} shows the same for the pruning
-depth of \Cref{cor.round}. We make no claim about the additive terms.
+depth of \Cref{cor.round}. We make no claim about the additive terms. In this
+section we write
+\[
+    \slack = 2\epsilon + \frac{\advr f}{1-f} ,
+\]
+for the slack in the growth rate bound, so that $\maxr = 1+\advr+\slack$.
+
+The adversary mines privately. It first follows the honest chain, so that the
+chain it holds is as long as any chain the validators hold. It then withholds
+every block it computes and hands the client the result. The blocks it withheld
+are on no honest chain, and there are about $\advr fs$ of them.
 
 \begin{definition}[Private mining]\label{def.private}
     The strategy $\pipriv$ with parameters $r_0\ge1$ and $s\ge1$ is the
@@ -196,3 +206,49 @@ plus a term that tends to $0$ with $s$. This factor tends to $1$ as
 $\epsilon'$, $f$ and $\epsilon$ tend to $0$. By \Cref{eq.attheight} the
 height of $\ch$ is about $(1+\advr)fr-fs$, so every height between
 $\advr fr$ and $(1+\advr)fr$ is obtained by a choice of $s$.
+
+\begin{corollary}[No constant depth]\label{cor.noconstant}
+    Let $k\ge0$, let $\epsilon'\in(0,1)$, let $r_0\ge1$ and let
+    $s\ge\lceil k\rceil/\left[(1-\epsilon')\advr f\right]$. In an execution
+    against $\pipriv$ with parameters $r_0$ and $s$, except with probability at
+    most $\typ+4e^{-\epsilon'^2\advr fs/3}$, the chain $\ch$ the client
+    receives at round $r=r_0+s$ satisfies $\prune{\ch}{k}\not\preceq\ch'$ for
+    every chain $\ch'$ adopted by an honest validator at round $r$.
+\end{corollary}
+\begin{proof}
+    Consider an execution in which \Cref{eq.attfork} holds, which is all but
+    the stated probability by \Cref{thm.attack}. Then
+    $\len{\ch}-\len{\ch\meet\ch'}>(1-\epsilon')\advr fs\ge\lceil k\rceil$. The
+    chain $\ch\meet\ch'$ contains the genesis block, so
+    $\len{\ch}>\lceil k\rceil+1$ and $\prune{\ch}{k}$ has length
+    $\len{\ch}-\lceil k\rceil>\len{\ch\meet\ch'}$. Both $\prune{\ch}{k}$ and
+    $\ch\meet\ch'$ are prefixes of $\ch$, so $\prune{\ch}{k}$ is not a prefix
+    of $\ch\meet\ch'$ and hence not a prefix of $\ch'$.
+\end{proof}
+
+No pruning depth that does not grow with the round is sound. A client running
+\Cref{def.client} prunes $\prn(r)$, which does grow, and
+\Cref{cor.roundtight} bounds by how much more than it must.
+
+\Cref{cor.noconstant} holds for any rule that prunes a fixed number of blocks.
+The same attack says more about rules that read the round of receipt and the
+length of the chain received, and nothing else. Take $r_0=(1-\advr)r$ and
+$s=\advr r$ in \Cref{def.private}. From \Cref{eq.attheight} the chain the
+client receives at round $r$ then has height about $fr$, which is also the
+height of a chain adopted by an honest validator at round $r$ in an execution
+in which the adversary does not mine. From \Cref{eq.attfork} the last
+$\advr^2fr$ blocks of that chain lie on no honest chain. A rule that reads
+only $r$ and $\len{\ch}$ takes the same value in the two executions, so it must
+prune at least $\advr^2fr$ blocks in both, and in particular from an honest
+chain. This is the second row of \Cref{tab.values}, and it is the lag that
+\Cref{thm.liveness} charges to a client with an honest peer. We claim this for
+this class of rules only. A rule that reads block timestamps, the target, or
+the contents of blocks lies outside the model of \Cref{sec.model}, and we make
+no claim about it.
+
+A client whose peer is adversarial is unsafe under a $k$-deep rule for a
+second and unrelated reason when the adversary holds a majority of the
+queries. \cite[Appendix F]{cuamdr} gives a balancing attack under adversary
+majority against which no confirmation depth is safe. \Cref{cor.noconstant}
+assumes \Cref{asm.majority}, so it is a statement about honest majority, and it
+is quantitative: the depth must grow, and $\advr^2fr$ is how fast.
