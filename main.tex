@@ -11,9 +11,32 @@
 \maketitle
 
 \begin{abstract}
+Bitcoin's $k$-deep confirmation rule is proved for parties that mine and are
+synchronised with one another. A client is neither. It cannot check that the
+peer it asks for a chain is honest, and it has no bound on how long it must
+wait for one that is. We show that no constant confirmation depth is sound for
+such a client, and we give the rule that replaces it. Take the Bitcoin backbone
+model with $n$ parties, of which $t$ are Byzantine. A client holding a chain
+that falls $d$ blocks short of a chain held by an honest validator need discard
+only $\frac{t}{n-2t}d$ blocks plus a constant, and no smaller coefficient
+suffices. A client does not know the length of an honest chain. It measures its
+own chain against the round instead, and discards $\frac{t}{n-t}$ of the gap to
+the tallest height any chain can have reached. The output is a prefix of
+every chain an honest validator adopts from that round onwards, and the outputs
+of any two clients are prefixes of one another. None of this assumes anything
+about the client's network, and a client that never hears an honest message is
+still safe. Liveness is what the network costs: a client that receives at round
+$r$ a chain as long as the honest chain of $D$ rounds earlier confirms the
+honest chain up to round
+$\left(1-\frac{t^2}{(n-t)^2}\right)r-\frac{n}{n-t}D$. A client with an honest peer
+therefore still pays a $\frac{t^2}{(n-t)^2}$ fraction of the age of the chain.
+That is about $1.2\%$ against an adversary holding a tenth of the mining power,
+and $25\%$ against one holding a third. A private mining adversary
+attains the coefficient.
 \end{abstract}
 
 \input{01introduction}
+\input{02related}
 \input{03model}
 \input{04construction}
 \input{05analysis}

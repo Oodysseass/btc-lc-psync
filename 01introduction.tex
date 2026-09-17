@@ -1,12 +1,152 @@
 \section{Introduction}
+\label{sec.intro}
 
-\paragraph{Problem}
+Bitcoin confirms a transaction by depth. A party waits until the block that
+carries the transaction is $k$ blocks from the tip of the chain it holds, and
+then treats the transaction as settled. The Bitcoin backbone protocol makes
+this precise. In a typical execution, removing $k$ blocks from the chain an
+honest party adopts leaves a prefix of the chain any honest party adopts at any
+later round, for $k$ of the order of the common prefix
+parameter~\cite[Theorem 4.10]{gkl24}.
 
-Fix a non-decreasing height schedule $\hgt$. Let $\ch$ be a chain of the block
-tree at round $r$ of height $\hgt(r)$, and let $\ch'$ be a chain adopted by an
-honest validator at round $r$. Write $\ch\meet\ch'$ for the longest common
-prefix of the two chains. We look for the largest function $\pref$ such that
-$\ch\meet\ch'$ has height at least $\pref(r)$ with overwhelming probability, for
-every such pair $\ch,\ch'$. We write $\prn(r)=\hgt(r)-\pref(r)$ for the pruning
-depth.
+That statement quantifies over honest parties. Honest parties mine, and they
+are synchronised with one another. A message an honest party sends at round $i$
+reaches every other honest party at round $i+1$. So an honest party always
+holds a chain that is nearly as long as the longest chain anybody holds, and
+that is what makes a constant $k$ enough for it. A client is not such a party.
 
+\paragraph{Clients}
+
+Clients do not mine. A client asks a peer for a chain and keeps a prefix of it.
+It cannot check that the peer is honest, and it has no bound on how long it
+must wait for a peer that is. Section 8 of~\cite{nakamoto08} states the rule a
+client should follow: it keeps the headers of the longest proof of work chain,
+``which he can get by querying network nodes until he's convinced he has the
+longest chain''. The quoted clause is an assumption about the client's network.
+It asks the client to establish from its own view that no longer chain exists.
+A client all of whose peers are adversarial cannot establish it, and an eclipse
+attack~\cite{eclipse} puts a client in exactly that position.
+
+This paper drops the assumption. The link between a client and the validators
+is under the control of the adversary. The adversary chooses which chains the
+client receives and in which round, and it may deliver nothing at all. There is
+no delay bound on the link and no round after which one applies. The validators
+stay synchronised among themselves, as in~\cite{gkl24}, and the client keeps a
+clock, so it knows the round. What it gives up is every guarantee about its own
+network. To the best of our knowledge, no prior work asks how deep a prefix
+such a client should keep.
+
+\paragraph{Short chains}
+
+A client that receives a short chain is worse off than one that receives a long
+chain, not better off. The natural reading of a short chain is that the client
+is merely behind, so that what it holds is old and therefore settled. That
+reading is wrong. Honest parties are never behind, so a chain shorter than an
+honest chain is evidence that the chain may not be honest, and the deficit
+measures the work the adversary could have spent on a private fork instead.
+\Cref{thm.prefix} shows that it is enough to prune $\frac{t}{n-2t}$ blocks for
+every block by which the chain received falls short of a chain adopted by an
+honest validator, plus a constant. \Cref{cor.tight} shows that no smaller
+coefficient is enough.
+
+The coefficient crosses $1$ at $t=n/3$. Below a third of the mining power a
+block of deficit costs the client less than a block of confirmation depth.
+Above a third it costs more.
+
+\paragraph{Confirmation depth}
+
+A client does not know the length of an honest chain. It knows the round and
+the chain it received. Two facts turn the one into the other. First, no chain
+has height above $\frac{n}{n-t}fr$ at round $r$, where $f$ is the probability
+that some honest validator computes a block in a round. Second, the adversary
+computes about $\frac{t}{n-t}f$ blocks per round, so a fork that began at round
+$\rst$ is at most about $\frac{t}{n-t}f(r-\rst)$ blocks deep. A shorter chain
+forces an earlier fork point, and an earlier fork point leaves more rounds in
+which to build the fork. Eliminating $\rst$ between the two bounds gives the
+pruning depth
+\[
+    \prn(r) = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right),
+\]
+where $\hgt$ is the height of the chain received. \Cref{def.client} is this
+rule with the corrections a typical execution requires, and
+\Cref{fig.certified} is the same statement drawn in the plane.
+
+A chain adopted by an honest validator has height about $fr$. A client that
+receives one, in the round it was adopted, still prunes
+$\frac{t^2}{(n-t)^2}fr$ blocks. The depth grows with the round, and no constant
+depth replaces it. The fraction of the chain it removes does not grow: it is
+$\frac{t^2}{(n-t)^2}$, the square of the adversary's share of the queries
+relative to the honest share. Against an adversary with a tenth of the mining
+power the fraction is about $1.2\%$, so a client that receives a chain of one
+million blocks discards its last twelve thousand. Against a quarter it is
+$11\%$, and against a third it is $25\%$.
+
+\paragraph{Agreement}
+
+Two clients that follow the rule agree. \Cref{thm.consistency} shows that their
+outputs are prefixes of one another. They do not communicate, they need not
+join in the same round, and they need not reach the same peer. Either of them
+may be receiving every chain from the adversary. This is the guarantee a client
+of a replicated state machine is normally given, and here it holds with no
+assumption about the client's network.
+
+\paragraph{Liveness}
+
+Safety costs no timing assumption. Liveness costs what the client's link costs.
+An adversary that delivers nothing leaves the client with no output, and no
+rule prevents that. \Cref{thm.liveness} bounds what the chains it does deliver
+are worth. Call a chain received at round $r$ \emph{$\stale$-stale} if it is at
+least as long as some chain an honest validator adopted at round $r-\stale$. A
+client that receives such a chain confirms the honest chain up to about
+\[
+    \left(1-\frac{t^2}{(n-t)^2}\right)r - \frac{n}{n-t}\,\stale
+\]
+rounds into the execution. An honest peer that answers in the same round is the
+case $\stale=0$. An adversarial peer that hands over a chain barely long enough
+to be accepted is the case $\stale>0$. The two differ by the offset
+$\frac{n}{n-t}\stale$, so a single theorem covers both.
+
+The lag grows with the round and the fraction does not. The confirmed prefix
+grows at rate $\left(1-\frac{t^2}{(n-t)^2}\right)f$, a constant fraction of the
+rate of the honest chain. A client that applies the rule again at a later round
+keeps strictly more, and by \Cref{cor.monotone} it never gives anything back.
+Confirmation does not deteriorate as the chain ages.
+
+\paragraph{Tightness}
+
+No constant depth is sound. \Cref{cor.noconstant} shows that against the
+private mining adversary of \Cref{def.private} the number of blocks a client
+must discard grows linearly in the round, so every fixed $k$ fails once the
+execution is long enough. This holds under honest majority. Under adversary
+majority a $k$-deep client is unsafe for a different
+reason~\cite[Appendix F]{cuamdr}. \Cref{cor.tight,cor.roundtight} show that the
+coefficient $\frac{t}{n-2t}$ and the pruning depth of \Cref{def.client} are
+both attained, up to a factor that tends to $1$ as $f$ and $\epsilon$ tend to
+$0$.
+
+\paragraph{Contributions}
+
+We work in the static synchronous backbone model of~\cite{gkl24} and change one
+thing: the link between a client and the validators is adversarial, with no
+delay bound. In that setting we make the following contributions.
+\begin{enumerate}
+    \item We give the confirmation rule a client should use, as a function of
+        the round of receipt and the chain received (\Cref{sec.construction}).
+    \item We prove that its output is a prefix of every chain adopted by an
+        honest validator at the round of receipt and at every later round. We
+        also prove that the outputs of any two clients are prefixes of one
+        another (\Cref{sec.safety}).
+    \item We prove one liveness bound that covers an honest peer and an
+        adversarial peer, and we show that the confirmed prefix grows at a
+        constant rate (\Cref{sec.liveness}).
+    \item We show that the coefficient of the rule is attained by private
+        mining, and that no constant confirmation depth is sound
+        (\Cref{sec.tightness}).
+\end{enumerate}
+
+\paragraph{Organisation}
+
+\Cref{sec.related} places the work. \Cref{sec.model} fixes the model,
+\Cref{sec.construction} gives the construction, \Cref{sec.analysis} proves it
+safe and live, and \Cref{sec.tightness} proves it tight.
+\Cref{sec.discussion} collects the remarks.
