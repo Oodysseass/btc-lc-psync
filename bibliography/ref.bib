@@ -1,35 +1,285 @@
-@misc{gkl24,
-  author = {Juan A. Garay and Aggelos Kiayias and Nikos Leonardos},
-  title = {The Bitcoin Backbone Protocol: Analysis and Applications},
-  year = {2024},
-  note = {Manuscript, March 2024. Journal version of the EUROCRYPT 2015 paper}
+%%% Backbone and common prefix %%%
+
+@article{gkl24,
+  author  = {Juan A. Garay and Aggelos Kiayias and Nikos Leonardos},
+  title   = {The {Bitcoin} Backbone Protocol: Analysis and Applications},
+  journal = {Journal of the ACM},
+  volume  = {71},
+  number  = {4},
+  pages   = {25:1--25:49},
+  year    = {2024},
+  note    = {Journal version of the EUROCRYPT 2015 paper. IACR Cryptology ePrint Archive, Report 2014/765}
 }
 
 @inproceedings{gkl15,
-  author = {Juan A. Garay and Aggelos Kiayias and Nikos Leonardos},
-  title = {The Bitcoin Backbone Protocol: Analysis and Applications},
+  author    = {Juan A. Garay and Aggelos Kiayias and Nikos Leonardos},
+  title     = {The {Bitcoin} Backbone Protocol: Analysis and Applications},
   booktitle = {Advances in Cryptology -- EUROCRYPT 2015, Part II},
-  pages = {281--310},
-  year = {2015}
+  pages     = {281--310},
+  year      = {2015}
+}
+
+@inproceedings{pss16,
+  author    = {Rafael Pass and Lior Seeman and Abhi Shelat},
+  title     = {Analysis of the Blockchain Protocol in Asynchronous Networks},
+  booktitle = {Advances in Cryptology -- EUROCRYPT 2017, Part II},
+  pages     = {643--673},
+  year      = {2017},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2016/454}
 }
 
 @misc{kp15,
-  author = {Aggelos Kiayias and Giorgos Panagiotakos},
-  title = {Speed-security tradeoffs in blockchain protocols},
-  howpublished = {IACR Cryptology ePrint Archive, Report 2015/1019},
-  year = {2015}
+  author       = {Aggelos Kiayias and Giorgos Panagiotakos},
+  title        = {Speed-Security Tradeoffs in Blockchain Protocols},
+  howpublished = {{IACR} Cryptology ePrint Archive, Report 2015/1019},
+  year         = {2015}
 }
 
-@misc{pss16,
-  author = {Rafael Pass and Lior Seeman and Abhi Shelat},
-  title = {Analysis of the blockchain protocol in asynchronous networks},
-  howpublished = {IACR Cryptology ePrint Archive, Report 2016/454},
-  year = {2016}
+@inproceedings{bmtz17,
+  author    = {Christian Badertscher and Ueli Maurer and Daniel Tschudi and Vassilis Zikas},
+  title     = {{Bitcoin} as a Transaction Ledger: A Composable Treatment},
+  booktitle = {Advances in Cryptology -- CRYPTO 2017, Part I},
+  pages     = {324--356},
+  year      = {2017},
+  note      = {Journal version: Journal of Cryptology, 2024. IACR Cryptology ePrint Archive, Report 2017/149}
 }
+
+%%% Settlement bounds for a synchronised observer %%%
+
+@inproceedings{dembo20,
+  author    = {Amir Dembo and Sreeram Kannan and Ertem Nusret Tas and David Tse and
+               Pramod Viswanath and Xuechao Wang and Ofer Zeitouni},
+  title     = {Everything is a Race and {Nakamoto} Always Wins},
+  booktitle = {Proceedings of the 2020 ACM SIGSAC Conference on Computer and Communications Security},
+  pages     = {859--878},
+  year      = {2020}
+}
+
+@inproceedings{grr22,
+  author    = {Peter Ga{\v{z}}i and Ling Ren and Alexander Russell},
+  title     = {Practical Settlement Bounds for Proof-of-Work Blockchains},
+  booktitle = {Proceedings of the 2022 ACM SIGSAC Conference on Computer and Communications Security},
+  pages     = {1217--1230},
+  year      = {2022},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2021/805}
+}
+
+@inproceedings{grr23,
+  author    = {Peter Ga{\v{z}}i and Ling Ren and Alexander Russell},
+  title     = {Practical Settlement Bounds for Longest-Chain Consensus},
+  booktitle = {Advances in Cryptology -- CRYPTO 2023, Part I},
+  pages     = {107--138},
+  year      = {2023},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2022/1571}
+}
+
+@inproceedings{guoren22,
+  author    = {Dongning Guo and Ling Ren},
+  title     = {{Bitcoin}'s Latency-Security Analysis Made Simple},
+  booktitle = {Proceedings of the 4th ACM Conference on Advances in Financial Technologies},
+  pages     = {244--253},
+  year      = {2022}
+}
+
+%%% Simplified payment verification %%%
 
 @misc{nakamoto08,
-  author = {Satoshi Nakamoto},
-  title = {Bitcoin: A peer-to-peer electronic cash system},
+  author       = {Satoshi Nakamoto},
+  title        = {{Bitcoin}: A Peer-to-Peer Electronic Cash System},
   howpublished = {\url{http://bitcoin.org/bitcoin.pdf}},
-  year = {2008}
+  year         = {2008}
+}
+
+@misc{sz16,
+  author       = {Yonatan Sompolinsky and Aviv Zohar},
+  title        = {{Bitcoin}'s Security Model Revisited},
+  howpublished = {arXiv:1605.09193},
+  year         = {2016}
+}
+
+%%% Succinct clients %%%
+
+@inproceedings{nipopow,
+  author    = {Aggelos Kiayias and Andrew Miller and Dionysis Zindros},
+  title     = {Non-Interactive Proofs of Proof-of-Work},
+  booktitle = {Financial Cryptography and Data Security 2020},
+  pages     = {505--522},
+  year      = {2020},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2017/963}
+}
+
+@inproceedings{logspace,
+  author    = {Aggelos Kiayias and Nikos Leonardos and Dionysis Zindros},
+  title     = {Mining in Logarithmic Space},
+  booktitle = {Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security},
+  pages     = {3487--3501},
+  year      = {2021},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2021/623}
+}
+
+@inproceedings{flyclient,
+  author    = {Benedikt B{\"u}nz and Lucianna Kiffer and Loi Luu and Mahdi Zamani},
+  title     = {{FlyClient}: Super-Light Clients for Cryptocurrencies},
+  booktitle = {2020 IEEE Symposium on Security and Privacy},
+  year      = {2020},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2019/226}
+}
+
+@inproceedings{blink,
+  author    = {Lukas Aumayr and Zeta Avarikioti and Matteo Maffei and Giulia Scaffino and
+               Dionysis Zindros},
+  title     = {{Blink}: An Optimal Proof of Proof-of-Work},
+  booktitle = {Financial Cryptography and Data Security 2025},
+  year      = {2025},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2024/692}
+}
+
+@inproceedings{lazyclients,
+  author    = {Ertem Nusret Tas and David Tse and Lei Yang and Dionysis Zindros},
+  title     = {Light Clients for Lazy Blockchains},
+  booktitle = {Financial Cryptography and Data Security 2024},
+  year      = {2024},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2022/384}
+}
+
+%%% Bootstrapping %%%
+
+@inproceedings{genesis,
+  author    = {Christian Badertscher and Peter Ga{\v{z}}i and Aggelos Kiayias and
+               Alexander Russell and Vassilis Zikas},
+  title     = {{Ouroboros} {Genesis}: Composable Proof-of-Stake Blockchains with Dynamic Availability},
+  booktitle = {Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security},
+  year      = {2018},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2018/378}
+}
+
+%%% On-chain clients %%%
+
+@misc{bitvm2,
+  author       = {Robin Linus and Lukas Aumayr and Zeta Avarikioti and Matteo Maffei and
+                  Andrea Pelosi and Orfeas Thyfronitis Litos and Christos Stefo and
+                  David Tse and Alexei Zamyatin},
+  title        = {Bridging {Bitcoin} to Second Layers via {BitVM2}},
+  howpublished = {{IACR} Cryptology ePrint Archive, Report 2025/1158},
+  year         = {2025}
+}
+
+@misc{bitvm3,
+  author       = {Robin Linus Woll and Ioannis Alexopoulos and Lukas Aumayr and
+                  Zeta Avarikioti and Matteo Maffei and David Tse},
+  title        = {{BitVM3}: Efficient {Bitcoin} Bridges via Garbled Circuits},
+  howpublished = {{IACR} Cryptology ePrint Archive, Report 2026/933},
+  year         = {2026}
+}
+
+@misc{clementine,
+  author       = {Ekrem Bal and Lukas Aumayr and Atacan {\.I}yido{\u{g}}an and
+                  Giulia Scaffino and Hakan Karaku{\c{s}} and Cengiz Eray Aslan and
+                  Orfeas Stefanos Thyfronitis Litos},
+  title        = {{Clementine}: A Collateral-Efficient, Trust-Minimized {Bitcoin} Bridge},
+  howpublished = {Manuscript},
+  year         = {2025}
+}
+
+@inproceedings{glimpse,
+  author    = {Giulia Scaffino and Lukas Aumayr and Zeta Avarikioti and Matteo Maffei},
+  title     = {{Glimpse}: On-Demand {PoW} Light Client with Constant-Size Storage for {DeFi}},
+  booktitle = {Proceedings of the 32nd USENIX Security Symposium},
+  year      = {2023}
+}
+
+%%% Sleepy parties and dynamic availability %%%
+
+@inproceedings{sleepy,
+  author    = {Rafael Pass and Elaine Shi},
+  title     = {The Sleepy Model of Consensus},
+  booktitle = {Advances in Cryptology -- ASIACRYPT 2017, Part II},
+  pages     = {380--409},
+  year      = {2017},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2016/918}
+}
+
+@inproceedings{rethinking,
+  author    = {Rafael Pass and Elaine Shi},
+  title     = {Rethinking Large-Scale Consensus},
+  booktitle = {30th IEEE Computer Security Foundations Symposium},
+  year      = {2017}
+}
+
+@inproceedings{ebbflow,
+  author    = {Joachim Neu and Ertem Nusret Tas and David Tse},
+  title     = {Ebb-and-Flow Protocols: A Resolution of the Availability-Finality Dilemma},
+  booktitle = {2021 IEEE Symposium on Security and Privacy},
+  pages     = {446--465},
+  year      = {2021}
+}
+
+@inproceedings{accountability,
+  author    = {Joachim Neu and Ertem Nusret Tas and David Tse},
+  title     = {The Availability-Accountability Dilemma and its Resolution via Accountability Gadgets},
+  booktitle = {Financial Cryptography and Data Security 2022},
+  year      = {2022},
+  note      = {arXiv:2105.06075}
+}
+
+@inproceedings{goldfish,
+  author    = {Francesco D'Amato and Joachim Neu and Ertem Nusret Tas and David Tse},
+  title     = {{Goldfish}: No More Attacks on {Ethereum}?!},
+  booktitle = {Financial Cryptography and Data Security 2024},
+  year      = {2024}
+}
+
+%%% Client models %%%
+
+@inproceedings{cuamdr,
+  author    = {Srivatsan Sridhar and Ertem Nusret Tas and Joachim Neu and
+               Dionysis Zindros and David Tse},
+  title     = {Consensus Under Adversary Majority Done Right},
+  booktitle = {Financial Cryptography and Data Security 2025},
+  year      = {2025},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2024/1799}
+}
+
+@misc{bsts,
+  author       = {Srivatsan Sridhar and Dionysis Zindros and David Tse},
+  title        = {Better Safe than Sorry: Recovering after Adversarial Majority},
+  howpublished = {{IACR} Cryptology ePrint Archive, Report 2023/1556},
+  year         = {2023}
+}
+
+@misc{stubborn,
+  author       = {Jacob D. Leshno and Elaine Shi and Rafael Pass},
+  title        = {On the Viability of Open-Source Financial Rails: Economic Security of Permissionless Consensus},
+  howpublished = {arXiv:2409.08951},
+  year         = {2024}
+}
+
+@inproceedings{lpr21,
+  author    = {Andrew Lewis-Pye and Tim Roughgarden},
+  title     = {How Does Blockchain Security Dictate Blockchain Implementation?},
+  booktitle = {Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security},
+  year      = {2021}
+}
+
+%%% Eclipsed clients %%%
+
+@inproceedings{eclipse,
+  author    = {Ethan Heilman and Alison Kendler and Aviv Zohar and Sharon Goldberg},
+  title     = {Eclipse Attacks on {Bitcoin}'s Peer-to-Peer Network},
+  booktitle = {Proceedings of the 24th USENIX Security Symposium},
+  pages     = {129--144},
+  year      = {2015},
+  note      = {{IACR} Cryptology ePrint Archive, Report 2015/263}
+}
+
+%%% Partial synchrony %%%
+
+@article{dls88,
+  author  = {Cynthia Dwork and Nancy Lynch and Larry Stockmeyer},
+  title   = {Consensus in the Presence of Partial Synchrony},
+  journal = {Journal of the ACM},
+  volume  = {35},
+  number  = {2},
+  pages   = {288--323},
+  year    = {1988}
 }
