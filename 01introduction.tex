@@ -49,11 +49,18 @@ how much work could have gone into a private fork.
 
 Two bounds meet, and the rule falls out of them. Write $f$ for the probability
 that some honest validator mines in a round, $r$ for the round at which the
-chain reaches the client and $\hgt$ for its height. No chain has height above
-$\frac{n}{n-t}fr$ at round $r$, so a chain that is short forked from the honest
-chain early. The adversary mines about $\frac{t}{n-t}f$ blocks per round, so a
-fork that began early had that many rounds in which to grow. The two pull
-against each other, and eliminating the round of the fork between them leaves
+chain reaches the client, $\hgt$ for its height, and $d$ for the number of
+blocks it carries beyond the point where it left the honest chain. No chain
+grows faster than $\frac{n}{n-t}f$ blocks per round, so no chain reaches a
+given height before a round proportional to that height. The fork point sits
+at height $\hgt-d$, and it therefore cannot have been computed before round
+$(\hgt-d)\frac{n-t}{nf}$. After it, only adversarial blocks extend the fork, and
+the adversary mines about $\frac{t}{n-t}f$ blocks per round, so $d$ is at most
+that rate times the rounds that remain. The deeper the fork, the lower the
+height at which it began, and the lower it began the earlier it may have been
+laid down, which leaves more rounds in which to extend it. The two bounds are
+consistent only up to a point. Eliminating the round of the fork between them
+leaves
 \[
     \prn(r) = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right)
 \]
@@ -63,25 +70,40 @@ corrections a typical execution requires. Nothing in it refers to a peer. The
 client evaluates it on whatever chain arrives, from whoever sends it, and the
 prefix that survives is a prefix of the chain every honest validator holds.
 
-Three things about the rule deserve stating plainly, because each runs against
-the way confirmation is usually described. The first is that a shorter chain is
-worse than a longer one, not safer. The reading that a client behind the tip is
-merely looking at older and therefore settled history is wrong, since honest
-validators are never behind, and every block of shortfall buys the adversary
-$\frac{t}{n-2t}$ blocks of fork. That exchange rate crosses one at $t=n/3$.
-The second is that no constant confirmation depth is sound. A chain that an
-honest validator adopted at round $r$ and handed over in the same round still
-has $\frac{t^2}{(n-t)^2}fr$ blocks pruned from it, and that quantity grows
-without bound as the execution runs. Six confirmations, or six hundred, fail
-once the chain is old enough. The third is that liveness survives this anyway.
-The depth grows, but the fraction of the chain it removes does not: it stays at
+Three things about the rule run against the way confirmation is usually
+described, and each is worth stating on its own.
+
+The first is that a short chain is the dangerous one. Intuition says the
+opposite. A chain that lags behind the tip looks like old history, and old
+history has had longer to settle. For a validator that reading is sound. For a
+client it is not, because two very different situations reach it looking the
+same. In one, an honest validator sent its chain and the message took an hour
+to arrive. In the other, the adversary forked an hour ago and has been
+extending that fork in private ever since. Both reach the client at round $r$
+as a chain too short for the round, and nothing inside either chain separates
+them. So the client must count every block of shortfall as work that might have
+gone into a fork. The rule gives up $\frac{t}{n-2t}$ blocks for each block by
+which the chain falls short of an honest one. Below $t=n/3$ that is less than a
+block of confirmation per block of shortfall, and above it is more. A client
+cannot see an honest chain to measure the shortfall against, so it measures
+against the tallest chain that could exist by round $r$, which is what
+$\prn(r)$ does.
+
+The second is that no constant confirmation depth is sound. Take the friendliest
+case there is. An honest validator adopts a chain at round $r$ and hands it
+straight to the client, with no delay at all. The rule still prunes
+$\frac{t^2}{(n-t)^2}fr$ blocks from it, and that number grows without bound as
+the execution runs. Six confirmations fail once the chain is old enough, and so
+do six hundred.
+
+The third is that liveness survives this anyway. The depth grows, but the
+fraction of the chain it removes does not. That fraction stays at
 $\frac{t^2}{(n-t)^2}$, the square of the adversary's share of the queries
 relative to the honest share. Against an adversary with a tenth of the mining
-power that fraction is about $1.2\%$, so a client handed a chain of one million
-blocks discards the last twelve thousand of them. Against a quarter it is
-$11\%$ and against a third it is $25\%$. The confirmed prefix grows at a
-constant rate, and a client that runs the rule again later confirms strictly
-more.
+power it is about $1.2\%$, so a client handed a chain of one million blocks
+discards the last twelve thousand. Against a quarter it is $11\%$, and against
+a third it is $25\%$. The confirmed prefix therefore grows at a constant rate,
+and a client that runs the rule again at a later round confirms strictly more.
 
 Our client is not a sleepy client, and the difference is the point. A sleepy
 party in the sense of~\cite{sleepy} knows when it was asleep, receives on waking

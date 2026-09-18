@@ -23,9 +23,10 @@ fork from an honest chain only adversarial blocks extend the fork, so
 \begin{equation}\label{eq.deep}
     d \lesssim \advr f(r-\rst) .
 \end{equation}
-The two pull against each other. A shorter chain forces an earlier fork point,
-by \Cref{eq.early}, and an earlier fork point leaves more rounds in which to
-build the fork, by \Cref{eq.deep}. Eliminating $\rst$ between them gives
+The two pull against each other. The deeper the fork, the lower the height
+$\hgt-d$ at which it began, and by \Cref{eq.early} a lower starting height
+permits an earlier $\rst$, which by \Cref{eq.deep} leaves more rounds in which
+to extend the fork. Eliminating $\rst$ between them gives
 \begin{equation}\label{eq.idealdepth}
     d \lesssim \advr\left((1+\advr)fr - \hgt\right) .
 \end{equation}
