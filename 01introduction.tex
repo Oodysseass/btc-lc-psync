@@ -1,6 +1,23 @@
 \section{Introduction}
 \label{sec.intro}
 
+The year is 2227.
+Humans have colonized $\alpha$ Centauri.
+All 21 million bitcoin have been mined.
+One bitcoin is now worth one multiplujillion dollars.
+Earth has been repurposed solely to mining bitcoins,
+and all bitcoin miners are located on earth.
+A lone hodler on $\alpha$ Centauri finally decides to
+sell his bitcoin.
+
+* Network of validators synchronous, but clients asynchronous
+* Known network delay within validators, unknown to clients
+* Realistic ``hybrid'' model even today (well-connected validators vs airplane)
+* Surprising result:
+  - Previous result: sync is required for PoW consensus and dynamic availability
+  - Our result: hybrid model (validators sync, clients async) still enables PoW consensus + dynamic availability
+* Sketch of construction / argument (warm up...) 5 paragraphs
+
 Bitcoin tolerates an adversary holding just under half of the mining power.
 That threshold is not free. It is bought with an assumption about the network:
 a message an honest validator sends at round $i$ reaches every other honest
