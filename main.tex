@@ -11,28 +11,28 @@
 \maketitle
 
 \begin{abstract}
-Bitcoin's $k$-deep confirmation rule is proved for parties that mine and are
-synchronised with one another. A client is neither. It cannot check that the
-peer it asks for a chain is honest, and it has no bound on how long it must
-wait for one that is. We show that no constant confirmation depth is sound for
-such a client, and we give the rule that replaces it. Take the Bitcoin backbone
-model with $n$ parties, of which $t$ are Byzantine. A client holding a chain
-that falls $d$ blocks short of a chain held by an honest validator need discard
-only $\frac{t}{n-2t}d$ blocks plus a constant, and no smaller coefficient
-suffices. A client does not know the length of an honest chain. It measures its
-own chain against the round instead, and discards $\frac{t}{n-t}$ of the gap to
-the tallest height any chain can have reached. The output is a prefix of
-every chain an honest validator adopts from that round onwards, and the outputs
-of any two clients are prefixes of one another. None of this assumes anything
-about the client's network, and a client that never hears an honest message is
-still safe. Liveness is what the network costs: a client that receives at round
-$r$ a chain as long as the honest chain of $D$ rounds earlier confirms the
-honest chain up to round
-$\left(1-\frac{t^2}{(n-t)^2}\right)r-\frac{n}{n-t}D$. A client with an honest peer
-therefore still pays a $\frac{t^2}{(n-t)^2}$ fraction of the age of the chain.
-That is about $1.2\%$ against an adversary holding a tenth of the mining power,
-and $25\%$ against one holding a third. A private mining adversary
-attains the coefficient.
+Bitcoin is a synchronous proof of work consensus protocol. Its resilience
+against an adversary holding just under half of the mining power rests on
+synchrony among the validators, and that assumption is known to be necessary.
+Clients are a different kind of party. A client does not mine and does not take
+part in the protocol. It only wants to read a ledger. Wallets are clients, and
+a client often has a poor connection, or would rather not delegate its view of
+the chain to a third party. The decentralised alternatives, simplified payment
+verification and the succinct proofs that followed it, all rest on the same two
+assumptions: that at least one party the client connects to is honest, and that
+the network is synchronous. We remove both. Our observation is that the honest
+validators grow the chain at a rate the client can compute in advance. A chain
+that is too short for the round in which it arrives is evidence of a fork that
+was mined in private, and the same rate bounds how long that fork can be. From
+the chain and a clock, and from nothing else, the client computes a prefix that
+is safe against every adversary. No party it speaks to need be honest, and no
+message need ever arrive on time. This is not the sleepy client model, in which
+a party knows when it was asleep and assumes synchrony while awake. Our client
+assumes nothing at all about the network and holds only a clock, which counts
+the rounds since the execution began. We give the construction, prove it safe,
+and prove it live: the client keeps confirming new transactions, at a rate we
+bound. We then prove the bound tight, by exhibiting an attack under which no
+client can confirm a longer prefix.
 \end{abstract}
 
 \input{01introduction}

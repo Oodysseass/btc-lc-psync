@@ -10,8 +10,6 @@ no honest chain. The client cannot locate the fork either, because it sees one
 chain and has nothing to compare it against. What it can do is bound how deep
 the fork is, from the height of the chain and the round.
 
-\paragraph{Two constraints}
-
 Let the client receive at round $r$ a chain of height $\hgt$, let $\rst$ be the
 round at which the fork point was computed, and let $d$ be the number of blocks
 after the fork point. Two facts bound $d$. First, no chain is taller than about
@@ -33,7 +31,7 @@ build the fork, by \Cref{eq.deep}. Eliminating $\rst$ between them gives
 \end{equation}
 The client prunes \Cref{eq.idealdepth} blocks. We write $\prn(r)$ for the
 number of blocks it prunes and $\pref(r)=\hgt-\prn(r)$ for the height of what
-it keeps, the certified height. The rest of this section replaces the three
+it keeps, the confirmed height. The rest of this section replaces the three
 approximations by the rates a typical execution guarantees, and
 \Cref{sec.analysis} proves the result sound.
 
@@ -52,10 +50,10 @@ At $\rate=1+\advr$ the chain is as tall as any chain can be, and the client
 prunes nothing. At $\rate=1$ the chain is as tall as an honest chain, and the
 client prunes an $\advr^2$ fraction of it. At $\rate=\advr$ the chain is no
 taller than what the adversary alone could have produced, and nothing is kept.
-\Cref{fig.certified} is the same statement drawn in the plane.
+\Cref{fig.confirmed} is the same statement drawn in the plane.
 \Cref{cor.limit} proves it.
 
-\input{figures/fig.certified}
+\input{figures/fig.confirmed}
 
 \paragraph{Pruning depth}
 
@@ -117,8 +115,6 @@ A client that stays online receives more than one chain. It runs
 \Cref{cor.monotone} shows that the outputs of \Cref{def.client} are nested, so
 the longest of them is well defined and the monotone client never retracts an
 output.
-
-\paragraph{Results}
 
 \Cref{cor.prune} shows that the output of \Cref{def.client} is a prefix of
 every chain adopted by an honest validator at the round of receipt and at every

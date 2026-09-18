@@ -59,30 +59,25 @@ if the validator was successful at round $i$.
 
 \paragraph{Clients}
 
-Clients do not mine. A client may join at any round and asks for a chain to
-keep. The link between a client and the validators is under the control of the
-adversary. The adversary chooses which chains a client receives and at which
-round, and it may withhold every chain for ever. There is no bound on the delay
-of this link and no round after which one applies. A client therefore does not
-know whether it is connected to an honest validator, nor how long it must wait
-for an honest message. We say that a client \emph{receives a chain at round
-$r$} when the adversary delivers that chain to it during round $r$.
+Clients do not mine and take no part in the protocol. A client may join at any
+round, and all it wants is to output a prefix of the chain the honest
+validators hold. The link between a client and the rest of the system is under
+the control of the adversary, which chooses which chains reach the client and
+in which round, and which may withhold every chain for ever. There is no bound
+on the delay of this link and no round after which one applies. We assume
+nothing about the parties that answer a client, and in particular we do not
+assume that any of them is honest. We say that a client \emph{receives a chain
+at round $r$} when the adversary delivers that chain to it during round $r$.
 
-This link is weaker than a partially synchronous one, which grants a delay
-bound from some round onwards. It is also weaker than the link of a sleeping
-party in~\cite{sleepy}, which on waking receives every message it would have
-received while asleep. In the terminology of~\cite{cuamdr} our client is
-silent, since it only listens, and it is not sleepy, since it reads the round
-number at every round.
-
-\paragraph{Client knowledge}
-
-The client knows the round. It also knows the genesis block $\gen$ and the
-parameters $n$, $t$, $f$, $\epsilon$ and $\lambda$. It does not know the length
-of any chain held by a validator. It does not know a delay bound for its own
-link, and it cannot test whether the validator it speaks to is honest. The
-construction of \Cref{sec.construction} uses the round of receipt and the chain
-received, and nothing else.
+What a client does have is a clock. It knows the round, the genesis block
+$\gen$, and the parameters $n$, $t$, $f$, $\epsilon$ and $\lambda$. It does not
+know the length of any chain a validator holds, and the construction of
+\Cref{sec.construction} uses the round of receipt and the chain received and
+nothing else. This link is weaker than a partially synchronous one, which
+grants a delay bound from some round onwards, and weaker than that of a
+sleeping party in~\cite{sleepy}, which on waking receives everything it missed.
+In the terminology of~\cite{cuamdr} our client is silent, since it only
+listens, and it is not sleepy, since it reads the round at every round.
 
 \paragraph{Chains and the block tree}
 

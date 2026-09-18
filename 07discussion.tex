@@ -8,7 +8,7 @@ does not. For a chain of height $\rate fr$, \Cref{cor.limit} gives
 $\prn(r)/\hgt\to\advr(1+\advr-\rate)/\rate$, which does not depend on $r$. At
 $\rate=1$ the fraction is $\advr^2$. So a client that receives an honest chain
 at round $r$ keeps a prefix of height about $(1-\advr^2)fr$, and one that
-receives an honest chain at a later round keeps strictly more. The certified
+receives an honest chain at a later round keeps strictly more. The confirmed
 height grows at rate $(1-\advr^2)f$. Confirmation does not deteriorate as the
 chain ages. Only the depth measured in blocks does, and
 \Cref{cor.noconstant} shows that it must.
@@ -24,7 +24,7 @@ $(1+\advr)(\rate-\advr)$. This map has the single fixed point $1+\advr$ and
 slope $1+\advr>1$ there, so the fixed point repels and every
 $\rate<1+\advr$ falls below $\advr$ after enough applications, at which point
 the client outputs $\bot$. Nothing is gained by the repetition:
-\Cref{cor.prune} certifies each output for every later round, so an output
+\Cref{cor.prune} confirms each output for every later round, so an output
 never has to be pruned again.
 
 \paragraph{Client knowledge}

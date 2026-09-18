@@ -270,19 +270,19 @@ removes this dependence. The cost is the gap between the two bounds of
     $\maxr-\advrone=1-f_2/f$.
 \end{proof}
 
-\Cref{cor.round} certifies a prefix at round $r$ only. Applied at a later
+\Cref{cor.round} confirms a prefix at round $r$ only. Applied at a later
 round $r''$ to the same chain $\ch$, it prunes more, because the term
 $\maxr f(r''+\lambda)$ grows while $\len{\ch}$ is fixed. So it does not show
-that the prefix certified at round $r$ is a prefix of the honest chains of
+that the prefix confirmed at round $r$ is a prefix of the honest chains of
 later rounds.
 
 We use \Cref{thm.prefix} instead, for a chain at least as long as an honest
 chain. Then $\len{\ch'}-\len{\ch}\le0$, and the pruning depth of
 \Cref{thm.prefix} is a constant that does not depend on the round.
 \Cref{lem.persist} applies this twice. The first honest chain that drops the
-certified prefix is compared with the chain its validator adopted one round
+confirmed prefix is compared with the chain its validator adopted one round
 earlier, which shows that it is shorter than the client's chain. It is then
-compared with the client's chain, which shows that it contains the certified
+compared with the client's chain, which shows that it contains the confirmed
 prefix after all.
 
 For the constant to be $k_0$, we assume for the rest of this section that
@@ -386,7 +386,7 @@ sense.
 \end{proof}
 
 A client that stays online therefore never retracts. It also never needs to
-prune a second time. \Cref{cor.prune} certifies each output for every later
+prune a second time. \Cref{cor.prune} confirms each output for every later
 round, so the rule is applied to chains as they are received and never to an
 output of its own.
 
@@ -535,7 +535,7 @@ $\pref(r)\le0$ below it.
 
 \begin{table}[t]
 \centering
-\caption{The pruning depth and the certified height of \Cref{cor.limit}, in
+\caption{The pruning depth and the confirmed height of \Cref{cor.limit}, in
 units of $fr$, at the four values of $\rate$ this paper
 uses.}\label{tab.values}
 \begin{tabular}{llll}
@@ -555,11 +555,11 @@ $\advr$ & as tall as the adversary alone can build & $0$ & $\advr$ \\
 Two readings of the second row matter. The pruning depth $\advr^2fr$ grows
 with the round, so no constant depth is sound, and \Cref{cor.noconstant}
 proves this. The fraction $\advr^2=t^2/(n-t)^2$ does not grow, so the
-certified height grows at the constant rate $(1-\advr^2)f$ and a client that
+confirmed height grows at the constant rate $(1-\advr^2)f$ and a client that
 applies the rule again at a later round keeps strictly more.
 
 The third row measures the cost of staleness. An honest chain has height about
-$fr$ at round $r$, so a certified height of
+$fr$ at round $r$, so a confirmed height of
 $(1+\advr)(1-\advr-\stale/r)fr$ is the height the honest chain had about
 \[
     \left(1-\frac{t^2}{(n-t)^2}\right)r - \frac{n}{n-t}\,\stale

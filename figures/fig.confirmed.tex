@@ -20,7 +20,7 @@
   \draw[thick,dashed] (0,0) -- (\xe,\ym) node[right] {$\rate=1$};
   \draw[thick]        (0,0) -- (\xe,\yl) node[right] {$\rate=\advr$};
 
-  % the received chain at round r, of height alpha, and its certified prefix
+  % the received chain at round r, of height alpha, and its confirmed prefix
   \def\xr{2.6}
   \def\ya{1.82}
   \def\yz{1.2711}
@@ -38,11 +38,11 @@
   \node[anchor=north west] at (0.12,4.45) {no chain exists here};
   \node at (2.85,0.34) {$\bot$};
 \end{tikzpicture}
-\caption{The certified height, drawn for $\advr=\frac{1}{3}$. A chain received
+\caption{The confirmed height, drawn for $\advr=\frac{1}{3}$. A chain received
 at round $r$ is a point at height $\hgt$. No chain reaches above the ray
 $\rate=1+\advr$, and a chain adopted by an honest validator reaches at least
-the ray $\rate=1$. The certified height $\pref(r)$ interpolates linearly
+the ray $\rate=1$. The confirmed height $\pref(r)$ interpolates linearly
 between the two outer rays, equal to $\hgt$ on the upper one and to zero on the
 lower one. The client prunes the difference $\prn(r)$, and it outputs $\bot$
-when the point falls below the lower ray.}\label{fig.certified}
+when the point falls below the lower ray.}\label{fig.confirmed}
 \end{figure}
