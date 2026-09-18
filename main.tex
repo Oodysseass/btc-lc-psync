@@ -5,34 +5,35 @@
 
 \begin{document}
 
-\title{Bitcoin Clients Without Synchrony}
+\title{Intergalactic Consensus:\\Asynchronous Bitcoin Clients}
 \author{Anonymous Submission}
 \institute{}
 \maketitle
 
 \begin{abstract}
-Bitcoin is a synchronous proof of work consensus protocol. Its resilience
-against an adversary holding just under half of the mining power rests on
-synchrony among the validators, and that assumption is known to be necessary.
-Clients are a different kind of party. A client does not mine and does not take
-part in the protocol. It only wants to read a ledger. Wallets are clients, and
-a client often has a poor connection, or would rather not delegate its view of
-the chain to a third party. The decentralised alternatives, simplified payment
-verification and the succinct proofs that followed it, all rest on the same two
-assumptions: that at least one party the client connects to is honest, and that
-the network is synchronous. We remove both. Our observation is that the honest
-validators grow the chain at a rate the client can compute in advance. A chain
-that is too short for the round in which it arrives is evidence of a fork that
-was mined in private, and the same rate bounds how long that fork can be. From
-the chain and a clock, and from nothing else, the client computes a prefix that
-is safe against every adversary. No party it speaks to need be honest, and no
-message need ever arrive on time. This is not the sleepy client model, in which
-a party knows when it was asleep and assumes synchrony while awake. Our client
-assumes nothing at all about the network and holds only a clock, which counts
-the rounds since the execution began. We give the construction, prove it safe,
-and prove it live: the client keeps confirming new transactions, at a rate we
-bound. We then prove the bound tight, by exhibiting an attack under which no
-client can confirm a longer prefix.
+Bitcoin is a \emph{synchronous} proof of work consensus protocol. Its resilience
+against an adversary holding just under half of the mining power rests exactly
+on the synchrony among the validators, and that assumption is known to be
+necessary. This assumption is also transferred to clients, where all client
+constructions up until now assume synchrony and existential honesty among
+their peers. However, clients can and should be treated in a more robust model.
+We remove both assumptions and achieve this. Our construction allows for a
+client to verify payments even if it has a poor connection, or may rather not
+trust a third party for a view of the chain.
+
+Our observation is that the honest validators grow the chain at a rate the
+client can compute in advance. A chain that is too short for the round in which
+it arrives is evidence of a fork that was mined in private, and the same rate
+bounds how long that fork can be. From the chain and a clock, and from nothing
+else, the client computes a prefix that is safe against every adversary; no
+party it speaks to need be honest, and no message need ever arrive on time. This
+is not the sleepy client model, in which a party knows when it was asleep and
+assumes synchrony while awake. Our client assumes nothing at all about the
+network and holds only a clock, which counts the rounds since the execution
+began. We give the construction, prove it safe, and prove it live: the client
+keeps confirming new transactions, at a rate we bound. We then prove the bound
+tight, by exhibiting an attack under which no client can confirm a longer
+prefix.
 \end{abstract}
 
 \input{01introduction}

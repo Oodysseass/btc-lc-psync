@@ -1,68 +1,54 @@
 \section{Introduction}
 \label{sec.intro}
 
-The year is 2227.
-Humans have colonized $\alpha$ Centauri.
-All 21 million bitcoin have been mined.
-One bitcoin is now worth one multiplujillion dollars.
-Earth has been repurposed solely to mining bitcoins,
-and all bitcoin miners are located on earth.
-A lone hodler on $\alpha$ Centauri finally decides to
-sell his bitcoin.
+The year is 2227. Humans have colonized $\alpha$ Centauri. All 21 million
+bitcoin have been mined. One bitcoin is now worth one multiplujillion dollars.
+Earth has been repurposed solely to mining bitcoins, and all bitcoin miners are
+located on earth. A lone hodler on $\alpha$ Centauri finally decides to sell
+their bitcoin.
 
-* Network of validators synchronous, but clients asynchronous
-* Known network delay within validators, unknown to clients
-* Realistic ``hybrid'' model even today (well-connected validators vs airplane)
-* Surprising result:
-  - Previous result: sync is required for PoW consensus and dynamic availability
-  - Our result: hybrid model (validators sync, clients async) still enables PoW consensus + dynamic availability
+While all validators are still based on earth, where network latency is known
+and bounded, intergalactic communication is still tricky; our hodler does not
+trust the dissemination of information from so far away. It could take years for
+an actual honest message to reach them. Lucky for them, they can still confirm
+transactions without assuming any bounded delay over their communication channel
+with Earth! Moreover, they don't even have to trust \emph{any} party that
+answers back from Earth!
+
+Although the network among bitcoin validators has to be \emph{good}, it turns
+out the same assumption is not necessary for the clients to use the chain. The
+clients can still confirm transactions in a \emph{secure} manner, even if their
+communication channels with the rest of the network are unstable. We put forth a
+construction that allows for this, and prove it secure and live.
+
+In particular, one the one hand we model the network of validators as
+synchronous, with a bounded network delay known to everybody, but on the other
+hand we allow the clients' connections to be asynchronous. We realize this by
+allowing the adversary to deliver any message of their choice at any round to
+the clients. This is a hybrid, network model that is realistic even today, and
+we explore it in this work for the first time. This could apply to wallets on
+airplanes, or laptops behind a router someone else controls, or any other device
+that is not always connected to the network and that may have a poor connection.
+
+Previously, we knew that the assumption of synchrony is necessary for
+Proof-of-Work consensus and dynamic availability. Notable work has discussed
+this *cite availability finality*. Previous work on longest chain clients has
+focused on optimizing the communication load of the messages downloaded by
+clients *cite blink, flyclient, nipopow*, but no result has shown that synchrony is in fact not necessary for
+the security of clients. This is the first result in this hybrid model, that
+allows for the security of clients to be achieved without the assumption of
+synchrony while still enabling the benefits of dynamic availability.
+
+We build this construction by leveraging the lower and upper bounds on the chain
+growth rate of a longest chain protocol. A client connecting later to the
+network can compute the lower and upper bounds on the length of an honest or
+adversarial chain. Knowing this, the client can compute the maximum number of
+adversarial blocks that could have been mined in private and discard those
+blocks from the chain. The remaining chain is a prefix of the chain that the
+client can safely use.
+
 * Sketch of construction / argument (warm up...) 5 paragraphs
-
-Bitcoin tolerates an adversary holding just under half of the mining power.
-That threshold is not free. It is bought with an assumption about the network:
-a message an honest validator sends at round $i$ reaches every other honest
-validator at round $i+1$. Weaken the assumption and the threshold falls. Under
-a bounded delay the tolerable adversary shrinks as the delay
-grows~\cite{pss16,dembo20}, and under partial synchrony no protocol reaches one
-half in both safety and liveness at once~\cite{cuamdr}. Synchrony among the
-validators is load bearing, and the backbone analysis of Bitcoin assumes it
-throughout~\cite{gkl24}.
-
-Validators are not the only parties who care about the answer. A client does
-not mine and does not run the protocol. It wants one thing, which is to read
-the ledger and to be sure that what it reads will not later be undone. Wallets
-are clients. So is a payment processor checking that a transfer went through,
-and so is anyone who looks at the chain without maintaining it. These parties
-are not on the validators' network and have no reason to be. A phone on an
-aeroplane is a client. So is a laptop behind a router someone else controls.
-Many such parties sidestep the problem by asking a hosted node to read the
-chain on their behalf, which does not answer the question so much as move it to
-whoever runs the service.
-
-The decentralised alternatives face the question squarely, and every one of
-them answers it the same way.
-Section 8 of~\cite{nakamoto08} tells a client to keep the headers of the longest
-proof of work chain, ``which he can get by querying network nodes until he's
-convinced he has the longest chain''. The quoted clause is an assumption written
-as advice. It asks that one of the nodes the client reaches be honest, and it
-asks that the chain that node holds be current. Superblock proofs~\cite{nipopow},
-probabilistic sampling~\cite{flyclient} and the interactive protocol
-of~\cite{blink} shrink what the client downloads, in the last case to a constant,
-and each of them inherits the clause untouched. All of them need one honest party
-among those the client speaks to, and all of them need the network to deliver on
-time. A client that has been eclipsed~\cite{eclipse} has neither.
-
-This paper asks what a client can do with neither, and the answer is that it
-can still confirm a prefix and can work out which one. The observation is about
-chain growth. Honest validators extend the chain at a rate fixed by the mining
-target and by how much of the mining power is honest, and a client knows both
-of these before it connects to anything. Knowing the round, it therefore knows
-a length the honest chain has already passed. A chain shorter than that was not
-produced by honest validators keeping pace. Its recent blocks were withheld
-while it was built, and the rate at which the adversary mines bounds how many
-such blocks there can be. A shortfall in length is not a sign that the client
-is merely behind and holding something older and safer. It is a measurement of
-how much work could have gone into a private fork.
+\\
 
 Two bounds meet, and the rule falls out of them. Write $f$ for the probability
 that some honest validator mines in a round, $r$ for the round at which the
