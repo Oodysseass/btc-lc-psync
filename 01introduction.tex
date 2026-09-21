@@ -21,23 +21,26 @@ clients can still confirm transactions in a \emph{secure} manner, even if their
 communication channels with the rest of the network are unstable. We put forth a
 construction that allows for this, and prove it secure and live.
 
-In particular, one the one hand we model the network of validators as
+In particular, on the one hand we model the network of validators as
 synchronous, with a bounded network delay known to everybody, but on the other
 hand we allow the clients' connections to be asynchronous. We realize this by
 allowing the adversary to deliver any message of their choice at any round to
-the clients. This is a hybrid, network model that is realistic even today, and
+the clients. This is a hybrid network model that is realistic even today, and
 we explore it in this work for the first time. This could apply to wallets on
 airplanes, or laptops behind a router someone else controls, or any other device
 that is not always connected to the network and that may have a poor connection.
 
 Previously, we knew that the assumption of synchrony is necessary for
 Proof-of-Work consensus and dynamic availability. Notable work has discussed
-this *cite availability finality*. Previous work on longest chain clients has
-focused on optimizing the communication load of the messages downloaded by
-clients *cite blink, flyclient, nipopow*, but no result has shown that synchrony is in fact not necessary for
-the security of clients. This is the first result in this hybrid model, that
-allows for the security of clients to be achieved without the assumption of
-synchrony while still enabling the benefits of dynamic availability.
+this~\cite{accountable-safety,ebbflow,cuamdr}. Previous work on longest chain
+clients has focused on optimizing the communication load of the messages
+downloaded by clients~\cite{nipopow,flyclient,blink}, but no result has shown
+that synchrony is in fact not necessary for the security of clients. This is the
+first result in this hybrid model, that allows for the security of clients to be
+achieved without the assumption of synchrony while still enabling the benefits
+of dynamic availability. We highlight that our model differs from the usual
+assumption of sleepy clients, where the client knows when it was asleep, gets
+everything it missed when it wakes, and assumes synchrony while it is awake.
 
 We build this construction by leveraging the lower and upper bounds on the chain
 growth rate of a longest chain protocol. A client connecting later to the
@@ -47,98 +50,56 @@ adversarial blocks that could have been mined in private and discard those
 blocks from the chain. The remaining chain is a prefix of the chain that the
 client can safely use.
 
-* Sketch of construction / argument (warm up...) 5 paragraphs
-\\
+A client wakes up at some point of the execution and asks the network for a
+chain. At some round $r$, no matter how much later, the adversary delivers to
+the client a chain. The client has no assumption for the sender of the chain or
+the delay. It has access, however, to the round number and the mining rates,
+which are fixed before the execution starts and are public. With these at hand,
+the client can compute both the lower and upper bounds on the length of an
+honest or adversarial chain, from the Chernoff bounds and the typicality
+analysis of \cite{gkl24}. In $r$ rounds honest validators have about $fr$
+succesful rounds and, thus, at least $fr$ blocks in the longest chain.
+Furthermore, the client knows that no chain can be taller than
+$\frac{n}{n-t}fr$ \footnote{This is actually not true in the general case, but
+for the exposition of the introduction we assume $f \to 0$.}, the honest and
+adversarial mining rates combined. This indicates how recent a block is; a block
+at height $h$ cannot have been mined before round $h\frac{n-t}{nf}$.
 
-Two bounds meet, and the rule falls out of them. Write $f$ for the probability
-that some honest validator mines in a round, $r$ for the round at which the
-chain reaches the client, $\hgt$ for its height, and $d$ for the number of
-blocks it carries beyond the point where it left the honest chain. No chain
-grows faster than $\frac{n}{n-t}f$ blocks per round, so no chain reaches a
-given height before a round proportional to that height. The fork point sits
-at height $\hgt-d$, and it therefore cannot have been computed before round
-$(\hgt-d)\frac{n-t}{nf}$. After it, only adversarial blocks extend the fork, and
-the adversary mines about $\frac{t}{n-t}f$ blocks per round, so $d$ is at most
-that rate times the rounds that remain. The deeper the fork, the lower the
-height at which it began, and the lower it began the earlier it may have been
-laid down, which leaves more rounds in which to extend it. The two bounds are
-consistent only up to a point. Eliminating the round of the fork between them
-leaves
-\[
-    \prn(r) = \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right)
-\]
-blocks, which is what the client discards. \Cref{fig.confirmed} is the same
-statement drawn in the plane, and \Cref{def.client} is the rule with the
-corrections a typical execution requires. Nothing in it refers to a peer. The
-client evaluates it on whatever chain arrives, from whoever sends it, and the
-prefix that survives is a prefix of the chain every honest validator holds.
+Say the chain at hand has height $\hgt$, and say the adversary forked it off the
+honest chain and mined the last $d$ blocks in private. Write $\rst$ for the
+round in which the fork point was mined. We give a lower and upper bound on
+$\rst$. From below, the fork point sits at height $\hgt-d$, and nothing reaches
+that height before round $(\hgt-d)\frac{n-t}{nf}$. So $\rst$ cannot be earlier
+than that. From above, only the adversary works on this branch once the fork is
+made, and it finds about $\frac{t}{n-t}f$ blocks per round. Producing $d$ of
+them takes it at least $d\frac{n-t}{tf}$ rounds, so $\rst$ cannot be later than
+$r-d\frac{n-t}{tf}$. Both bounds move with $d$, and as $d$ grows the upper one
+falls faster than the lower one, so the window closes. Past some $d$ no round
+is left for the fork point to sit in, and a fork that deep cannot exist. That
+largest $d$ is what the client is after. Asking that the lower bound not exceed
+the upper one is an inequality in $d$, and solving it gives
+\(
+    d \le \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right) =: \prn(r) .
+\)
+The client throws away that many blocks.
 
-Three things about the rule run against the way confirmation is usually
-described, and each is worth stating on its own.
-
-The first is that a short chain is the dangerous one. Intuition says the
-opposite. A chain that lags behind the tip looks like old history, and old
-history has had longer to settle. For a validator that reading is sound. For a
-client it is not, because two very different situations reach it looking the
-same. In one, an honest validator sent its chain and the message took an hour
-to arrive. In the other, the adversary forked an hour ago and has been
-extending that fork in private ever since. Both reach the client at round $r$
-as a chain too short for the round, and nothing inside either chain separates
-them. So the client must count every block of shortfall as work that might have
-gone into a fork. The rule gives up $\frac{t}{n-2t}$ blocks for each block by
-which the chain falls short of an honest one. Below $t=n/3$ that is less than a
-block of confirmation per block of shortfall, and above it is more. A client
-cannot see an honest chain to measure the shortfall against, so it measures
-against the tallest chain that could exist by round $r$, which is what
-$\prn(r)$ does.
-
-The second is that no constant confirmation depth is sound. Take the friendliest
-case there is. An honest validator adopts a chain at round $r$ and hands it
-straight to the client, with no delay at all. The rule still prunes
-$\frac{t^2}{(n-t)^2}fr$ blocks from it, and that number grows without bound as
-the execution runs. Six confirmations fail once the chain is old enough, and so
-do six hundred.
-
-The third is that liveness survives this anyway. The depth grows, but the
-fraction of the chain it removes does not. That fraction stays at
-$\frac{t^2}{(n-t)^2}$, the square of the adversary's share of the queries
-relative to the honest share. Against an adversary with a tenth of the mining
-power it is about $1.2\%$, so a client handed a chain of one million blocks
-discards the last twelve thousand. Against a quarter it is $11\%$, and against
-a third it is $25\%$. The confirmed prefix therefore grows at a constant rate,
-and a client that runs the rule again at a later round confirms strictly more.
-
-Our client is not a sleepy client, and the difference is the point. A sleepy
-party in the sense of~\cite{sleepy} knows when it was asleep, receives on waking
-everything it missed, and assumes synchrony while it is awake. The client models
-of~\cite{cuamdr} inherit that shape, and what sleeping costs there is the
-ability to time the arrival of a message. Our client keeps its clock and gives up
-everything else. It assumes no bound on the delay of its own link, at any round,
-and it assumes that no party it speaks to is honest. The clock is all that is
-left, and counting rounds since the execution began turns out to be enough.
-
-Clients that never speak to one another still agree. The output of one is a
-prefix of the output of the other, whatever each was sent and whenever each
-joined, even if one of them is eclipsed and the other is not. This is the
-guarantee a reader of a replicated state machine expects, and here it costs no
-assumption about either client's network. Finally, the bound cannot be
-improved. Against an adversary that mines in private, a client that confirmed
-any more would confirm a block that the honest validators go on to abandon, so
-the prefix our rule returns is the longest prefix any client can safely return.
+It is immediate that the confirmation rule of the construction is not a constant
+number throughout the execution, but depends on the height of the chain and the
+round it was delivered. As the execution runs, the number of blocks the client
+discards grows. Nonetheless, the construction is not only safe, but live; we
+show that the confirmed prefix grows at a constant rate.
 
 \paragraph{Contributions}
 
-We work in the static synchronous backbone model of~\cite{gkl24} and change
-what a client is allowed to assume: nothing about its own network, and nothing
-about the honesty of the parties that answer it.
+We work in the static synchronous backbone model of~\cite{gkl24}, while assuming
+clients that have an asynchronous connection to the network.
 \begin{enumerate}
-    \item We give a confirmation rule that a client evaluates from the round
-        and the chain in front of it (\Cref{sec.construction}).
+    \item We give a confirmation rule that a client evaluates given only a chain
+        and the current round of the execution (\Cref{sec.construction}).
     \item We prove that what it returns is a prefix of every chain an honest
         validator adopts from that round onwards, and that any two clients
         running it return prefixes of one another (\Cref{sec.safety}).
-    \item We prove it live, in one bound that covers an honest counterparty and
-        an adversarial one, and we show the confirmed prefix grows at a constant
+    \item We prove it live, and we show the confirmed prefix grows at a constant
         rate (\Cref{sec.liveness}).
     \item We prove the bound tight by exhibiting a private mining adversary
         that attains it, and we show that no constant confirmation depth is
