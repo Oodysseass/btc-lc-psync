@@ -58,21 +58,43 @@ constant throughput, but a deteriorating liveness.
 
 \input{figures/fig.rates}
 
-\Cref{fig.rates} shows why the rule works. Every chain the client receives
-is a prefix followed by a tail. The prefix is on the honest chain. The tail is
-not, and the adversary mined it in private. The client wants to discard the
-tail. It cannot see where the tail starts, but it knows the round and it knows
-how fast the adversary alone can mine. A simple rule discards as many blocks
-as the adversary could have mined by itself since the start of the execution.
-\Cref{fig.rates}(a) draws it. It is safe, and it discards more than needed.
-The prefix had to be mined too, and no chain grows faster than everybody
-together. So the prefix took rounds to reach its height, and the tail could
-only use the rounds after that. The taller the chain, the later the tail
-starts, and the shorter it is. \Cref{fig.rates}(b) draws the worst case, and
-our rule discards exactly the tail of that case. Write $\advr=t/(n-t)$, where
-$t$ of the $n$ validators are adversarial. For a chain as tall as an honest
-chain, the simple rule discards $\advr$ times its height, and ours discards
-$\advr^2$ times it.
+We give some intuition on why such a construction is possible. Every validator
+makes a fixed number of attempts per round, and each attempt finds a block with
+a fixed probability. So the honest validators together find blocks at a known
+rate, which we call the honest rate. The adversary finds blocks at $\advr$
+times the honest rate, where $\advr=t/(n-t)$ and $t$ of the $n$ validators are
+adversarial. Everybody together finds blocks at $1+\advr$ times the honest
+rate. We measure rates in units of the honest rate from now on, so the
+adversary mines at rate $\advr$ and everybody together at rate $1+\advr$. These
+rates bound how chains grow. The chain of an honest validator grows at least at
+the honest rate, because honest validators build on the longest chain they see.
+No chain grows faster than rate $1+\advr$, because every block is somebody's
+work. The client knows the rates before it sees a single block, and
+\Cref{fig.rates} draws them as three lines. Now look at the chain the client
+received at round $r$. It has two parts. The first is a prefix that the honest
+validators also hold. The second is a tail that they do not hold: the adversary
+mined it in private, after it left the honest chain. The client wants to keep
+the prefix and prune the tail. It cannot see where one ends and the other
+begins. What it can do is bound the length of the tail, and prune that many
+blocks. A first bound is simple. The tail is the adversary's own work, and the
+adversary has mined for at most $r$ rounds. So the tail is at most what the
+adversary alone mines in $r$ rounds, and a client that prunes that many blocks
+is safe. \Cref{fig.rates}(a) draws this rule. It is safe, and it prunes far
+more than it needs to. The reason is that the tail could not have started at
+round $0$. The prefix came first, and it had to be mined too. Even at rate
+$1+\advr$, a prefix of a given height takes a certain number of rounds to
+build. The tail only gets the rounds that remain. So the taller the chain, the
+more rounds its prefix took, the later its tail began, and the shorter the tail
+is. \Cref{fig.rates}(b) draws the worst case: a prefix that grows at rate
+$1+\advr$, and then a tail that grows at rate $\advr$, until it reaches the
+height of the chain. No tail is longer than that one. Our rule prunes exactly
+that tail. Three heights fix the rule. The tallest chain that can exist has no
+tail, and the client keeps all of it\footnote{With the exception of the common
+prefix parameter $k$.}. A chain as tall as an honest chain has a tail that is a
+$\advr^2$ fraction of it, and the client prunes that fraction. The first rule
+prunes a $\advr < \advr^2$ fraction. A chain that the adversary alone could have
+mined may be all tail, and the client keeps nothing. Between these heights the
+pruning depth is linear.
 
 \paragraph{Contributions}
 
