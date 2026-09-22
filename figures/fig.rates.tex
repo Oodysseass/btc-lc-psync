@@ -1,0 +1,83 @@
+\begin{figure}[!t]
+\centering
+\colorlet{cadv}{red!80!black}
+\colorlet{chon}{blue!70!black}
+\colorlet{call}{violet}
+% rho = 1/2, drawn with the honest rate as slope 1/2: the three rays have
+% slopes 3/4 (everybody), 1/2 (honest, dashed) and 1/4 (adversary alone).
+% The received chain is the dot at (r, honest height), r = 2.5.
+\begin{tikzpicture}[x=0.9cm,y=1.1cm,>=stealth,font=\footnotesize]
+  \def\xe{3.3}
+  \def\xr{2.5}
+  % axes
+  \draw[->] (0,0) -- (3.7,0) node[below] {round};
+  \draw[->] (0,0) -- (0,2.65) node[left] {height};
+  % rays
+  \draw[thick,call]        (0,0) -- (\xe,2.475) node[right] {everybody};
+  \draw[thick,dashed,chon] (0,0) -- (\xe,1.65)  node[right] {honest};
+  \draw[thick,cadv]        (0,0) -- (\xe,0.825) node[right] {adversary};
+  % the tail the simple rule assumes: the adversary alone, for all r rounds
+  \draw[very thick,cadv] (0,0.625) -- (\xr,1.25) node[pos=0.3,above,sloped] {tail};
+  \draw[dotted] (\xr,0) -- (\xr,1.25);
+  \draw[dotted] (0,0.625) -- (\xr,0.625);
+  \fill (\xr,1.25) circle (1.8pt);
+  \draw[very thick] (\xr-0.07,0.625) -- (\xr+0.07,0.625);
+  \draw[<->] (\xr+0.18,0.625) -- (\xr+0.18,1.25)
+    node[pos=0.8,right,fill=white,inner sep=1pt] {discard};
+  \node[anchor=north] at (\xr,-0.06) {$r$};
+  \node at (1.6,-0.75) {(a)};
+\end{tikzpicture}
+\hspace{0.3cm}
+\begin{tikzpicture}[x=0.9cm,y=1.1cm,>=stealth,font=\footnotesize]
+  \def\xe{3.3}
+  \def\xr{2.5}
+  \def\xf{1.25}
+  % axes
+  \draw[->] (0,0) -- (3.7,0) node[below] {round};
+  \draw[->] (0,0) -- (0,2.65) node[left] {height};
+  % rays
+  \draw[thick,call]        (0,0) -- (\xe,2.475) node[right] {everybody};
+  \draw[thick,dashed,chon] (0,0) -- (\xe,1.65)  node[right] {honest};
+  \draw[thick,cadv]        (0,0) -- (\xe,0.825) node[right] {adversary};
+  % the worst case: prefix along the top ray, then tail at the adversary's rate
+  \draw[very thick,call] (0,0) -- (\xf,0.9375) node[midway,above,sloped] {prefix};
+  \draw[very thick,cadv] (\xf,0.9375) -- (\xr,1.25) node[midway,above=1pt,sloped] {tail};
+  \draw[dotted] (\xr,0) -- (\xr,1.25);
+  \draw[dotted] (\xf,0) -- (\xf,0.9375) -- (\xr,0.9375);
+  \fill (\xr,1.25) circle (1.8pt);
+  \draw[fill=white] (\xf,0.9375) circle (1.8pt);
+  \draw[very thick] (\xr-0.07,0.9375) -- (\xr+0.07,0.9375);
+  \draw[<->] (\xr+0.18,0.9375) -- (\xr+0.18,1.25)
+    node[midway,right,fill=white,inner sep=1pt] {discard};
+  \node[anchor=north] at (\xf,-0.06) {fork};
+  \node[anchor=north] at (\xr,-0.06) {$r$};
+  \node at (1.6,-0.75) {(b)};
+\end{tikzpicture}
+\caption{The blocks the client discards. The figure shows height against
+round. A vertical distance is a number of blocks. A slope is a number of
+blocks per round. Write $\advr=t/(n-t)$, where $t$ of the $n$ validators are
+adversarial. The adversary mines $\advr$ blocks for every block the honest
+validators mine, and $\advr=\frac{1}{2}$ here. The three thin lines show how
+fast a chain can grow: the adversary alone in red, the honest validators in
+blue, and everybody together in violet, which is $1+\advr$ times the honest
+rate. The dot is the
+chain the client receives at round $r$. Here it is as tall as an honest chain.
+The chain has two parts. The prefix is on the honest chain. The tail is not.
+The adversary mined the tail in private, and the client wants to discard
+exactly the tail. The thick line shows how the chain grew over time, and
+each piece of it has the color of the rate it follows. The vertical rise of
+the red piece is the number of blocks in the tail, and this rise is what the
+client discards. (a) The simple rule. Suppose the adversary
+mined the tail by itself for all $r$ rounds. Then the tail has as many blocks
+as the bottom line at round $r$. The client discards that many, here half of
+the chain. This supposes a prefix that was already there at round $0$. (b) The
+rule of this paper. No block exists at round $0$. The prefix had to be mined
+too, and it grew at most as fast as the top line. So the prefix took rounds to
+build, and the tail could only use the rounds after that. The worst case is
+drawn. The prefix follows the top line until the fork. The tail has the slope
+of the bottom line and ends at the dot. No tail can be longer than this. The
+client discards its rise, here a quarter of the chain. That is $\advr^2$ times
+the honest height, against $\advr$ times it in (a). A taller dot means a later
+fork and a shorter tail. A dot on the top line has no tail. A dot on the
+bottom line is all tail.}\label{fig.rates}
+\end{figure}

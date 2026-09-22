@@ -1,0 +1,12 @@
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.94\textwidth]{figures/network-model}
+\caption{The network model. The validators are on Earth, and they are
+synchronous with one another: a message from one of them reaches all the
+others within a bounded delay that everybody knows. The whole analysis of
+bitcoin rests on this. The client is on $\alpha$ Centauri, and its link to
+Earth is asynchronous: a message may take any amount of time to arrive, or it
+may never arrive, and the client is never told which. What the client does have
+is a clock, so it knows the current round, and it knows the parameters of the
+protocol, which are public. It knows nothing else.}\label{fig.model}
+\end{figure}

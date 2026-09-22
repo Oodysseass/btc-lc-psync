@@ -2,93 +2,77 @@
 \label{sec.intro}
 
 The year is 2227. Humans have colonized $\alpha$ Centauri. All 21 million
-bitcoin have been mined.
-Because bitcoin requires network synchrony, all bitcoin miners are
-still located on earth. A lone hodler on $\alpha$ Centauri finally decides to sell
-her bitcoin.
+bitcoin have been mined. A lone hodler on $\alpha$ Centauri finally decides to
+sell her bitcoin.
 
 While all validators are still based on earth, where network latency is known
 and bounded, intergalactic communication is still tricky; our hodler does not
 trust the dissemination of information from so far away. It could take years for
-an actual honest message to reach her, or the message might be dropped altogether.
-It is known that bitcoin requires network synchrony.
-Lucky for her, we come to her rescue! With our new protocol, she can still confirm
+an actual honest message to reach her, or the message might be dropped
+altogether. How is she going to use bitcoin without network synchrony? Lucky for
+her, we come to her rescue! With our new protocol, she can still confirm
 transactions without assuming any bounded delay over her communication channel
 with earth.
 
-Although the network among bitcoin validators has to be \emph{good}, it turns
-out the same assumption is not necessary for the clients to use the chain. The
-clients can still confirm transactions in a \emph{secure} manner, even if their
-communication channels with the rest of the network are unstable. We put forth a
-construction that allows for this, and prove it secure and live.
+\input{figures/fig.model}
 
-In particular, on the one hand we model the network of validators as
-synchronous, with a bounded network delay known to everybody, but on the other
-hand we allow the clients' connections to be asynchronous. We realize this by
-allowing the adversary to deliver any message of their choice at any round to
-the clients. This is a hybrid network model that is realistic even today, and
-we explore it in this work for the first time. This could apply to wallets on
-airplanes, or laptops behind a router someone else controls, or any other device
-that is not always connected to the network and that may have a poor connection.
+The necessity of synchrony is well understood, both for Proof-of-Work consensus
+and for dynamic availability in
+general~\cite{accountable-safety,ebbflow,cuamdr}, and the clients of a longest
+chain protocol have always inherited the assumption from the validators.
+Previous work on longest chain clients has focused on optimizing the
+communication load of the messages downloaded by
+clients~\cite{nipopow,flyclient,blink}, and has left the assumption untouched;
+no result has shown that synchrony is in fact not necessary for the security of
+clients. Our construction is safe even in asynchrony, while preserving the
+benefits of dynamic availability. We highlight that our model differs from the
+usual assumption of sleepy clients, where the client knows when it was asleep,
+gets everything it missed when it wakes, and assumes synchrony while it is
+awake.
 
-Previously, we knew that the assumption of synchrony is necessary for
-Proof-of-Work consensus and dynamic availability. Notable work has discussed
-this~\cite{accountable-safety,ebbflow,cuamdr}. Previous work on longest chain
-clients has focused on optimizing the communication load of the messages
-downloaded by clients~\cite{nipopow,flyclient,blink}, but no result has shown
-that synchrony is in fact not necessary for the security of clients. This is the
-first result in this hybrid model, that allows for the security of clients to be
-achieved without the assumption of synchrony while still enabling the benefits
-of dynamic availability. We highlight that our model differs from the usual
-assumption of sleepy clients, where the client knows when it was asleep, gets
-everything it missed when it wakes, and assumes synchrony while it is awake.
+We frame this in a hybrid network model. On the one hand we model the network of
+validators as synchronous, with a bounded network delay known to everybody. On
+the other hand we allow the clients' connections to be asynchronous. This
+network model is the most realistic today, and we explore it in this work for
+the first time. Validators are specific machines, optimized to stay well
+connected. Clients are everyday devices: wallets on airplanes, laptops behind a
+router under someone else's control, or any device may have a poor connection or
+is under a denial-of-service attack. In this model the clients can still confirm
+transactions, even if their communication with the rest of the network is
+unstable. We put forth a construction that allows for this, and prove it safe
+and live.
 
-We build this construction by leveraging the lower and upper bounds on the chain
-growth rate of a longest chain protocol. A client connecting later to the
-network can compute the lower and upper bounds on the length of an honest or
-adversarial chain. Knowing this, the client can compute the maximum number of
-adversarial blocks that could have been mined in private and discard those
-blocks from the chain. The remaining chain is a prefix of the chain that the
-client can safely use.
+When a client wakes up, it asks the network for a chain and waits until it
+receives one. It has access to a trusty clock and knows the round $r$ when it
+received the chain $\ch$. From the received chain, it will prune a suffix in
+order to compute a confirmed prefix of $\ch$. In contrast to the confirmation
+rule under a synchronous network, our client does not prune a constant number of
+blocks, but computes a function $\prn(r, \hgt)$ of the round $r$ and the length
+$\hgt$ of the chain $\ch$ that arrived. If the chain is much shorter than
+expected for the current round, the client discards all of it. Otherwise, it
+keeps $\prune{\ch}{\prn(r, \hgt)}$. A client that stays connected to the network
+and receives honest chains round after round will confirm a prefix that grows
+lineraly with the round number. However, the pruning function $\prn(r, \hgt)$
+also grows linearly with the height of the chain. This gives our construction a
+constant throughput, but a deteriorating liveness.
 
-A client wakes up at some point of the execution and asks the network for a
-chain. At some round $r$, no matter how much later, the adversary delivers to
-the client a chain. The client has no assumption for the sender of the chain or
-the delay. It has access, however, to the round number and the mining rates,
-which are fixed before the execution starts and are public. With these at hand,
-the client can compute both the lower and upper bounds on the length of an
-honest or adversarial chain, from the Chernoff bounds and the typicality
-analysis of \cite{gkl24}. In $r$ rounds honest validators have about $fr$
-succesful rounds and, thus, at least $fr$ blocks in the longest chain.
-Furthermore, the client knows that no chain can be taller than
-$\frac{n}{n-t}fr$ \footnote{This is actually not true in the general case, but
-for the exposition of the introduction we assume $f \to 0$.}, the honest and
-adversarial mining rates combined. This indicates how recent a block is; a block
-at height $h$ cannot have been mined before round $h\frac{n-t}{nf}$.
+\input{figures/fig.rates}
 
-Say the chain at hand has height $\hgt$, and say the adversary forked it off the
-honest chain and mined the last $d$ blocks in private. Write $\rst$ for the
-round in which the fork point was mined. We give a lower and upper bound on
-$\rst$. From below, the fork point sits at height $\hgt-d$, and nothing reaches
-that height before round $(\hgt-d)\frac{n-t}{nf}$. So $\rst$ cannot be earlier
-than that. From above, only the adversary works on this branch once the fork is
-made, and it finds about $\frac{t}{n-t}f$ blocks per round. Producing $d$ of
-them takes it at least $d\frac{n-t}{tf}$ rounds, so $\rst$ cannot be later than
-$r-d\frac{n-t}{tf}$. Both bounds move with $d$, and as $d$ grows the upper one
-falls faster than the lower one, so the window closes. Past some $d$ no round
-is left for the fork point to sit in, and a fork that deep cannot exist. That
-largest $d$ is what the client is after. Asking that the lower bound not exceed
-the upper one is an inequality in $d$, and solving it gives
-\(
-    d \le \frac{t}{n-t}\left(\frac{n}{n-t}fr-\hgt\right) =: \prn(r) .
-\)
-The client throws away that many blocks.
-
-It is immediate that the confirmation rule of the construction is not a constant
-number throughout the execution, but depends on the height of the chain and the
-round it was delivered. As the execution runs, the number of blocks the client
-discards grows. Nonetheless, the construction is not only safe, but live; we
-show that the confirmed prefix grows at a constant rate.
+\Cref{fig.rates} shows why the rule works. Every chain the client receives
+is a prefix followed by a tail. The prefix is on the honest chain. The tail is
+not, and the adversary mined it in private. The client wants to discard the
+tail. It cannot see where the tail starts, but it knows the round and it knows
+how fast the adversary alone can mine. A simple rule discards as many blocks
+as the adversary could have mined by itself since the start of the execution.
+\Cref{fig.rates}(a) draws it. It is safe, and it discards more than needed.
+The prefix had to be mined too, and no chain grows faster than everybody
+together. So the prefix took rounds to reach its height, and the tail could
+only use the rounds after that. The taller the chain, the later the tail
+starts, and the shorter it is. \Cref{fig.rates}(b) draws the worst case, and
+our rule discards exactly the tail of that case. Write $\advr=t/(n-t)$, where
+$t$ of the $n$ validators are adversarial. For a chain as tall as an honest
+chain, the simple rule discards $\advr$ times its height, and ours discards
+$\advr^2$ times it.
 
 \paragraph{Contributions}
 
