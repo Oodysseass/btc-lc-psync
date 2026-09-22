@@ -1,0 +1,104 @@
+\section{Proofs for the model}
+\label{appendix.model}
+
+\begin{proofof}{\Cref{lem.membership}}
+    The blocks of a chain held by a client at round $r$ exist at round $r$, so
+    each was computed in a round of $[0,r]$. For the second claim, let $B$ be a
+    block of a chain adopted by an honest validator at round $r$, other than the
+    genesis block. If the validator received $B$, it received it at a round at
+    most $r$, so $B$ was sent, and hence computed, at a round at most $r-1$.
+    Otherwise the validator computed $B$ itself, at a round at most $r-1$,
+    because a validator adopts before it queries the oracle. So every block of
+    the chain is in $\bt_{r-1}$.
+\end{proofof}
+
+\begin{proofof}{\Cref{lem.fork}}
+    If $B$ is the genesis block, then $i=r=0$, every validator has a chain of
+    length $1$ at round $1$, and every chain has length at least $1$. Otherwise
+    the honest validator that computed $B$ appended $B$ at round $r$ to the
+    chain it adopted at round $r$, made the result its local chain, and sent it.
+    The result has length $i+1$, so that validator has a chain of length
+    greater than $i$ at round $r+1$. Every honest validator receives the
+    result at the beginning of round $r+1$, so it is an argument of
+    $\fn{maxvalid}$. Hence the chain adopted at round $r+1$ has length greater
+    than $i$. We claim that the same holds at every round $r'>r+1$. The chain a
+    validator has at round $r'$ is the chain it adopted at round $r'-1$,
+    possibly extended by one block. By induction on $r'$ it has length greater
+    than $i$. The chain adopted at round $r'$ is at least as long.
+\end{proofof}
+
+\begin{proofof}{\Cref{lem.fsq}}
+    Two or more of the $q(n-t)$ honest queries succeed with probability at most
+    $\binom{q(n-t)}{2}p^2\le(pq(n-t))^2/2$, and $pq(n-t)<f/(1-f)$ by
+    \Cref{eq.rates}.
+\end{proofof}
+
+\begin{proofof}{\Cref{thm.typical}}
+    \Cref{def.typical} is~\cite[Definition 4.4]{gkl24}, in the form
+    of~\cite[Lemma 4.6]{gkl24}, with the bound on $W(S)$ added, and
+    \cite[Theorem 4.5]{gkl24} bounds the probability that any of the other
+    conditions fails by $4L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}$.
+    It remains to bound the probability that the added condition fails, and
+    this is a Chernoff bound. $W(S)$ is a sum of $|S|$ independent Bernoulli
+    trials with mean $\mu=f_2|S|$, the $W_r$ of distinct rounds being
+    independent for the same reason as the $X_r$ in~\cite{gkl24}. For $a>0$
+    the Chernoff bound gives $\Pr[W(S)\ge\mu+a]\le\exp(-a^2/(2\mu+a))$. Take
+    $a=\epsilon f|S|$. \Cref{asm.majority} gives $f<1/3$, so by \Cref{lem.fsq}
+    $2f_2<f^2/(1-f)^2<3f^2$ and $3f+\epsilon<2$, and
+    \[
+        \frac{a^2}{2\mu+a} = \frac{\epsilon^2f^2|S|}{2f_2+\epsilon f}
+        > \frac{\epsilon^2f^2|S|}{3f^2+\epsilon f} = \frac{\epsilon^2f|S|}{3f+\epsilon}
+        > \frac{\epsilon^2f|S|}{2} \ge \frac{\epsilon^2\lambda f}{2} .
+    \]
+    So the bound on $W(S)$ fails for a given $S$ with probability at most
+    $e^{-\epsilon^2\lambda f/2}$. A union bound over the at most $L^2$ sets $S$
+    adds one term $L^2e^{-\Omega(\epsilon^2\lambda f)}$, which is why the first
+    coefficient of $\typ$ is $5$ rather than the $4$ of~\cite{gkl24}.
+\end{proofof}
+
+\section{Proofs for the growth bounds}
+\label{appendix.analysis}
+
+\begin{proofof}{\Cref{lem.rho}}
+    By definition, $\advrtwo<1$ is equivalent to
+    $\frac{\advr}{1-f}+\frac{f_2}{f}<1-3\epsilon$. From \Cref{asm.majority},
+    $\advr\le1-\delta$ and $f<1/3$, and $f_2/f<f/(2(1-f)^2)$ by
+    \Cref{lem.fsq}. So it suffices to show
+    \[
+        \frac{1-\delta}{1-f}+\frac{f}{2(1-f)^2} < 1-3\epsilon .
+    \]
+    Multiplying by $(1-f)^2$, this is
+    $1-\tfrac{f}{2}-\delta(1-f)<(1-3\epsilon)(1-f)^2$, that is,
+    $\delta(1-f)>\tfrac{3f}{2}-f^2+3\epsilon(1-f)^2$. Since $f<1/3$, the right
+    side is at most $(1-f)(2f+3\epsilon)$. So $\delta>2f+3\epsilon$ suffices,
+    and it follows from $3f+3\epsilon<\delta$.
+\end{proofof}
+
+\begin{proofof}{\Cref{lem.honestone}}
+    Suppose towards a contradiction that $\ch[i]$ and $\ch[i']$ with $i<i'$ are
+    both honest and both computed at round $r$. Only the genesis block was
+    computed at round $0$, so $r\ge1$. The honest validator that computed
+    $\ch[i']$ extended at round $r$ the chain it adopted at round $r$. A block
+    determines all of its ancestors, so that chain is $\ch[{:}i']$, and it
+    contains $\ch[i]$. From \Cref{lem.membership}, $\ch[{:}i']\in\bt_{r-1}$,
+    so $\ch[i]$ was computed at a round at most $r-1$. This contradicts the
+    assumption that $\ch[i]$ was computed at round $r$.
+\end{proofof}
+
+\begin{proofof}{\Cref{lem.length}}
+    Let $r'=\max(r,\lambda)$ and let $\ch\in\bt_r$. The blocks of $\ch[1{:}]$
+    were computed in rounds of $[1,r']$. From \Cref{lem.honestone}, the honest
+    ones were computed in distinct rounds, each of them successful. So there
+    are at most $X([1,r'])$ honest blocks, and at most $Z([1,r'])$ adversarial
+    ones. Since $r'\ge\lambda$, \Cref{def.typical} applies and
+    \[
+        \len{\ch}-1 = \len{\ch[1{:}]} <
+            (1+\epsilon)fr'+\left(\frac{\advr}{1-f}+\epsilon\right)fr' = \maxr f r',
+    \]
+    where the last equality uses $\frac{\advr}{1-f}=\advr+\frac{\advr f}{1-f}$.
+    This proves the first item. For the second, every honest validator has a
+    chain of length $1$ at round $1$. From \Cref{lem.growth}, every honest
+    validator adopts at round $r$ a chain of length at least $1+X([1,r-1])$.
+    Since $r-1\ge\lambda$, \Cref{def.typical} gives $X([1,r-1])>(1-\epsilon)f(r-1)$,
+    and hence $\len{\ch}-1>(1-\epsilon)f(r-1)$.
+\end{proofof}
