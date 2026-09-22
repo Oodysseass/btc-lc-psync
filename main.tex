@@ -11,29 +11,25 @@
 \maketitle
 
 \begin{abstract}
-Bitcoin is a \emph{synchronous} proof of work consensus protocol. Its resilience
-against an adversary holding just under half of the mining power rests exactly
-on the synchrony among the validators, and that assumption is known to be
-necessary. This assumption is also transferred to clients, where all client
-constructions up until now assume synchrony and existential honesty among
-their peers. However, clients can and should be treated in a more robust model.
-We remove both assumptions and achieve this. Our construction allows for a
-client to verify payments even if it has a poor connection, or may rather not
-trust a third party for a view of the chain.
-
-Our observation is that the honest validators grow the chain at a rate the
-client can compute in advance. A chain that is too short for the round in which
-it arrives is evidence of a fork that was mined in private, and the same rate
-bounds how long that fork can be. From the chain and a clock, and from nothing
-else, the client computes a prefix that is safe against every adversary; no
-party it speaks to need be honest, and no message need ever arrive on time. This
-is not the sleepy client model, in which a party knows when it was asleep and
-assumes synchrony while awake. Our client assumes nothing at all about the
-network and holds only a clock, which counts the rounds since the execution
-began. We give the construction, prove it safe, and prove it live: the client
-keeps confirming new transactions, at a rate we bound. We then prove the bound
-tight, by exhibiting an attack under which no client can confirm a longer
-prefix.
+Bitcoin is a \emph{synchronous} proof of work consensus protocol. Its security
+against a minority adversary rests on the synchrony among the validators, and
+that assumption is known to be necessary. Bitcoin clients have inherited it:
+every client construction to date assumes that messages arrive on time and that
+at least one of its peers is honest. We show that a client needs neither.  We
+keep the validators synchronous and give the client an asynchronous link to
+them, over which the adversary may delay or drop any message and may itself
+answer. The client holds a clock and nothing else. Bitcoin confirms a block once
+it is $k$ blocks deep in the chain, for a constant $k$. Our client confirms a
+block once it is deep enough for the current round and for the height of the
+chain it received. We prove the rule safe and live in the Bitcoin backbone
+model: what the client confirms is a prefix of every honest chain, at the round
+of receipt and at every round after, and the confirmed prefix grows at a
+constant rate. Asynchrony costs latency. A client that receives an honest chain
+at round $r$ discards a $t^2/(n-t)^2$ fraction of it, where $t$ of the $n$
+validators are adversarial. It discards $\Theta(r)$ blocks where a synchronous
+client discards a constant, and it confirms a block $\Theta(r)$ rounds after the
+honest validators do. We prove this tight: a private mining adversary forces
+every safe rule to discard as much, and no constant depth is safe.
 \end{abstract}
 
 \input{01introduction}
