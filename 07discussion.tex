@@ -4,8 +4,8 @@
 \paragraph{Confirmation rate}
 
 The pruning depth grows with the round. The fraction of the chain it removes
-does not. For a chain of height $\rate fr$, \Cref{cor.limit} gives
-$\prn(r)/\hgt\to\advr(1+\advr-\rate)/\rate$, which does not depend on $r$. At
+does not. For a chain $\ch$ of height $\rate fr$, \Cref{cor.limit} gives
+$\prn(r,\hgt)/\hgt\to\advr(1+\advr-\rate)/\rate$, which does not depend on $r$. At
 $\rate=1$ the fraction is $\advr^2$. So a client that receives an honest chain
 at round $r$ keeps a prefix of height about $(1-\advr^2)fr$, and one that
 receives an honest chain at a later round keeps strictly more. The confirmed
@@ -18,43 +18,43 @@ chain ages. Only the depth measured in blocks does, and
 \Cref{def.client} is applied to a chain as it is received, never to an output
 of a previous application. Applying it twice at the same round is sound and
 lossy. It is sound because the output is a chain of $\bt_r$ like any other, so
-\Cref{cor.round} applies to it. It is lossy because, in the normalised form of
+\Cref{thm.round} applies to it. It is lossy because, in the normalised form of
 \Cref{cor.limit}, a second application sends $\rate$ to
 $(1+\advr)(\rate-\advr)$. This map has the single fixed point $1+\advr$ and
 slope $1+\advr>1$ there, so the fixed point repels and every
 $\rate<1+\advr$ falls below $\advr$ after enough applications, at which point
 the client outputs $\bot$. Nothing is gained by the repetition:
-\Cref{cor.prune} confirms each output for every later round, so an output
+\Cref{thm.safety} confirms each output for every later round, so an output
 never has to be pruned again.
 
 \paragraph{Client knowledge}
 
-\Cref{def.client} uses $n$, $t$, $f$, $\epsilon$ and $\lambda$, and the client
-is given them. A client that prunes more than $\prn(r)$ still outputs a prefix
-of every honest chain, since a prefix of a prefix is a prefix. A client that
-prunes less has no guarantee from \Cref{cor.round}. An error in the parameters
-that raises the pruning depth therefore costs liveness, and one that lowers it
-costs safety. We do not analyse how a client obtains the parameters.
+\Cref{def.client} uses $n$, $t$, $f$, $\epsilon$ and $\lambda$, and we give the
+client all of them. Suppose it gets them wrong. If it prunes more than
+$\prn(r,\hgt)$ it still outputs a prefix of every honest chain, since a prefix of a
+prefix is a prefix. If it prunes less, \Cref{thm.round} says nothing. So an
+error that raises the depth costs liveness and an error that lowers it costs
+safety. We do not study how a client comes by the parameters.
 
 \paragraph{Variable difficulty}
 
-The analysis assumes a static population and a fixed target $T$. Under these
-assumptions the height of a chain is a proxy for the work in it, which is what
-\Cref{eq.early} needs. Variable difficulty breaks the proxy. An adversary that
-controls the timestamps of the blocks it produces can inflate the apparent time
-between difficulty adjustments, induce the largest decrease in target the rule
-allows, and reach a given height for much less work.
+The analysis assumes a static population and a fixed target $T$. Under those
+assumptions the height of a chain stands in for the work inside it, which is
+what \Cref{eq.early} needs. Variable difficulty breaks that. An adversary that
+controls the timestamps of its own blocks can stretch the apparent time between
+difficulty adjustments, trigger the largest drop in target the rule allows, and
+reach a given height for far less work.
 \cite{bitvm3} reports that about a fifth of the hashing power suffices to keep
 pace with the honest validators in this way, against an on-chain client that
 checks height alone. It repairs the client by binding the committed timestamps
-to the consensus time of the chain. \Cref{def.client} reads height against the round,
-so it is open to the same substitution. A version for variable difficulty would
-have to compare accumulated work against the round rather than height against
-the round. We do not carry that out here.
+to the consensus time of the chain. \Cref{def.client} reads height against the round, so the same substitution
+works against it. A version for variable difficulty would have to compare
+accumulated work against the round instead of height against the round. We do
+not do that here.
 
 \paragraph{Open questions}
 
-The additive terms of \Cref{thm.prefix,cor.round} are of order $\lambda f$,
+The additive terms of \Cref{thm.prefix,thm.round} are of order $\lambda f$,
 the order of the common prefix parameter of~\cite{gkl24}. We do not claim
 that they are optimal. The analysis is for the synchronous network
 of~\cite{gkl24}. In the bounded delay model of~\cite{gkl24,pss16} the rate

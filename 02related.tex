@@ -3,11 +3,12 @@
 
 \paragraph{Bitcoin clients}
 
-Every decentralised Bitcoin client we know of assumes that one of the parties it
-reaches is honest and that the network delivers on time. Simplified payment
-verification~\cite[Section 8]{nakamoto08} states the assumption as advice, and
-its cost is linear in the length of the chain. The work that followed attacks
-the cost and leaves the assumption alone. Superblock proofs~\cite{nipopow} bring
+Every decentralised Bitcoin client we know of assumes two things: that one of
+the parties it reaches is honest, and that the network delivers on time.
+Simplified payment verification~\cite[Section 8]{nakamoto08} states the
+assumption as advice, and it costs the client work linear in the length of the
+chain. Everything that followed went after the cost and left the assumption
+alone. Superblock proofs~\cite{nipopow} bring
 the client's work down to polylogarithmic and extend to miners
 in~\cite{logspace}. \cite{flyclient} samples blocks probabilistically, and
 \cite{blink} reaches a constant with an interactive protocol.
@@ -26,19 +27,17 @@ chain among those it was shown must still decide how much of it to keep.
 \cite{cuamdr} makes the client model a parameter rather than an afterthought and
 crosses four binary choices, among them whether a client sleeps and whether it
 can send as well as receive. Longest chain consensus sits in their sleepy silent
-client model, where they prove a resilience of just under one half optimal. Their
-clients share the validators' network, and degraded connectivity is captured by
-sleeping, whose cost is that a sleeping client cannot time the arrival of a
-message. Ours is the complement: it keeps its clock and gives up the delay bound
-and every honesty assumption instead. The sleepy model itself~\cite{sleepy}
+client model, where they prove a resilience of just under one half optimal. Their clients sit on the validators' network, and a poor connection is modelled
+by sleeping, which costs a client the ability to tell when a message arrived.
+Ours is the mirror image. It keeps its clock and gives up the delay bound and
+every honesty assumption instead. The sleepy model itself~\cite{sleepy}
 delivers to a waking party everything it missed, which restores it to the
 position of a synchronised party, and the dynamically available protocols built
 on it~\cite{ebbflow,goldfish,accountability} inherit that. Ouroboros
 Genesis~\cite{genesis} is the closest in spirit: a party joining from the genesis
 block cannot use a constant depth either, so its selection rule compares the
-density of candidate chains in the slots after their fork point instead. It
-compares two chains locally, in proof of stake with a slot clock, where we
-compare one chain against the round in proof of work. Appendix F
+density of candidate chains in the slots after their fork point instead. That rule compares two chains against each other, in proof of stake with a slot
+clock. We compare one chain against the round, in proof of work. Appendix F
 of~\cite{cuamdr} shows that under adversary majority a client confirming a
 $k$-deep block is unsafe for every $k$. \Cref{cor.noconstant} is a different
 statement, under honest majority, that says how fast the depth must grow.
@@ -60,31 +59,29 @@ tolerable adversary as a function of the block interval and the delay. A
 separate line computes the constant a well connected observer actually needs:
 \cite{grr22,grr23} give concrete settlement bounds for proof of work and for
 longest chain consensus, and \cite{guoren22} gives closed form bounds on the
-probability of a safety violation as a function of the depth. Those results
-sharpen the constant. We show that for a client whose own link is unconstrained
-there is no constant to sharpen, which does not contradict them: their observer
-receives every honest message within the delay bound, and ours receives what
-the adversary chooses to send. Under partial synchrony~\cite{dls88} a bound
+probability of a safety violation as a function of the depth. Those results sharpen the constant. We show that for a client whose own link is
+unconstrained there is no constant left to sharpen. This does not contradict
+them. Their observer receives every honest message inside the delay bound, and
+ours receives whatever the adversary decides to send. Under partial synchrony~\cite{dls88} a bound
 applies after an unknown stabilisation time, and our client's link is weaker
 still, since no bound applies at any round. Safety never uses one. Liveness
-does, and what a stabilisation time buys is a bound on the staleness of
-\Cref{def.stale}, which is the only quantity \Cref{thm.liveness} charges to the
-network.
+does, and what a stabilisation time buys is a bound on the age of the honest
+chain the client receives, which is the only quantity \Cref{thm.liveness}
+charges to the network.
 
 \paragraph{On-chain clients}
 
 Bitcoin script cannot verify a chain, so bridges build a client out of a dispute
-game, and the result is the same idea enforced by different means. The client
+game instead. The result is the same idea enforced by other means. The client
 of~\cite{bitvm2} works at static difficulty. An operator commits to a recent
 block height, an absolute timelock enforces that the claim is recent, and the
-operator must then exhibit headers up to that height. An untrusted party's
-claimed height is checked against a clock it cannot move, which is our rule
-executed on chain, with an economic game and a counterparty to slash in place of
-a client with neither. \cite{bitvm3} shows that the static construction fails
+operator must then exhibit headers up to that height. An untrusted party claims a height and the claim is checked against a clock it
+cannot move. That is our rule executed on chain, with an economic game and a
+counterparty to slash standing in for a client that has neither. \cite{bitvm3} shows that the static construction fails
 once difficulty varies, since an operator that controls timestamps can induce
 the largest permitted drop in target, and repairs it by binding the committed
 timestamps to the consensus time of the chain. Its output is a block that after
 $u$ rounds sits at depth at least $k$ in every honest chain, which is the
-guarantee \Cref{cor.prune} gives. \cite{clementine} handles variable difficulty
+guarantee \Cref{thm.safety} gives. \cite{clementine} handles variable difficulty
 with a permissioned verifier set, and \cite{glimpse} gives an on-demand client
 with constant-size storage.

@@ -2,8 +2,8 @@
 \caption{The pruning client of \Cref{def.client}.}\label{alg.client}
 \begin{algorithmic}[1]
 \Procedure{Client}{$\ch, r$}\Comment{$\ch$ is the chain received at round $r$}
-    \State $k \gets \max\{k_0,\ M(r,\len{\ch})\}$
-        \Comment{$M$ is \Cref{eq.depth}} \label{line.depth}
+    \State $k \gets \prn(r,\len{\ch})$
+        \Comment{\Cref{eq.depth}} \label{line.depth}
     \State $P \gets \prune{\ch}{k}$ \label{line.prune}
     \If{$\len{P} > 1$} \State \Return $P$ \label{line.output}
     \Else \State \Return $\bot$ \label{line.bot}

@@ -8,6 +8,10 @@
 \Crefname{assumption}{Assumption}{Assumptions}
 \let\llncsendproof\endproof
 \renewcommand{\endproof}{\qed\llncsendproof}
+%% A proof deferred to the appendix, headed "Proof of Lemma n." and closed
+%% with the same end mark.
+\newenvironment{proofof}[1]{\par\addvspace{\medskipamount}\noindent\textit{Proof
+of #1.}\enspace\ignorespaces}{\qed\par\addvspace{\medskipamount}}
 
 %%% Function names and variables %%%
 \newcommand{\fn}[1]{\ensuremath{\mathtt{#1}}}
@@ -27,17 +31,46 @@
 \newcommand{\advrone}{\rho_1}
 \newcommand{\advrtwo}{\rho_2}
 \newcommand{\maxr}{A}
-\newcommand{\slack}{\eta}
 \newcommand{\hgt}{\alpha}
 \newcommand{\pref}{\zeta}
 \newcommand{\rate}{g}
-\newcommand{\stale}{D}
 \newcommand{\prn}{\gamma}
 \newcommand{\typ}{\epsilon_{\mathrm{typ}}}
-\newcommand{\pos}{\ell^{*}}
+\newcommand{\pos}{i^{*}}
 \newcommand{\rst}{r^{*}}
 \newcommand{\bst}{B^{*}}
 \newcommand{\pipriv}{\pi_{\mathrm{private}}}
+
+%%% Figure pieces %%%
+%% Styles and helpers used by figures/blocktree.tex. The drawing is a
+%% standalone document; the paper inputs only its body, so what its preamble
+%% defines is repeated here.
+\tikzset{
+  ink/.style   = {line width=0.7pt, line cap=round, line join=round},
+  blk/.style   = {ink, fill=white},
+  cut/.style   = {ink, fill=gray!15},
+  lim/.style   = {line width=0.6pt, dash pattern=on 2.4pt off 2.2pt, gray!65},
+  brc/.style   = {line width=0.5pt, decorate,
+                  decoration={brace, amplitude=3.6pt, mirror, raise=1pt}},
+  person/.pic = {
+    \draw[ink] (0,0.60) circle[radius=0.115];
+    \draw[ink] (0,0.485) -- (0,0.215);
+    \draw[ink] (-0.17,0.33) -- (0,0.46) -- (0.17,0.33);
+    \draw[ink] (-0.15,0) -- (0,0.215) -- (0.15,0);
+  },
+  devil/.pic = {
+    \draw[ink] (0,0.60) circle[radius=0.115];
+    \draw[ink] (0,0.485) -- (0,0.215);
+    \draw[ink] (-0.17,0.33) -- (0,0.46) -- (0.17,0.33);
+    \draw[ink] (-0.15,0) -- (0,0.215) -- (0.15,0);
+    \fill (-0.10,0.675) -- (-0.16,0.86) -- (-0.03,0.705) -- cycle
+          (0.10,0.675) -- (0.16,0.86) -- (0.03,0.705) -- cycle;
+  },
+}
+% \blk[style]{x}{y}
+\newcommand{\blk}[3][blk]{\draw[#1] (#2-0.17,#3-0.21) rectangle (#2+0.17,#3+0.21);}
+% \lnk{x1}{y1}{x2}{y2} -- edge between the facing sides of two blocks
+\newcommand{\lnk}[4]{\draw[ink] (#1+0.17,#2) -- (#3-0.17,#4);}
 
 %%% Author notes %%%
 \newcommand{\odysseas}[1]{{\color{blue}[Odysseas: #1]}}

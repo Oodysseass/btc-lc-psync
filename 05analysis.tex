@@ -7,170 +7,122 @@ those of \Cref{sec.construction}. We use one more,
 \[
     \advrtwo = \frac{\advrone}{1-\epsilon} ,
 \]
-which is $\advrone$ measured per honest block instead of per round. It also
-tends to $\advr$ as $f$ and $\epsilon$ tend to $0$.
+which is $\advrone$ measured per honest block instead of per round; it tends
+to $\advr$ as $f$ and $\epsilon$ tend to $0$, and \Cref{lem.rho} shows that it
+stays below $1$. We also assume $\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$, a
+lower bound of the same order as the bound $\lambda\ge2/f$ of
+\Cref{sec.model}, so that $k_0=2(\lambda+2)f\ge\frac{2f+1}{1-\advrtwo}$.
 
-A client receives a chain from a peer it does not trust and keeps a prefix of
-it. This section answers four questions about that prefix.
-\begin{enumerate}
-    \item How much of the chain is on the honest chain now? \Cref{thm.prefix}
-        answers in terms of the length of an honest chain, and
-        \Cref{cor.round} rewrites the same answer in the two quantities the
-        client has, the round and the length of the chain it received.
-    \item Is that part still on the honest chain later? \Cref{lem.persist} and
-        \Cref{cor.prune}.
-    \item Does another client keep something compatible?
-        \Cref{thm.consistency}.
-    \item Is what the client keeps enough to be useful? \Cref{thm.liveness}
-        and \Cref{cor.confirm}.
-\end{enumerate}
-\Cref{sec.limit} states the answers in the normalised form of
-\Cref{eq.normal}, and \Cref{sec.tightness} shows that none of them can be
-improved.
+The section has four parts. \Cref{sec.growth} bounds how fast chains grow.
+\Cref{sec.counting} counts the blocks on each side of a fork. \Cref{sec.safety}
+proves that what the client keeps is on every honest chain, now and later.
+\Cref{sec.liveness} proves that it keeps enough.
+
+\subsection{Growth bounds}
+\label{sec.growth}
+
+The three lemmas of this subsection are routine, and their proofs are in
+\Cref{appendix.analysis}. The first says that the constant $\advrtwo$ is below
+$1$, so that the bounds below are well defined. The second says that honest
+work on one chain arrives one block per round at most.
 
 \begin{lemma}\label{lem.rho}
     $\advrtwo<1$.
 \end{lemma}
-\begin{proof}
-    By definition, $\advrtwo<1$ is equivalent to
-    $\frac{\advr}{1-f}+\frac{f_2}{f}<1-3\epsilon$. From \Cref{asm.majority},
-    $\advr\le1-\delta$ and $f<1/3$, and $f_2/f<f/(2(1-f)^2)$. So it suffices to
-    show
-    \[
-        \frac{1-\delta}{1-f}+\frac{f}{2(1-f)^2} < 1-3\epsilon .
-    \]
-    Multiplying by $(1-f)^2$, this is
-    $1-\tfrac{f}{2}-\delta(1-f)<(1-3\epsilon)(1-f)^2$, that is,
-    $\delta(1-f)>\tfrac{3f}{2}-f^2+3\epsilon(1-f)^2$. Since $f<1/3$, the right
-    side is at most $(1-f)(2f+3\epsilon)$. So $\delta>2f+3\epsilon$ suffices,
-    and it follows from $3f+3\epsilon<\delta$.
-\end{proof}
 
 \begin{lemma}\label{lem.honestone}
     In a typical execution, a chain contains at most one honest block computed
     in any given round.
 \end{lemma}
-\begin{proof}
-    Suppose towards a contradiction that $\ch[j]$ and $\ch[j']$ with $j<j'$ are
-    both honest and both computed at round $i$. Only the genesis block was
-    computed at round $0$, so $i\ge1$. The honest validator that computed $\ch[j']$ extended at round $i$ the chain it adopted at round $i$.
-    A block determines all of its ancestors, so that chain is $\ch[{:}j']$, and
-    it contains $\ch[j]$. From \Cref{lem.membership}, $\ch[{:}j']\in\bt_{i-1}$,
-    so $\ch[j]$ was computed at a round at most $i-1$. This contradicts the
-    assumption that $\ch[j]$ was computed at round $i$.
-\end{proof}
 
-\begin{lemma}\label{lem.length}
-    In a typical execution the following hold for every integer $v\ge0$.
+The third lemma is the one the client relies on. It is a ceiling and a floor.
+Nobody mines faster than everybody mining together, so no chain of any kind
+is taller than about $\maxr fr$ at round $r$. Honest validators keep extending
+the longest chain they see, so an honest chain is at least about $fr$ tall. A
+chain the client is handed sits below the ceiling and has no floor, because the
+adversary may deliver any chain that exists.
+
+\begin{lemma}[Growth bounds]\label{lem.length}
+    In a typical execution the following hold for every round $r\ge0$.
     \begin{enumerate}
-        \item Every chain $\ch\in\bt_v$ satisfies
-            $\len{\ch}-1<\maxr f\max(v,\lambda)$.
-        \item If $v>\lambda$, every chain $\ch$ adopted by an honest validator
-            at round $v$ satisfies $\len{\ch}-1>(1-\epsilon)f(v-1)$.
+        \item Every chain $\ch\in\bt_r$ satisfies
+            $\len{\ch}-1<\maxr f\max(r,\lambda)$.
+        \item If $r>\lambda$, every chain $\ch$ adopted by an honest validator
+            at round $r$ satisfies $\len{\ch}-1>(1-\epsilon)f(r-1)$.
+    \end{enumerate}
+\end{lemma}
+
+\subsection{Counting}
+\label{sec.counting}
+
+Take a chain $\ch$ the client holds and a chain $\ch'$ an honest validator
+holds, and look at the last honest block they share. Everything $\ch$ carries
+above that block and $\ch'$ does not was mined after it. In that window the
+honest validators kept growing $\ch'$, one block per successful round, and
+every block $\ch$ gained can be charged to a distinct adversarial success in
+the same window. The lemma makes the three counts exact.
+
+\begin{lemma}[Counting]\label{lem.count}
+    In a typical execution, let $\ch\in\bt_r$ and let $\ch'$ be a chain adopted
+    by an honest validator at round $r$. Let $\bst=\ch[\pos]=\ch'[\pos]$ be the
+    last honest block of $\ch\meet\ch'$ and let $\rst$ be the round in which it
+    was computed. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$. Then $\rst\le r-1$,
+    and
+    \begin{enumerate}
+        \item every block of $\ch[\pos+1{:}]$ and of $\ch'[\pos+1{:}]$ was
+            computed in a round of $S'$;
+        \item $\len{\ch'[\pos+1{:}]}\ge X(S)$;
+        \item $\len{\ch[\pos+1{:}]}\le Z(S')+W(S)+1$.
     \end{enumerate}
 \end{lemma}
 \begin{proof}
-    Let $w=\max(v,\lambda)$ and let $\ch\in\bt_v$. The blocks of $\ch[1{:}]$
-    were computed in rounds of $[1,w]$. From \Cref{lem.honestone}, the honest
-    ones were computed in distinct rounds, each of them successful. So there
-    are at most $X([1,w])$ honest blocks, and at most $Z([1,w])$ adversarial
-    ones. Since $w\ge\lambda$, \Cref{def.typical} applies and
-    \[
-        \len{\ch}-1 = \len{\ch[1{:}]} <
-            (1+\epsilon)fw+\left(\frac{\advr}{1-f}+\epsilon\right)fw = \maxr f w,
-    \]
-    where the last equality uses $\frac{\advr}{1-f}=\advr+\frac{\advr f}{1-f}$.
-    This proves the first item. For the second, every honest validator has a
-    chain of length $1$ at round $1$. From \Cref{lem.growth}, every honest
-    validator adopts at round $v$ a chain of length at least $1+X([1,v-1])$.
-    Since $v-1\ge\lambda$, \Cref{def.typical} gives $X([1,v-1])>(1-\epsilon)f(v-1)$,
-    and hence $\len{\ch}-1>(1-\epsilon)f(v-1)$.
-\end{proof}
-
-Let $r>\lambda$. The first item bounds every chain of $\bt_r$ from above:
-$\len{\ch}-1<\maxr fr$, whether or not any honest validator ever adopted $\ch$.
-The second item bounds only the chains adopted by honest validators from below:
-$\len{\ch}-1>(1-\epsilon)f(r-1)$. A chain that a client holds has no lower
-bound, since the adversary may deliver a chain of any length. It does have an
-upper bound. In particular, a client cannot receive at round $r$ a chain of
-height $\maxr fr$ or more.
-
-\subsection{Counting lemmas}
-\label{sec.counting}
-
-Throughout this subsection, let
-$\ch\in\bt_r$ and let $\ch'$ be a chain adopted by an honest validator at round
-$r$. Let $\bst$ be the last honest block of $\ch\meet\ch'$, let $\pos$ be its
-height and let $\rst$ be the round at which it was computed, so
-$\bst=\ch[\pos]=\ch'[\pos]$. Put $S=[\rst+1,r-1]$ and $S'=[\rst,r]$.
-\Cref{lem.rounds} locates the rounds in which the blocks of $\ch[\pos+1{:}]$
-and $\ch'[\pos+1{:}]$ were computed, \Cref{lem.honestlen} bounds
-$\len{\ch'[\pos+1{:}]}$ from below, and \Cref{lem.count} bounds
-$\len{\ch[\pos+1{:}]}$ from above.
-
-\begin{lemma}\label{lem.rounds}
-    $\rst\le r-1$. Every block of $\ch[\pos+1{:}]$ and every block of
-    $\ch'[\pos+1{:}]$ was computed in a round of $S'$.
-\end{lemma}
-\begin{proof}
+    The genesis block is honest and lies on both chains, so $\bst$ exists.
     From \Cref{def.tree} and \Cref{lem.membership}, every block of $\ch$ was
     computed in a round of $[0,r]$ and every block of $\ch'$ in a round of
     $[0,r-1]$. The block $\bst$ lies on $\ch'$ and was computed at round
     $\rst$, so $\rst\le r-1$. No predictions occur, so along a chain the round
     at which a block was computed is non-decreasing in the height. Hence every
     block of $\ch[\pos+1{:}]$ and every block of $\ch'[\pos+1{:}]$ was computed
-    in a round of $[\rst,r]=S'$.
-\end{proof}
+    in a round of $[\rst,r]=S'$, which is the first item.
 
-\begin{lemma}\label{lem.honestlen}
-    $\len{\ch'[\pos+1{:}]}\ge X(S)$.
-\end{lemma}
-\begin{proof}
-    The block $\bst$ is honest, at height $\pos$, and was computed at round
-    $\rst$. From
-    \Cref{lem.fork}, some honest validator has a chain of length at least
-    $\pos+1$ at round $\rst+1$. From \Cref{lem.rounds}, $\rst+1\le r$, so
-    \Cref{lem.growth} applies with $v=\rst+1$ and $w=r$: every honest validator
-    adopts at round $r$ a chain of length at least
+    For the second item, $\bst$ is honest, at height $\pos$, and was computed
+    at round $\rst$. From \Cref{lem.fork}, some honest validator has a chain of
+    length at least $\pos+1$ at round $\rst+1$. Since $\rst+1\le r$,
+    \Cref{lem.growth} from round $\rst+1$ to round $r$ gives that every honest
+    validator adopts at round $r$ a chain of length at least
     $\pos+1+X([\rst+1,r-1])=\pos+1+X(S)$. In particular
     $\len{\ch'[\pos+1{:}]}=\len{\ch'}-\pos-1\ge X(S)$.
-\end{proof}
 
-\begin{lemma}\label{lem.count}
-    $\len{\ch[\pos+1{:}]}\le Z(S')+W(S)+1$.
-\end{lemma}
-\begin{proof}
-    Split the blocks of $\ch[\pos+1{:}]$ into three classes: $a$ adversarial
-    blocks, $h_1$ honest blocks computed in a convergence opportunity of $S$,
-    and $h_2$ remaining honest blocks. Then $\len{\ch[\pos+1{:}]}=a+h_1+h_2$.
-    We bound $h_2$ first and $a+h_1$ second.
+    For the third item, split the blocks of $\ch[\pos+1{:}]$ into three
+    classes: $a$ adversarial blocks, $h_1$ honest blocks computed in a
+    convergence opportunity of $S$, and $h_2$ remaining honest blocks. Then
+    $\len{\ch[\pos+1{:}]}=a+h_1+h_2$. We bound $h_2$ first and $a+h_1$ second.
 
-    From \Cref{lem.rounds}, every honest block of $\ch[\pos+1{:}]$ was
-    computed in a round of $S'$. None was computed at round $\rst$: the block
-    $\bst$ is honest and was computed at round $\rst$, and by
-    \Cref{lem.honestone} a chain has at most one honest block per round. So
-    every honest block of $\ch[\pos+1{:}]$ was computed in a round of
-    $S\cup\{r\}$. The $h_2$ blocks are the honest blocks of $\ch[\pos+1{:}]$
-    computed at round $r$ or in a successful round of $S$ that is not a
-    convergence opportunity. From \Cref{lem.honestone} again, they were
-    computed in distinct rounds. So at most one of them was computed at round
-    $r$, and at most $W(S)$ of them were computed in successful rounds of $S$
-    that are not convergence opportunities. Hence
-    $h_2\le W(S)+1$.
+    By the first item, every honest block of $\ch[\pos+1{:}]$ was computed in a
+    round of $S'$. None was computed at round $\rst$: the block $\bst$ is
+    honest and was computed at round $\rst$, and by \Cref{lem.honestone} a
+    chain has at most one honest block per round. So every honest block of
+    $\ch[\pos+1{:}]$ was computed in a round of $S\cup\{r\}$. The $h_2$ blocks
+    are the honest blocks of $\ch[\pos+1{:}]$ computed at round $r$ or in a
+    successful round of $S$ that is not a convergence opportunity. From
+    \Cref{lem.honestone} again, they were computed in distinct rounds. So at
+    most one of them was computed at round $r$, and at most $W(S)$ of them were
+    computed in successful rounds of $S$ that are not convergence
+    opportunities. Hence $h_2\le W(S)+1$.
 
     We claim that $a+h_1\le Z(S')$. Define a map from the $a+h_1$ blocks of the
     first two classes to adversarial blocks computed in rounds of $S'$. An
-    adversarial $\ch[j]$ is mapped to itself. It was computed in a round of $S'$
-    by \Cref{lem.rounds}. An honest $\ch[j]$ computed in a convergence
-    opportunity $u\in S$ is mapped to $\ch'[j]$. We check that $\ch'[j]$ is such
-    a block. The honest validator that computed $\ch[j]$ sent a chain of length
-    $j+1$ at round $u\le r-1$, so from \Cref{lem.fork} $\len{\ch'}>j$ and
-    $\ch'[j]$ exists. Since $j>\pos$ and $\ch[j]$ is honest, $\ch'[j]\ne\ch[j]$
-    by the maximality of $\pos$, so $\ch'[j]$ is adversarial by
-    \Cref{lem.unique}. It lies on $\ch'[\pos+1{:}]$, so from \Cref{lem.rounds}
+    adversarial $\ch[i]$ is mapped to itself. It was computed in a round of $S'$
+    by the first item. An honest $\ch[i]$ computed in a convergence
+    opportunity $r'\in S$ is mapped to $\ch'[i]$. We check that $\ch'[i]$ is such
+    a block. The honest validator that computed $\ch[i]$ sent a chain of length
+    $i+1$ at round $r'\le r-1$, so from \Cref{lem.fork} $\len{\ch'}>i$ and
+    $\ch'[i]$ exists. Since $i>\pos$ and $\ch[i]$ is honest, $\ch'[i]\ne\ch[i]$
+    by the maximality of $\pos$, so $\ch'[i]$ is adversarial by
+    \Cref{lem.unique}. It lies on $\ch'[\pos+1{:}]$, so by the first item
     it was computed in a round of $S'$. The map is injective: two blocks at
-    distinct heights of one chain are distinct, and $\ch[j]=\ch'[j']$ would
-    force $j=j'$ since no copies occur, with $\ch[j]$ adversarial and $\ch[j']$
+    distinct heights of one chain are distinct, and $\ch[i]=\ch'[i']$ would
+    force $i=i'$ since no copies occur, with $\ch[i]$ adversarial and $\ch[i']$
     honest. Each adversarial block is the output of a distinct successful
     adversarial query, and $Z(S')$ counts the successful adversarial queries in
     the rounds of $S'$. Hence $a+h_1\le Z(S')$, and
@@ -189,7 +141,7 @@ $\len{\ch[\pos+1{:}]}$ from above.
     \]
 \end{theorem}
 \begin{proof}
-    Let $\bst$, $\pos$, $\rst$, $S$ and $S'$ be as in \Cref{sec.counting}, and write $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$.
+    Let $\bst$, $\pos$, $\rst$, $S$ and $S'$ be as in \Cref{lem.count}, and write $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$.
     Since $\ch\meet\ch'$ contains $\bst$, we have
     $\len{\ch\meet\ch'}\ge\pos+1=\len{\ch}-d$, so it suffices to bound $d$. If
     $d<k_0$ we are done, so assume $d\ge k_0=2(\lambda+2)f$.
@@ -197,7 +149,7 @@ $\len{\ch[\pos+1{:}]}$ from above.
     We first show that $|S|>\lambda$. The subsequence $\ch[\pos+1{:}]$ consists
     of $d$ consecutive blocks of $\ch$, so from \Cref{lem.span} they were
     computed in more than $d/(2f)\ge\lambda+2$ consecutive rounds. From
-    \Cref{lem.rounds}, all these rounds lie in $S'=[\rst,r]$, which has $|S|+2$
+    \Cref{lem.count}, all these rounds lie in $S'=[\rst,r]$, which has $|S|+2$
     elements. Hence $|S|>\lambda$, and \Cref{def.typical} applies to $S$ and to
     $S'$.
 
@@ -211,7 +163,7 @@ $\len{\ch[\pos+1{:}]}$ from above.
     \begin{equation}\label{eq.upper}
         d < \advrone f|S| + 2f + 1 .
     \end{equation}
-    From \Cref{lem.honestlen,def.typical},
+    From \Cref{lem.count,def.typical},
     $\len{\ch'}-\pos-1\ge X(S)>(1-\epsilon)f|S|$, so
     $f|S|<(\len{\ch'}-\pos-1)/(1-\epsilon)$ and
     \[
@@ -224,27 +176,23 @@ $\len{\ch[\pos+1{:}]}$ from above.
 
 The quantity $\len{\ch}-\len{\ch\meet\ch'}$ is the number of blocks of $\ch$
 that are not on $\ch'$. Once it exceeds $k_0$, \Cref{thm.prefix} bounds it by
-$\frac{\advrtwo}{1-\advrtwo}(\len{\ch'}-\len{\ch})$ plus the constant
-$\frac{2f+1}{1-\advrtwo}$. As $f$ and $\epsilon$ tend to $0$ the coefficient
-tends to
-\[
-    \frac{\advr}{1-\advr} = \frac{t}{n-2t}.
-\]
-\Cref{sec.tightness} shows that no smaller coefficient is possible. The bound
-depends on $\len{\ch'}$, which a client does not know. The next corollary
-removes this dependence. The cost is the gap between the two bounds of
-\Cref{lem.length}.
+$\frac{\advrtwo}{1-\advrtwo}$ blocks for every block by which $\ch$ falls short
+of $\ch'$, plus a constant, and the coefficient tends to
+$\frac{\advr}{1-\advr}=\frac{t}{n-2t}$. \Cref{sec.tightness} shows that no
+smaller coefficient works. The bound depends on $\len{\ch'}$, which a client
+does not know. The next theorem trades that for the round, at the cost of the
+gap between the ceiling and the floor of \Cref{lem.length}.
 
-\begin{corollary}[Round form]\label{cor.round}
+\begin{theorem}[Round form]\label{thm.round}
     In a typical execution, for every round $r$, every chain $\ch\in\bt_r$ and
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
         \len{\ch\meet\ch'} > \len{\ch} - \max\left\{k_0,\
         \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{1-f_2/f}\right\}.
     \]
-\end{corollary}
+\end{theorem}
 \begin{proof}
-    Let $\bst$, $\pos$, $\rst$ and $S$ be as in \Cref{sec.counting} and write $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$. As in the proof
+    Let $\bst$, $\pos$, $\rst$ and $S$ be as in \Cref{lem.count} and write $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$. As in the proof
     of \Cref{thm.prefix}, $\len{\ch\meet\ch'}\ge\pos+1=\len{\ch}-d$, so it suffices
     to bound $d$ by the maximum in the statement, and we may assume $d\ge k_0$,
     which gives $|S|>\lambda$ and \Cref{eq.upper}.
@@ -270,268 +218,272 @@ removes this dependence. The cost is the gap between the two bounds of
     $\maxr-\advrone=1-f_2/f$.
 \end{proof}
 
-\Cref{cor.round} confirms a prefix at round $r$ only. Applied at a later
-round $r''$ to the same chain $\ch$, it prunes more, because the term
-$\maxr f(r''+\lambda)$ grows while $\len{\ch}$ is fixed. So it does not show
-that the prefix confirmed at round $r$ is a prefix of the honest chains of
-later rounds.
+The maximum in \Cref{thm.round} is the pruning depth $\prn(r,\len{\ch})$ of
+\Cref{def.client}, so the theorem says that the client's output is a prefix of
+every honest chain at the round of receipt. It does not yet say that it stays
+one. Applied at a later round to the same chain, \Cref{thm.round} prunes more,
+because the round grows and the chain does not. The next lemma closes the gap
+with \Cref{thm.prefix} instead, which for a chain at least as long as an
+honest chain prunes only a constant.
 
-We use \Cref{thm.prefix} instead, for a chain at least as long as an honest
-chain. Then $\len{\ch'}-\len{\ch}\le0$, and the pruning depth of
-\Cref{thm.prefix} is a constant that does not depend on the round.
-\Cref{lem.persist} applies this twice. The first honest chain that drops the
-confirmed prefix is compared with the chain its validator adopted one round
-earlier, which shows that it is shorter than the client's chain. It is then
-compared with the client's chain, which shows that it contains the confirmed
-prefix after all.
-
-For the constant to be $k_0$, we assume for the rest of this section that
-$\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$, so that
-$k_0=2(\lambda+2)f\ge\frac{2f+1}{1-\advrtwo}$. If $\ch\in\bt_r$, $\ch'$ is
-adopted by an honest validator at round $r$ and $\len{\ch}\ge\len{\ch'}$, then
-the second term of the maximum in \Cref{thm.prefix} is at most
-$\frac{2f+1}{1-\advrtwo}\le k_0$, and \Cref{thm.prefix} gives
-\begin{equation}\label{eq.longer}
-    \len{\ch\meet\ch'} > \len{\ch}-k_0 .
-\end{equation}
-In words, a chain at least as long as an honest chain forks from it by fewer
-than $k_0$ blocks.
-
-\begin{lemma}\label{lem.persist}
-    Let $r$ be a round, let $\ch\in\bt_r$ and let $k\ge k_0$ be an integer. If
-    $\prune{\ch}{k}\preceq\ch'$ for every chain $\ch'$ adopted by an honest
-    validator at round $r$, then $\prune{\ch}{k}\preceq\ch''$ for every chain
-    $\ch''$ adopted by an honest validator at a round $r''>r$.
+\begin{lemma}[Persistence]\label{lem.persist}
+    In a typical execution, let $\ch\in\bt_r$ and let $k\ge k_0$ be an
+    integer. If $\prune{\ch}{k}\preceq\ch'$ for every chain $\ch'$ adopted by
+    an honest validator at round $r$, then $\prune{\ch}{k}\preceq\ch''$ for
+    every chain $\ch''$ adopted by an honest validator at every round $r''>r$.
 \end{lemma}
 \begin{proof}
+    We first note the form \Cref{thm.prefix} takes for a chain that is at
+    least as long as an honest chain. Let $\ch_1$ be a chain of the block tree
+    at some round and $\ch_2$ a chain adopted by an honest validator at that
+    round, with $\len{\ch_1}\ge\len{\ch_2}$. The second term of the maximum in
+    \Cref{thm.prefix} is then at most
+    $\frac{2f+1}{1-\advrtwo}\le k_0$, so
+    \begin{equation}\label{eq.longer}
+        \len{\ch_1\meet\ch_2} > \len{\ch_1}-k_0 .
+    \end{equation}
+
     Write $P=\prune{\ch}{k}$. If $k\ge\len{\ch}-1$ then $P$ has at most one
     block, so it is the genesis chain or empty and is a prefix of every chain.
     There is nothing to prove, so assume $k<\len{\ch}-1$, which gives
     $\len{P}=\len{\ch}-k$. Suppose, towards a contradiction, that the claim
-    fails. Let $s>r$ be the first
-    round at which an honest validator $V$ adopts a chain $\ch_s$ with
-    $P\not\preceq\ch_s$, and let $\ch_A$ be the chain $V$ adopted at round
-    $s-1$. Then $P\preceq\ch_A$: by hypothesis if $s-1=r$, by the choice of $s$
-    otherwise. At round $s$ the chain $V$ has is $\ch_A$ extended by at most
-    one block. It contains $P$, so it differs from $\ch_s$, and since
-    $\fn{maxvalid}$ returns a longest argument, $\len{\ch_s}\ge\len{\ch_A}$.
+    fails. Let $r'>r$ be the first round at which an honest validator $V$
+    adopts a chain $\ch_B$ with $P\not\preceq\ch_B$, and let $\ch_A$ be the
+    chain $V$ adopted at round $r'-1$. Then $P\preceq\ch_A$: by hypothesis if
+    $r'-1=r$, by the choice of $r'$ otherwise. At round $r'$ the chain $V$ has
+    is $\ch_A$ extended by at most one block. It contains $P$, so it differs
+    from $\ch_B$, and since $\fn{maxvalid}$ returns a longest argument,
+    $\len{\ch_B}\ge\len{\ch_A}$.
 
-    First compare $\ch_s$ with $\ch_A$. Both $P$ and $\ch_s\meet\ch_A$ are
-    prefixes of $\ch_A$ and $P\not\preceq\ch_s$, so
-    $\len{\ch_s\meet\ch_A}<\len{P}$. On the other hand, $\ch_s\in\bt_{s-1}$ by
-    \Cref{lem.membership} and $\len{\ch_s}\ge\len{\ch_A}$, so \Cref{eq.longer}
-    at round $s-1$ gives $\len{\ch_s\meet\ch_A}>\len{\ch_s}-k_0\ge\len{\ch_s}-k$.
-    Hence $\len{\ch_s}-k<\len{\ch}-k$, that is, $\len{\ch_s}<\len{\ch}$.
+    First compare $\ch_B$ with $\ch_A$. Both $P$ and $\ch_B\meet\ch_A$ are
+    prefixes of $\ch_A$ and $P\not\preceq\ch_B$, so
+    $\len{\ch_B\meet\ch_A}<\len{P}$. On the other hand, $\ch_B\in\bt_{r'-1}$ by
+    \Cref{lem.membership} and $\len{\ch_B}\ge\len{\ch_A}$, so \Cref{eq.longer}
+    at round $r'-1$ gives $\len{\ch_B\meet\ch_A}>\len{\ch_B}-k_0\ge\len{\ch_B}-k$.
+    Hence $\len{\ch_B}-k<\len{\ch}-k$, that is, $\len{\ch_B}<\len{\ch}$.
 
-    Now compare $\ch$ with $\ch_s$. Since $\ch\in\bt_s$ and
-    $\len{\ch}>\len{\ch_s}$, \Cref{eq.longer} at round $s$ gives
-    $\len{\ch\meet\ch_s}>\len{\ch}-k_0\ge\len{\ch}-k=\len{P}$. Both $P$ and
-    $\ch\meet\ch_s$ are prefixes of $\ch$, so
-    $P\preceq\ch\meet\ch_s\preceq\ch_s$. This contradicts the choice of
-    $\ch_s$.
+    Now compare $\ch$ with $\ch_B$. Since $\ch\in\bt_{r'}$ and
+    $\len{\ch}>\len{\ch_B}$, \Cref{eq.longer} at round $r'$ gives
+    $\len{\ch\meet\ch_B}>\len{\ch}-k_0\ge\len{\ch}-k=\len{P}$. Both $P$ and
+    $\ch\meet\ch_B$ are prefixes of $\ch$, so
+    $P\preceq\ch\meet\ch_B\preceq\ch_B$. This contradicts the choice of
+    $\ch_B$.
 \end{proof}
 
-\begin{corollary}[Safety]\label{cor.prune}
+\begin{theorem}[Safety]\label{thm.safety}
     In a typical execution, if the client of \Cref{def.client} receives its
     chain at round $r$ and outputs a chain $P\ne\bot$, then $P\preceq\ch''$ for
     every chain $\ch''$ adopted by an honest validator at every round
     $r''\ge r$.
-\end{corollary}
+\end{theorem}
 \begin{proof}
-    Let $\ch$ be the chain received at round $r$, so $P=\prune{\ch}{\prn(r)}$
-    and $\ch\in\bt_r$ by \Cref{lem.membership}. For $r''=r$, \Cref{cor.round}
-    gives $\len{\ch\meet\ch''}>\len{\ch}-\prn(r)\ge\len{P}$, and both $P$ and
-    $\ch\meet\ch''$ are prefixes of $\ch$, so $P\preceq\ch''$. For $r''>r$, the integer $\lceil\prn(r)\rceil$ is at least $k_0$ and
-    $P=\prune{\ch}{\lceil\prn(r)\rceil}$, so \Cref{lem.persist} with
-    $k=\lceil\prn(r)\rceil$ gives $P\preceq\ch''$.
+    Let $\ch$ be the chain received at round $r$ and $\hgt$ its height, so
+    $P=\prune{\ch}{\prn(r,\hgt)}$ and $\ch\in\bt_r$ by \Cref{lem.membership}.
+    For $r''=r$, \Cref{thm.round} gives
+    $\len{\ch\meet\ch''}>\hgt-\prn(r,\hgt)\ge\len{P}$, and both $P$ and
+    $\ch\meet\ch''$ are prefixes of $\ch$, so $P\preceq\ch''$. For $r''>r$, the
+    integer $\lceil\prn(r,\hgt)\rceil$ is at least $k_0$ and
+    $P=\prune{\ch}{\lceil\prn(r,\hgt)\rceil}$, so \Cref{lem.persist} with
+    $k=\lceil\prn(r,\hgt)\rceil$ gives $P\preceq\ch''$.
 \end{proof}
 
-Two clients need not receive the same chain, join in the same round, or reach
-the same peer. \Cref{cor.prune} nonetheless makes their outputs comparable.
-
-\begin{theorem}[Consistency]\label{thm.consistency}
-    In a typical execution, consider two clients, not necessarily distinct,
-    each running \Cref{def.client}. Let the first receive a chain at round
-    $r_1$ and output $P_1\ne\bot$, and let the second receive a chain at round
-    $r_2$ and output $P_2\ne\bot$. Then $P_1\preceq P_2$ or $P_2\preceq P_1$.
-\end{theorem}
+\begin{corollary}[Consistency]\label{cor.consistency}
+    In a typical execution, let two clients, not necessarily distinct, run
+    \Cref{def.client}, receive chains at rounds $r_1$ and $r_2$, and output
+    $P_1\ne\bot$ and $P_2\ne\bot$. Then $P_1\preceq P_2$ or $P_2\preceq P_1$.
+    In particular the output of \Cref{def.monotone} is well defined, and it is
+    a prefix of every chain adopted by an honest validator at every round from
+    the receipt that produced it onwards.
+\end{corollary}
 \begin{proof}
     Assume $r_1\le r_2$; otherwise exchange the two clients. Since $t<n$ some
     validator is honest, and it adopts a chain $\ch''$ at round $r_2$. From
-    \Cref{cor.prune} applied to the first client with $r''=r_2\ge r_1$ we get
-    $P_1\preceq\ch''$. From \Cref{cor.prune} applied to the second client with
-    $r''=r_2$ we get $P_2\preceq\ch''$. Two prefixes of one chain are prefixes
-    of one another.
+    \Cref{thm.safety} applied to each client with $r''=r_2$ we get
+    $P_1\preceq\ch''$ and $P_2\preceq\ch''$, and two prefixes of one chain are
+    prefixes of one another. The outputs of a single client are therefore
+    nested, so a longest one exists, which is the output of
+    \Cref{def.monotone}. It is an output of \Cref{def.client}, so
+    \Cref{thm.safety} applies to it.
 \end{proof}
 
-The two clients do not communicate. Either of them may be receiving every
-chain from the adversary. The proof uses only that each output is a prefix of
-one common honest chain, so it does not use that the two clients ran the same
-rule. Any two rules whose outputs satisfy \Cref{cor.prune} agree in the same
-sense.
-
-\begin{corollary}[Monotonicity]\label{cor.monotone}
-    In a typical execution, the outputs other than $\bot$ of a single client
-    running \Cref{def.client} are prefixes of one another. The output of
-    \Cref{def.monotone} is therefore well defined, and it is a prefix of every
-    chain adopted by an honest validator at the round of the receipt that
-    produced it and at every later round.
-\end{corollary}
-\begin{proof}
-    The first claim is \Cref{thm.consistency} with the two clients equal. A
-    finite non-empty set of chains that are prefixes of one another has a
-    longest element, which is the output of \Cref{def.monotone}. That output is
-    one of the outputs of \Cref{def.client}, so the second claim is
-    \Cref{cor.prune} applied to it.
-\end{proof}
-
-A client that stays online therefore never retracts. It also never needs to
-prune a second time. \Cref{cor.prune} confirms each output for every later
-round, so the rule is applied to chains as they are received and never to an
-output of its own.
+The two clients never talk to each other, and either may be fed every chain by
+the adversary. The proof uses only that both outputs are prefixes of one honest
+chain, so any two rules whose outputs satisfy \Cref{thm.safety} agree in the
+same way.
 
 \subsection{Liveness}
 \label{sec.liveness}
 
-The output is a prefix of the honest chain. We now bound how much of the
-honest chain it is. \Cref{cor.growth} does this in terms of the height of the
-chain received, which is the quantity an adversarial peer controls.
+The output is a prefix of every honest chain. This subsection says how much of
+the honest chain it is, first when an honest validator sent the chain, then
+when anyone did. Everything rests on the identity \Cref{eq.pref}, which we
+recall: for a chain of height $\hgt$ received at round $r$,
+\[
+    \pref(r,\hgt) = \min\Big\{\hgt-k_0,\
+    \frac{\maxr}{1-f_2/f}\big(\hgt-h_0(r)\big)\Big\},
+    \qquad h_0(r)=\advrone f(r+\lambda)+2f+1 .
+\]
+Both branches increase with $\hgt$, so a taller chain never confirms less. The
+output is not $\bot$ whenever $\pref(r,\hgt)\ge2$: then $\prn(r,\hgt)\le\hgt-2$,
+so $\lceil\prn(r,\hgt)\rceil\le\hgt-1$ and the client keeps at least two
+blocks.
 
-\begin{corollary}[Growth]\label{cor.growth}
+\begin{theorem}[Honest chains]\label{thm.liveness}
+    In a typical execution, let $\lambda<r'\le r$ and let the client of
+    \Cref{def.client} receive at round $r$ a chain of height $\hgt$ adopted by
+    an honest validator at round $r'$. Then
+    \[
+        \pref(r,\hgt) \ge \min\Big\{(1-\epsilon)f(r'-1)-k_0,\
+        \frac{\maxr}{1-f_2/f}\big((1-\epsilon)f(r'-1)-h_0(r)\big)\Big\},
+    \]
+    and the output is not $\bot$ whenever the right-hand side is at least $2$.
+\end{theorem}
+\begin{proof}
+    From \Cref{lem.length}, $\hgt>(1-\epsilon)f(r'-1)$, since $r'>\lambda$.
+    Both branches of \Cref{eq.pref} increase with $\hgt$, so substituting the
+    bound gives the inequality, and $\pref(r,\hgt)\ge2$ rules out $\bot$ as
+    noted above.
+\end{proof}
+
+With $r'=r$ the chain is an honest chain of the current round. Since
+$(1-\epsilon)-\advrone=(1-\epsilon)(1-\advrtwo)$, the second branch is then
+\[
+    \frac{\maxr(1-\epsilon)(1-\advrtwo)}{1-f_2/f}\,fr
+\]
+minus a term of order $\lambda f$, and the first branch is larger for large
+$r$. So the confirmed height grows linearly in $r$, at a rate that tends to
+$(1-\advr^2)f$, and a client that receives an honest chain again later confirms
+strictly more. With $r'<r$ the chain is $r-r'$ rounds old. The bound falls with
+the age and reaches $\bot$ when $(1-\epsilon)f(r'-1)$ drops to about $h_0(r)$,
+that is, when the honest chain the client was sent is no taller than what the
+adversary alone could have built by now. \Cref{cor.delay} states that
+threshold. First we turn the growth rate into a confirmation time.
+
+\begin{corollary}[Confirmation time]\label{cor.confirm}
+    In a typical execution, let $\ch_1$ be a chain adopted by an honest
+    validator at a round $r_1>\lambda$, and let $r>r_1$ satisfy
+    $(1-\epsilon)f(r-1)\ge k_0+2$ and
+    \[
+        \frac{\maxr}{1-f_2/f}\big((1-\epsilon)f(r-1)-h_0(r)\big)
+        \;\ge\; \maxr f(r_1+\lambda)+1 .
+    \]
+    Then every client that receives at round $r$ a chain adopted by an honest
+    validator at round $r$ outputs a chain $P\ne\bot$ with
+    $\prune{\ch_1}{k_0}\preceq P$.
+\end{corollary}
+\begin{proof}
+    Let $\ch''$ be the chain received, of height $\hgt''$, and let $P$ be the
+    output. Both branches of the bound in \Cref{thm.liveness} are at least
+    $2$ under the two hypotheses, so $P\ne\bot$. From \Cref{lem.commonprefix}
+    with $k=k_0\ge2\lambda f$, $\prune{\ch_1}{k_0}\preceq\ch''$, and
+    $P\preceq\ch''$ by construction, so the shorter of the two is a prefix of
+    the other. It remains to show
+    $\len{P}\ge\len{\prune{\ch_1}{k_0}}=\len{\ch_1}-\lceil k_0\rceil$. Since
+    $r>r_1$, \Cref{lem.growth} gives $\len{\ch''}\ge\len{\ch_1}$. If
+    $\prn(r,\hgt'')=k_0$ then
+    $\len{P}=\len{\ch''}-\lceil k_0\rceil\ge\len{\ch_1}-\lceil k_0\rceil$.
+    Otherwise $\prn(r,\hgt'')>k_0$ and \Cref{eq.pref} gives
+    $\pref(r,\hgt'')=\frac{\maxr}{1-f_2/f}(\hgt''-h_0(r))$. Now
+    $\hgt''>(1-\epsilon)f(r-1)$ and $\len{\ch_1}<\maxr f(r_1+\lambda)+1$ by
+    \Cref{lem.length}, so the second hypothesis gives $\pref(r,\hgt'')>\len{\ch_1}$,
+    and $\len{P}=\hgt''+1-\lceil\prn(r,\hgt'')\rceil>\hgt''-\prn(r,\hgt'')=\pref(r,\hgt'')$. Hence
+    $\len{P}>\len{\ch_1}>\len{\ch_1}-\lceil k_0\rceil$.
+\end{proof}
+
+The condition is linear in $r$ and $r_1$. It holds for every $r\ge r_1+u$
+with
+\[
+    u = \left(\frac{1-f_2/f}{(1-\epsilon)(1-\advrtwo)}-1\right)r_1
+\]
+plus a term of order $\lambda$, and the coefficient tends to
+$\frac{\advr}{1-\advr}=\frac{t}{n-2t}$. So a block that an honest validator
+holds at round $r_1$ is confirmed by every client with an honest sender within
+a $\frac{t}{n-2t}$ fraction of $r_1$ further rounds. This is the coefficient of
+\Cref{thm.prefix}: a client one block behind an honest chain gives up
+$\frac{t}{n-2t}$ blocks, and a block $r_1$ rounds old waits $\frac{t}{n-2t}r_1$
+rounds. Both are the same exchange rate between honest and adversarial work.
+
+\begin{corollary}[Delay]\label{cor.delay}
+    In a typical execution, let $\lambda<r'\le r$ and let the client of
+    \Cref{def.client} receive at round $r$ a chain $\ch$ adopted by an honest
+    validator at round $r'$. If
+    \[
+        (1-\epsilon)f(r'-1)\ \ge\ \max\Big\{k_0+2,\
+        h_0(r)+\frac{2(1-f_2/f)}{\maxr}\Big\},
+    \]
+    then the output is not $\bot$.
+\end{corollary}
+\begin{proof}
+    Both branches of the bound in \Cref{thm.liveness} are then at least $2$.
+\end{proof}
+
+In the limit the condition reads $fr'\ge\advr fr$, that is $r'\ge\advr r$. An
+honest chain is accepted as long as it is not older than a $(1-\advr)$
+fraction of the current round, however slow the link that carried it.
+
+\begin{corollary}[Arbitrary chains]\label{cor.floor}
     In a typical execution, let the client of \Cref{def.client} receive at
-    round $r$ a chain of height $\hgt$ and output a chain $P\ne\bot$. Then
+    round $r$ a chain of height $\hgt$.
     \begin{enumerate}
-        \item $\len{P}-1\ge\min\left\{\hgt-k_0,\
-            \frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}\right\}-1$,
-            and
-        \item every block of $P$ was computed at a round earlier than
-            $r-\frac{\prn(r)}{2f}+1$.
+        \item If the output is not $\bot$, then $\hgt>k_0$ and $\hgt>h_0(r)$.
+        \item $\pref(r,\hgt)\le\frac{\maxr}{1-f_2/f}\big(\hgt-h_0(r)\big)$.
     \end{enumerate}
 \end{corollary}
 \begin{proof}
-    Let $\ch$ be the chain received, so $\hgt=\len{\ch}-1$, and the height of
-    $P=\prune{\ch}{\prn(r)}$ is $\hgt-\lceil\prn(r)\rceil\ge\hgt-\prn(r)-1$.
-    From \Cref{sec.construction}, $\prn(r)=\max\{k_0,M\}$ with
-    $M=M(r,\hgt+1)$ as in \Cref{eq.depth}, so
-    $\hgt-\prn(r)=\min\{\hgt-k_0,\hgt-M\}$. Since
-    $1-f_2/f+\advrone=\maxr$,
-    \[
-        \hgt-M=\frac{\maxr\hgt-\advrone\maxr f(r+\lambda)-\maxr(2f+1)}{1-f_2/f}.
-    \]
-    This proves the first item. For the second, the pruned blocks
-    $\ch[\len{P}{:}]$ are $\lceil\prn(r)\rceil\ge k_0\ge2\lambda f$ consecutive
-    blocks of $\ch$. From \Cref{lem.span} they were computed in more than
-    $\prn(r)/(2f)$ consecutive rounds, the last of them at a round at most
-    $r$. So the first of them was computed at a round earlier than
-    $r-\prn(r)/(2f)+1$. No predictions occur, so every block of $P$ was
-    computed at a round at most that of the first pruned block.
+    If the output is not $\bot$ then $\hgt-\lceil\prn(r,\hgt)\rceil\ge1$, so
+    $\pref(r,\hgt)=\hgt-\prn(r,\hgt)>0$, and both branches of \Cref{eq.pref} are
+    positive, which is the first item. The second item is \Cref{eq.pref}, since
+    a minimum is at most its second argument.
 \end{proof}
 
-That height is bounded from below once we know how far behind the received
-chain is.
-
-\begin{definition}[Stale chain]\label{def.stale}
-    Let $\stale\ge0$ be an integer. A chain received at round $r$ is
-    \emph{$\stale$-stale} if its length is at least the length of some chain
-    adopted by an honest validator at round $r-\stale$.
-\end{definition}
-
-A chain adopted by an honest validator at round $r$ and delivered in the same
-round is $0$-stale. A chain the adversary withholds for $\stale$ rounds before
-delivering it is $\stale$-stale. A chain the adversary builds itself is
-$\stale$-stale for the $\stale$ that matches its length. One theorem covers
-all three.
-
-\begin{theorem}[Liveness]\label{thm.liveness}
-    In a typical execution, let the client of \Cref{def.client} receive at
-    round $r$ a $\stale$-stale chain with $r-\stale>\lambda$, and let it output
-    $P\ne\bot$. Then $\len{P}-1\ge\min\{\ell_1,\ell_2\}-1$, where
-    \begin{gather*}
-        \ell_1 = (1-\epsilon)f(r-\stale-1)-k_0 , \\
-        \ell_2 = \frac{\maxr\left[(1-\epsilon)f(r-\stale-1)
-            -\advrone f(r+\lambda)-(2f+1)\right]}{1-f_2/f} .
-    \end{gather*}
-\end{theorem}
-\begin{proof}
-    Let $\ch$ be the chain received and $\hgt=\len{\ch}-1$ its height. From
-    \Cref{def.stale} there is a chain $\ch_1$ adopted by an honest validator at
-    round $r-\stale$ with $\len{\ch}\ge\len{\ch_1}$. Since $r-\stale>\lambda$,
-    \Cref{lem.length} gives $\len{\ch_1}-1>(1-\epsilon)f(r-\stale-1)$, and
-    hence $\hgt>(1-\epsilon)f(r-\stale-1)$. Both terms of the minimum in
-    \Cref{cor.growth} are non-decreasing in $\hgt$, because $\maxr>0$ and
-    $1-f_2/f>0$. Substituting the bound on $\hgt$ into them gives $\ell_1$ and
-    $\ell_2$.
-\end{proof}
-
-A bound on the length of the output says which transactions it contains, once
-we name the earlier honest chains that the output covers.
-
-\begin{corollary}[Confirmation]\label{cor.confirm}
-    In a typical execution, let the client of \Cref{def.client} receive a chain
-    at round $r$ and output $P\ne\bot$, and let $\ch_1$ be a chain adopted by
-    an honest validator at a round $r_1\le r$. If $\len{\ch_1}\le\len{P}+k_0$,
-    then $\prune{\ch_1}{k_0}\preceq P$.
-\end{corollary}
-\begin{proof}
-    Since $t<n$ some validator is honest, and it adopts a chain $\ch''$ at
-    round $r$. Since $k_0\ge2\lambda f$ and $r_1\le r$, \Cref{lem.commonprefix}
-    gives $\prune{\ch_1}{k_0}\preceq\ch''$. From \Cref{cor.prune},
-    $P\preceq\ch''$. Both are prefixes of $\ch''$, so one is a prefix of the
-    other. The hypothesis gives
-    $\len{\prune{\ch_1}{k_0}}\le\max\{0,\len{\ch_1}-k_0\}\le\len{P}$, so the
-    shorter one is $\prune{\ch_1}{k_0}$.
-\end{proof}
-
-Liveness is conditional on receiving a chain. The adversary controls the
-client's link, so it may deliver nothing at all, and then the client outputs
-$\bot$ for ever. What \Cref{thm.liveness} bounds is the cost of the chains the
-adversary does deliver. \Cref{sec.limit} reads that cost off in rounds.
+The first item is the floor. A chain no taller than $h_0(r)$, which is about
+the number of blocks the adversary could have mined by itself, is rejected. The
+adversary cannot make the client confirm a chain it could have built alone. The
+second item is what the adversary can do instead. A chain just above $h_0(r)$
+is accepted and confirms almost nothing, and that is the least an accepted
+chain confirms. It is also the adversary's whole leverage over liveness. It
+cannot make the client confirm anything false, by \Cref{thm.safety}, and it
+cannot make the client retract anything, by \Cref{cor.consistency}, so all it
+can do is hand over chains that add little. Liveness is then whatever the
+honest chains that reach the client provide, which is \Cref{thm.liveness}.
 
 \subsection{Normalised form}
 \label{sec.limit}
 
-The bounds above carry the corrections a typical execution requires. We now
-state what they say once those corrections vanish. Write $\rate=\hgt/(fr)$, as
-in \Cref{sec.construction}, for the height of the received chain in units of
-$fr$.
+The bounds above carry the corrections a typical execution needs. Stripping
+those away shows what they say. Write $\rate=\hgt/(fr)$, as in
+\Cref{sec.construction}, for the height of the chain that arrived, measured in
+units of $fr$.
 
 \begin{corollary}[Normalised form]\label{cor.limit}
     Fix $\advr$ and let a chain of height $\hgt=\rate fr$ be received at round
     $r$. Then
     \[
-        \lim_{f,\epsilon\to0}\ \lim_{r\to\infty}\ \frac{\prn(r)}{fr}
+        \lim_{f,\epsilon\to0}\ \lim_{r\to\infty}\ \frac{\prn(r,\hgt)}{fr}
             = \advr\left(1+\advr-\rate\right),
         \qquad
-        \lim_{f,\epsilon\to0}\ \lim_{r\to\infty}\ \frac{\pref(r)}{fr}
+        \lim_{f,\epsilon\to0}\ \lim_{r\to\infty}\ \frac{\pref(r,\hgt)}{fr}
             = (1+\advr)\left(\rate-\advr\right) .
     \]
 \end{corollary}
 \begin{proof}
-    From \Cref{sec.construction}, $\prn(r)=\max\{k_0,\ M(r,\hgt+1)\}$ with $M$
-    as in \Cref{eq.depth}. Dividing $M(r,\hgt+1)$ by $fr$ and substituting
-    $\hgt=\rate fr$,
-    \[
-        \frac{M(r,\hgt+1)}{fr}
-        = \frac{\advrone\left[\maxr(1+\lambda/r)-\rate\right]
-            +\maxr(2f+1)/(fr)}{1-f_2/f} .
-    \]
-    The terms $\lambda/r$ and $\maxr(2f+1)/(fr)$ tend to $0$ as $r$ grows, and
-    so does $k_0/(fr)$. Hence $\prn(r)/(fr)$ tends to
-    $\max\{0,\ \advrone(\maxr-\rate)/(1-f_2/f)\}$. From \Cref{lem.length},
-    $\rate<\maxr$, so the maximum is its second argument. Letting $f$ and
-    $\epsilon$ tend to $0$ sends $\advrone$ to $\advr$, $\maxr$ to $1+\advr$
-    and $f_2/f$ to $0$, which gives the first limit. For the second,
-    $\pref(r)/(fr)=\rate-\prn(r)/(fr)$ tends to
-    $\rate-\advr(1+\advr-\rate)=(1+\advr)(\rate-\advr)$.
+    From \Cref{eq.pref}, $\pref(r,\hgt)/(fr)$ is the minimum of $\rate-k_0/(fr)$
+    and $\frac{\maxr}{1-f_2/f}\big(\rate-h_0(r)/(fr)\big)$. As $r\to\infty$,
+    $k_0/(fr)\to0$ and $h_0(r)/(fr)\to\advrone$, so the second term tends to
+    $\frac{\maxr}{1-f_2/f}(\rate-\advrone)$, which is at most $\rate$ because
+    $\rate<\maxr$ by \Cref{lem.length} and $\maxr-\advrone=1-f_2/f$. The
+    minimum is therefore the second term. Letting $f$ and $\epsilon$ tend to
+    $0$ sends $\advrone$ to $\advr$, $\maxr$ to $1+\advr$ and $f_2/f$ to $0$,
+    which gives the second limit, and $\prn(r,\hgt)/(fr)=\rate-\pref(r,\hgt)/(fr)$ gives
+    the first.
 \end{proof}
 
-Every quantity this paper reports is a value of $\rate$ in \Cref{cor.limit}.
+Every number this paper reports is a value of $\rate$ in \Cref{cor.limit}, and
 \Cref{tab.values} lists the four that matter. The first row is the tallest
 chain that exists at round $r$, from \Cref{lem.length}, and the client keeps
-all of it. The second is a chain as tall as an honest one. The third is a
-$\stale$-stale chain, from \Cref{thm.liveness} with $\hgt=f(r-\stale)$. The
-fourth is the shortest chain from which the client keeps anything, since
-$\pref(r)\le0$ below it.
+all of it. The second is a chain as tall as an honest one. The third is an
+honest chain of an earlier round $r'$, from \Cref{thm.liveness}. The fourth is
+the floor of \Cref{cor.floor}, below which the client keeps nothing.
 
 \begin{table}[t]
 \centering
@@ -540,37 +492,24 @@ units of $fr$, at the four values of $\rate$ this paper
 uses.}\label{tab.values}
 \begin{tabular}{llll}
 \hline
-$\rate$ & the chain received & $\pref(r)/(fr)$ & $\prn(r)/(fr)$ \\
+$\rate$ & the chain received & $\pref(r,\hgt)/(fr)$ & $\prn(r,\hgt)/(fr)$ \\
 \hline
 $1+\advr$ & the tallest chain that exists & $1+\advr$ & $0$ \\
 $1$ & as tall as an honest chain & $1-\advr^2$ & $\advr^2$ \\
-$1-\stale/r$ & as tall as an honest chain of round $r-\stale$
-    & $(1+\advr)\left(1-\advr-\frac{\stale}{r}\right)$
-    & $\advr\left(\advr+\frac{\stale}{r}\right)$ \\
+$r'/r$ & as tall as an honest chain of round $r'$
+    & $(1+\advr)\left(\frac{r'}{r}-\advr\right)$
+    & $\advr\left(1+\advr-\frac{r'}{r}\right)$ \\
 $\advr$ & as tall as the adversary alone can build & $0$ & $\advr$ \\
 \hline
 \end{tabular}
 \end{table}
 
-Two readings of the second row matter. The pruning depth $\advr^2fr$ grows
-with the round, so no constant depth is sound, and \Cref{cor.noconstant}
-proves this. The fraction $\advr^2=t^2/(n-t)^2$ does not grow, so the
-confirmed height grows at the constant rate $(1-\advr^2)f$ and a client that
-applies the rule again at a later round keeps strictly more.
-
-The third row measures the cost of staleness. An honest chain has height about
-$fr$ at round $r$, so a confirmed height of
-$(1+\advr)(1-\advr-\stale/r)fr$ is the height the honest chain had about
-\[
-    \left(1-\frac{t^2}{(n-t)^2}\right)r - \frac{n}{n-t}\,\stale
-\]
-rounds into the execution. By \Cref{cor.confirm} the client confirms the
-honest chain up to that round. Two terms make up the lag. The first,
-$\frac{t^2}{(n-t)^2}r$, is paid even by a client that receives an honest chain
-in the round it was adopted. It is the price of not knowing that the peer is
-honest. The second, $\frac{n}{n-t}\stale$, is the price of staleness, and it
-slightly exceeds $\stale$. The client keeps nothing once
-$\stale\ge\frac{n-2t}{n-t}r$, which is the fourth row. An adversary that wants
-the client to output anything must deliver a chain fresher than that, and its
-only remaining lever is to push the output back by $\frac{n}{n-t}$ rounds for
-each round of staleness it adds.
+The second row says two things at once. The depth $\advr^2fr$ grows with the
+round, so no constant depth is sound, which is \Cref{cor.noconstant}. The
+fraction $\advr^2=t^2/(n-t)^2$ does not grow at all, so the confirmed height
+climbs at the steady rate $(1-\advr^2)f$. The third row prices delay. An honest
+chain of round $r'$ confirms up to the height the honest chain had about
+$(1+\advr)(r'-\advr r)$ rounds in, which is $(1-\advr^2)r$ for $r'=r$ and falls
+by $1+\advr=\frac{n}{n-t}$ rounds for every round the chain is late. It reaches
+zero at $r'=\advr r$, the fourth row, which is the delay threshold of
+\Cref{cor.delay}.

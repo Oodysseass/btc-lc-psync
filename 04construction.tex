@@ -4,55 +4,56 @@
 A client receives a chain and keeps a prefix of it. This section says which
 prefix.
 
-The client cannot keep the whole chain. The chain it receives may fork from
-every chain held by an honest validator, and the blocks after the fork are on
-no honest chain. The client cannot locate the fork either, because it sees one
-chain and has nothing to compare it against. What it can do is bound how deep
-the fork is, from the height of the chain and the round.
+It cannot keep all of it. The chain it was handed may fork off every chain the
+honest validators hold, and the blocks after that fork are on no honest chain.
+It cannot find the fork either. It has one chain and nothing to compare it
+against. What it can do is put a bound on how deep the fork goes, using only the
+height of the chain and the round.
 
-Let the client receive at round $r$ a chain of height $\hgt$, let $\rst$ be the
-round at which the fork point was computed, and let $d$ be the number of blocks
-after the fork point. Two facts bound $d$. First, no chain is taller than about
-$(1+\advr)f\rst$ at round $\rst$, so the fork point is at height at most about
-$(1+\advr)f\rst$ and
+Let the client receive at round $r$ a chain $\ch$ of height $\hgt$. Let $\rst$ be the
+round in which the fork point was mined, and let $d$ be the number of blocks
+that come after it. Two facts bound $d$. The first is that no chain is taller
+than about $(1+\advr)f\rst$ at round $\rst$, so the fork point is no higher than
+that, and
 \begin{equation}\label{eq.early}
     \hgt \lesssim (1+\advr)f\rst + d .
 \end{equation}
-Second, the adversary computes about $\advr f$ blocks per round, and after a
-fork from an honest chain only adversarial blocks extend the fork, so
+The second is that only adversarial blocks extend a fork, and the adversary
+finds about $\advr f$ blocks per round, so
 \begin{equation}\label{eq.deep}
     d \lesssim \advr f(r-\rst) .
 \end{equation}
-The two pull against each other. The deeper the fork, the lower the height
-$\hgt-d$ at which it began, and by \Cref{eq.early} a lower starting height
-permits an earlier $\rst$, which by \Cref{eq.deep} leaves more rounds in which
-to extend the fork. Eliminating $\rst$ between them gives
+Both inequalities constrain $\rst$, and they constrain it from opposite sides.
+\Cref{eq.early} rearranges to $\rst\gtrsim(\hgt-d)/((1+\advr)f)$: the fork point
+needed that long to reach its height. \Cref{eq.deep} rearranges to
+$\rst\lesssim r-d/(\advr f)$: the adversary needed that long to mine the $d$
+blocks above it. A round satisfying both exists only while $d$ is small enough,
+and eliminating $\rst$ between them gives
 \begin{equation}\label{eq.idealdepth}
     d \lesssim \advr\left((1+\advr)fr - \hgt\right) .
 \end{equation}
-The client prunes \Cref{eq.idealdepth} blocks. We write $\prn(r)$ for the
-number of blocks it prunes and $\pref(r)=\hgt-\prn(r)$ for the height of what
-it keeps, the confirmed height. The rest of this section replaces the three
-approximations by the rates a typical execution guarantees, and
+The client prunes that many blocks. We write $\prn(r,\hgt)$ for the number it
+prunes and $\pref(r,\hgt)=\hgt-\prn(r,\hgt)$ for the height of what is left, the
+confirmed height. Both read only the round and the height. The three bounds above are approximate. The rest of this section
+replaces them by rates that hold in every typical execution, and
 \Cref{sec.analysis} proves the result sound.
 
 \paragraph{Normalised form}
 
-Write $\rate=\hgt/(fr)$ for the height of the received chain in units of the
-height an honest chain is expected to reach by round $r$. Dividing
+It helps to measure the chain against what an honest chain would be. Write
+$\rate=\hgt/(fr)$ for its height in units of $fr$. Dividing
 \Cref{eq.idealdepth} by $fr$ gives
 \begin{equation}\label{eq.normal}
     \frac{d}{fr} \lesssim \advr\left(1+\advr-\rate\right),
     \qquad\text{so}\qquad
     \frac{\hgt-d}{fr} \gtrsim (1+\advr)\left(\rate-\advr\right) .
 \end{equation}
-One variable now carries the whole rule, and three of its values matter.
-At $\rate=1+\advr$ the chain is as tall as any chain can be, and the client
-prunes nothing. At $\rate=1$ the chain is as tall as an honest chain, and the
-client prunes an $\advr^2$ fraction of it. At $\rate=\advr$ the chain is no
-taller than what the adversary alone could have produced, and nothing is kept.
-\Cref{fig.confirmed} is the same statement drawn in the plane.
-\Cref{cor.limit} proves it.
+One number now carries the whole rule, and three of its values matter. At
+$\rate=1+\advr$ the chain is as tall as any chain can be, and the client prunes
+nothing. At $\rate=1$ it is as tall as an honest chain, and the client prunes an
+$\advr^2$ fraction of it. At $\rate=\advr$ it is no taller than what the
+adversary could have built alone, and nothing is kept. \Cref{fig.confirmed}
+draws this, and \Cref{cor.limit} proves it.
 
 \input{figures/fig.confirmed}
 
@@ -71,41 +72,54 @@ second is
     \advrone = \frac{\advr}{1-f} + \frac{f_2}{f} + 2\epsilon ,
 \]
 the rate per round at which the adversary lengthens a fork, from
-\Cref{eq.upper}. It takes the place of $\advr f$ in \Cref{eq.deep}. Both exceed $\advr$ only by the collision rate $f_2/f$ and by
-multiples of $\epsilon$, and both tend to $\advr$ as $f$ and $\epsilon$ tend to
-$0$, while $\maxr$ tends to $1+\advr=n/(n-t)$. The third is
-$k_0 = 2(\lambda+2)f$, the scale of the common prefix parameter
-of~\cite{gkl24}. Since $\lambda\ge2/f$ we have
-$2\lambda f\le k_0\le4\lambda f$.
-From \Cref{eq.fsq}, $f_2/f<f/(2(1-f)^2)$, and $f<1/3$ by
-\Cref{asm.majority}, so $f_2/f<1$ and the quantity
+\Cref{eq.upper}. It takes the place of $\advr f$ in \Cref{eq.deep}. Neither
+constant is far from $\advr$. Each exceeds it only by the collision rate $f_2/f$
+and by multiples of $\epsilon$, and both tend to $\advr$ as $f$ and $\epsilon$
+tend to $0$, while $\maxr$ tends to $1+\advr=n/(n-t)$. The third constant is
+$k_0=2(\lambda+2)f$, which is the scale of the common prefix parameter
+of~\cite{gkl24}. Since $\lambda\ge2/f$ we have $2\lambda f\le k_0\le4\lambda f$.
+From \Cref{lem.fsq}, $f_2/f<f/(2(1-f)^2)$, and $f<1/3$ by
+\Cref{asm.majority}, so $f_2/f<1$ and the pruning depth
 \begin{equation}\label{eq.depth}
-    M(r,\ell)
-    = \frac{\advrone\left[\maxr f(r+\lambda)-\ell+1\right]+\maxr(2f+1)}{1-f_2/f}
+    \prn(r,\hgt)
+    = \max\left\{k_0,\
+    \frac{\advrone\left[\maxr f(r+\lambda)-\hgt+1\right]+\maxr(2f+1)}{1-f_2/f}\right\}
 \end{equation}
-is well defined, and we set $\prn(r)=\max\{k_0,\ M(r,\len{\ch})\}$.
+is well defined. The confirmed height $\pref(r,\hgt)=\hgt-\prn(r,\hgt)$ then
+reads, using $\maxr-\advrone=1-f_2/f$,
+\begin{equation}\label{eq.pref}
+    \pref(r,\hgt) = \min\Big\{\hgt-k_0,\
+    \frac{\maxr}{1-f_2/f}\big(\hgt-h_0(r)\big)\Big\},
+    \qquad h_0(r)=\advrone f(r+\lambda)+2f+1 .
+\end{equation}
+This is the same rule seen from below. The height $h_0(r)$ is about the number
+of blocks the adversary alone can have mined by round $r$, and nothing below
+it is confirmed. Whatever sits above it is confirmed, scaled by
+$\frac{\maxr}{1-f_2/f}$, which tends to $1+\advr$.
 
 \begin{definition}[Pruning client]\label{def.client}
     The pruning client is the following.
     \begin{enumerate}
         \item The client asks for a chain and waits until it receives one. Let
-            $\ch$ be the chain received and let $r$ be the round of receipt.
-        \item The client computes $\prn(r)=\max\{k_0,\ M(r,\len{\ch})\}$.
-        \item If $\prune{\ch}{\prn(r)}$ has more than one block, the client
+            $\ch$ be the chain received, let $\hgt$ be its height, and let $r$
+            be the round of receipt.
+        \item The client computes $\prn(r,\hgt)$ by \Cref{eq.depth}.
+        \item If $\prune{\ch}{\prn(r,\hgt)}$ has more than one block, the client
             outputs it. Otherwise it outputs $\bot$.
     \end{enumerate}
 \end{definition}
 
 \input{algorithms/alg.client}
 
-The client uses the round of receipt and the chain received. It does not use
-the length of any chain held by a validator, a delay bound for its own link, or
-any test of whether its peer is honest.
+The rule reads two things: the round the chain arrived and its height. It does
+not read the blocks of the chain, and it does not read the length of any chain
+a validator holds. It does not need a
+delay bound. It never asks whether whoever answered is honest.
 
 \paragraph{Repeated confirmation}
 
-A client that stays online receives more than one chain. It runs
-\Cref{def.client} on each and keeps the longest output.
+A client that stays online is handed more than one chain. It runs
+\Cref{def.client} on each and keeps whichever output is longest.
 
 \begin{definition}[Monotone client]\label{def.monotone}
     The monotone client runs \Cref{def.client} on every chain it receives and
@@ -113,13 +127,12 @@ A client that stays online receives more than one chain. It runs
     every run returned $\bot$.
 \end{definition}
 
-\Cref{cor.monotone} shows that the outputs of \Cref{def.client} are nested, so
-the longest of them is well defined and the monotone client never retracts an
-output.
+This is well defined. \Cref{cor.consistency} shows that the outputs of
+\Cref{def.client} are nested, so one of them is longest, and a client that keeps
+it never has to take anything back.
 
-\Cref{cor.prune} shows that the output of \Cref{def.client} is a prefix of
-every chain adopted by an honest validator at the round of receipt and at every
-later round. \Cref{thm.consistency} shows that the outputs of any two clients
-are prefixes of one another. \Cref{thm.liveness} bounds how far the output
-trails the honest chain. \Cref{cor.tight} shows that no smaller pruning depth
-is sound.
+Four results follow. \Cref{thm.safety} shows the output is a prefix of every
+chain an honest validator adopts, at the round of receipt and at every round
+after it. \Cref{cor.consistency} shows any two clients output prefixes of one
+another. \Cref{thm.liveness} says how far behind the honest chain the output
+sits. \Cref{cor.tight} shows no smaller pruning depth is sound.
