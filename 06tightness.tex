@@ -1,15 +1,16 @@
 \section{Tightness}
 \label{sec.tightness}
 
-We show two things. No constant confirmation depth is sound. And the depth
-$\prn(r,\hgt)$ that \Cref{alg.client} prunes is, in the limit, no more than it
-has to be. One attack gives both. The adversary follows the honest chain for
-$r_0$ rounds, so that the chain she holds is as long as any chain the validators
-hold. Then she stops publishing, mines for $s$ more rounds in private, and hands
-the client what she has. The blocks she kept private are on no honest chain, and
-there are about $\advr fs$ of them. Throughout this section the adversary has the
-largest power that \Cref{asm.majority} allows, $t=\advr(n-t)$. The proofs are
-in \Cref{appendix.tightness}.
+We show two things. No constant confirmation depth is sound. And no safe rule
+that reads only the round and the height prunes, in the limit, less than the
+depth $\prn(r,\hgt)$ of \Cref{alg.client}. One attack gives both. The adversary
+follows the honest chain for $r_0$ rounds, so that the chain she holds is as
+long as any chain the validators hold. Then she stops publishing, mines for $s$
+more rounds in private, and hands the client what she has, possibly cut at a
+height of her choice. The blocks she kept private are on no honest chain, and
+there are about $\advr fs$ of them. Throughout this section $\advr>0$ and the
+adversary has the largest power that \Cref{asm.majority} allows,
+$t=\advr(n-t)$. The proofs are in \Cref{appendix.tightness}.
 
 \begin{definition}[Private mining]\label{def.private}
     The strategy $\pipriv$ with parameters $r_0\ge1$ and $s\ge1$ is the
@@ -28,27 +29,74 @@ in \Cref{appendix.tightness}.
         \item At round $r$ she sends the client the chain $\ch$ formed by
             $\ch_0$ and every block she computed in the rounds of $[r_0+1,r]$.
     \end{enumerate}
+    For $\hgt\ge0$, the strategy $\pipriv^\hgt$ is the same, except that at
+    round $r$ she sends the client $\ch[{:}\hgt+1]$, the chain $\ch$ cut at
+    height $\hgt$, whenever $\ch$ has height at least $\hgt$.
 \end{definition}
 
-\begin{theorem}[Tightness, informal]\label{thm.tight}
-    Let the client receive at round $r$ the chain $\ch$ that $\pipriv$ sends it.
+\begin{lemma}[Private mining]\label{thm.attack}
+    Let $r_0,s\ge1$, let $r=r_0+s$ and let $\epsilon'\in(0,1)$. In an
+    execution against $\pipriv$, except with probability at most
+    $\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, the chain $\ch$ sent to
+    the client is in $\bt_r$, and every chain $\ch'$ adopted by an honest
+    validator at round $r$ satisfies
+    \begin{align}
+        \len{\ch}-\len{\ch\meet\ch'} &> (1-\epsilon')\advr fs,
+            \label{eq.attfork}\\
+        \len{\ch}-1 &> (1-\epsilon')\left[(1+\advr)fr_0+\advr fs\right].
+            \label{eq.attheight}
+    \end{align}
+\end{lemma}
+
+The first item of the next theorem says that no constant depth is safe. The
+second gives a lower bound on the depth of every safe rule that reads only the
+round and the height. The third says that the depth of \Cref{alg.client} meets
+this bound in the limit, at every height.
+
+\begin{theorem}[Tightness]\label{thm.tight}
     \begin{enumerate}
-        \item For every constant $k$, once $s$ exceeds about $k/(\advr f)$,
+        \item Let $\ch$ be the chain that $\pipriv$ sends the client at round
+            $r$. Let $k\ge0$, $\epsilon'\in(0,1)$, $r_0\ge1$ and
+            $s\ge\lceil k\rceil/\left[(1-\epsilon')\advr f\right]$. Except with
+            probability at most $\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$,
             $\prune{\ch}{k}$ is a prefix of no chain adopted by an honest
-            validator at round $r$, with overwhelming probability in
-            $\min\{r_0,s\}$.
-        \item With $s=\advr r$, the chain $\ch$ is about as tall as an honest
-            chain, about $fr$, and about $\advr^2fr$ of its blocks are on no
-            honest chain. This is what the client prunes from it.
+            validator at round $r$.
+        \item Let $R$ be a function of the round and the height, and let a
+            client prune $\lceil R(r,\hgt)\rceil$ blocks from each chain of
+            height $\hgt$ that it receives at round $r$. Let
+            $\epsilon'\in(0,1)$, $r_0,s\ge1$, $r=r_0+s$ and
+            $\hgt\le(1-\epsilon')\left[(1+\advr)fr_0+\advr fs\right]$.
+            Suppose that, against $\pipriv^\hgt$, the chain the client computes
+            at round $r$ is a prefix of every chain adopted by an honest
+            validator at round $r$ with probability greater than
+            $\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$. Then
+            \[
+                \lceil R(r,\hgt)\rceil>\hgt-\maxr f\max\{r_0,\lambda\} .
+            \]
+        \item Let $a\in(\advr,1+\advr)$, $\epsilon'\in(0,1-a/(1+\advr))$,
+            $\hgt=\lfloor afr\rfloor$,
+            $r_0=\lceil\hgt/((1-\epsilon')f)-\advr r\rceil$ and $s=r-r_0$. For
+            large $r$, these meet the conditions of the second item on
+            $r_0$, $s$ and $\hgt$, and
+            \[
+                \lim_{f,\epsilon,\epsilon'\to0}\ \lim_{r\to\infty}\
+                \frac{\hgt-\maxr f\max\{r_0,\lambda\}}{fr}
+                =\lim_{f,\epsilon,\epsilon'\to0}\ \lim_{r\to\infty}\
+                \frac{\prn(r,\hgt)}{fr}
+                =\advr(1+\advr-a) .
+            \]
     \end{enumerate}
 \end{theorem}
 
-\Cref{cor.noconstant,cor.ruletight} in \Cref{appendix.tightness} state both
-items precisely. The second item matters for honest chains too. The attack chain has height
-about $fr$, which is the height of an honest chain in an execution where the
-adversary does not mine at all. A rule that reads only the round and the height
-cannot tell the two executions apart, so it prunes about $\advr^2fr$ from the
-honest chain too. That is the lag behind the honest chain in \Cref{thm.liveness},
-and for rules of this kind it is necessary. A rule that reads timestamps, the
-target, or the contents of blocks is outside the model of \Cref{sec.model}, and
-we make no claim about it.
+The cut is what makes the second item hold at every height. Without it, the
+height of the attack chain would be random, and a rule could prune much at the
+heights that attacks produce and little at the others. Together, the second
+and third items say that no safe rule that reads only the round and the height
+prunes, in the limit, less than \Cref{alg.client}, at any height. This matters
+for honest chains too. When the adversary does not mine, an honest chain at
+round $r$ has height about $fr$, and at $a=1$ the third item gives
+$\advr^2fr$. So every safe rule of this kind prunes about a $\advr^2$ fraction
+of such a chain, as \Cref{alg.client} does (\Cref{sec.liveness}), and its
+confirmation delay grows linearly with the round, as in \Cref{thm.liveness}. A
+rule that reads timestamps, the target, or the contents of blocks is outside
+the model of \Cref{sec.model}, and we make no claim about it.

@@ -96,7 +96,8 @@ given to the honest validators at round $r$ is confirmed at most about
 $\frac{\advr^2}{1-\advr^2}r$ rounds later, and every round by which the chain
 the client receives is stale costs at most $\frac{1}{1-\advr}$ more. In bitcoin
 this delay is a constant. For the client it grows with the round, and
-\Cref{sec.tightness} shows that this is necessary.
+\Cref{sec.tightness} shows that every safe rule that reads only the round and
+the height prunes as much, in the limit.
 
 \Cref{thm.liveness} also shows that the confirmed prefix grows at a constant
 rate. Solving $r'\ge r+u(r,D)$ for $r$, a client that receives a $D$-stale chain
