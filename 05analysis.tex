@@ -9,16 +9,15 @@ same order as $\lambda\ge2/f$ that the proof of safety needs. The proofs are in
 
 The proofs make the argument of \Cref{sec.construction} exact. They count the
 blocks of a received chain above its fork point with an honest chain, and
-charge each of them to an adversarial block, or to one of the rare rounds in
-which two honest validators found a block at once. At the round of receipt,
-this bounds the blocks of the received chain that are not on the honest chain
-by the pruning depth. Later rounds split into two cases. If the received chain
-is shorter than some honest chain, what the client keeps lies at least $k_0$
-blocks deep in that honest chain, and the common prefix property
-of~\cite{gkl24} keeps it there. If the received chain is at least as long as
-every honest chain, the client is in the position of a validator that receives
-the longest chain in the network, and pruning $k_0$ blocks is enough, as it is
-for the validator.
+charge each of them to an adversarial block, or a succeseful round that is not a
+convergence opportunity. For the round of receipt, this bounds the number of
+blocks of the received chain that are on a private fork, off the honest chain.
+Later rounds split into two cases. If the received chain is shorter than some
+honest chain, what the client keeps lies at least $k_0$ blocks deep in that
+honest chain, and the common prefix property of~\cite{gkl24} keeps it there. If
+the received chain is at least as long as every honest chain, the client is in
+the position of a validator that receives the longest chain in the network, and
+pruning $k_0$ blocks is enough, as it is for the validator.
 
 \subsection{Safety}
 \label{sec.safety}

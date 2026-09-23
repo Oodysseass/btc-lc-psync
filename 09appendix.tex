@@ -271,13 +271,13 @@ is the last honest block of $\ch\meet\ch'$. The next lemma counts the blocks of
 each chain above the fork point. The honest validators kept extending $\ch'$
 after the fork point was mined, so $\ch'$ gained at least one block in every
 successful round. Each block of $\ch$ above the fork point is of one of three
-kinds. It is adversarial. It is an honest block mined in a convergence
-opportunity, and then the block of $\ch'$ at the same height is adversarial by
-\Cref{lem.unique}, so it can be charged to that block. Or it is an honest block
-mined at round $r$, or in a round in which two or more honest validators found
-a block. So $\ch$ gained at most as many blocks as the adversary mined, plus one
-for each round in which two or more honest validators found a block, plus one
-for round $r$.
+kinds: either (a) it is adversarial, or (b) it is an honest block mined in a
+convergence opportunity, and then the block of $\ch'$ at the same height is
+adversarial by \Cref{lem.unique}, so it can be charged to that block, or (c) it
+is an honest block mined at round $r$, or in a round in which two or more honest
+validators found a block. So $\ch$ gained at most as many blocks as the
+adversary mined, plus one for each round in which two or more honest validators
+found a block, plus one for round $r$.
 
 \begin{lemma}[Counting]\label{lem.count}
     In a typical execution, let $\ch\in\bt_r$ and let $\ch'$ be a chain adopted

@@ -42,7 +42,7 @@ yields a block. We say that this block was \emph{computed at round $r$}.
 
 \paragraph{Protocol.}
 
-Validators run the Bitcoin backbone protocol of~\cite{gkl24}. Every validator
+Validators run the bitcoin backbone protocol of~\cite{gkl24}. Every validator
 keeps a local chain, initialized with the genesis block $\gen$. At round $r$ a
 validator runs $\fn{maxvalid}$ on its local chain and on the chains it received
 at the beginning of round $r$. Function $\fn{maxvalid}$ returns the longest
@@ -66,7 +66,7 @@ Clients are parties that do not participate in the consensus protocol. A client
 is only interested in confirming a ledger that is derived from the chain the
 validators maintain. This ledger must be \emph{safe}. A client's connection to
 the rest of the network is asynchronous; the adversary can delay messages for
-any arbitrary, finite amount of time. Thus, the client cannot assume that it is
+any arbitrary amount of time. Thus, the client cannot assume that it is
 going to receive a message from an honest party within a certain number of
 rounds. We say that a client \emph{receives a chain at round $r$} when the
 adversary delivers that chain to it during round $r$.
