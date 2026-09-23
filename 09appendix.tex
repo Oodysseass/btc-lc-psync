@@ -566,12 +566,15 @@ do.
 
 \subsection{Liveness}
 
+The honest chain keeps growing after the transaction is settled in it. The
+proof shows that, from round $r+u(r,D)$ on, it has grown by more than the
+client prunes.
+
 \begin{proofof}{\Cref{thm.liveness}}
     Write $\theta=1-\epsilon-\advrone$ and $B=\maxr/(1-\ftwo/f)$. By
     \Cref{lem.rho}, $\advrone=(1-\epsilon)\advrtwo<1-\epsilon$, so $\theta>0$ and
     $\advrone<1$. \Cref{asm.majority} gives $f<1/3$ and $\epsilon<1/3$, so
-    $1/f\le\lambda/2$, $\lambda\ge6$ and $1-\epsilon>2/3$, since
-    $\lambda\ge2/f$.
+    $1-\epsilon>2/3$, and $\lambda\ge2/f$ gives $\lambda\ge6$.
 
     Let $r_1=r+u_V$, with $u_V$ as in \Cref{lem.gklliveness}, and let $\ch_1$
     be a chain adopted by an honest validator at round $r_1$. By
@@ -579,46 +582,41 @@ do.
     $\ch''$ be the $D$-stale chain the client receives at round $r'$, adopted
     by an honest validator at round $r''=r'-D$, let $\hgt''$ be its height, and
     let $\ch'=\prune{\ch''}{\prn(r',\hgt'')}$ be the chain the client computes
-    from it. We show that $\ch'$ has more than one block and that
-    $\prune{\ch_1}{k_0}\preceq\ch'$. By \Cref{cor.consistency}, the output of
-    the client then has $\ch'$ as a prefix at every round from $r'$ on, and so
-    it contains the transaction.
+    from it. We show that $\prune{\ch_1}{k_0}\preceq\ch'$. Then $\ch'$ contains
+    the transaction, which is not in the genesis block, so $\ch'$ has more than
+    one block. By \Cref{cor.consistency}, the output of the client then has
+    $\ch'$ as a prefix at every round from $r'$ on, and so it contains the
+    transaction.
 
-    First, $r'$ is large enough. Since $\lceil k_0\rceil\le2(\lambda+2)f+1$
-    and $2/f\le\lambda$, we have
+    First, $r'$ is large enough. Since $\lceil k_0\rceil\le2(\lambda+2)f+1$ and
+    $2/f\le\lambda$, we have
     $u_V\le(5\lambda+8)/(1-\epsilon)+1<\tfrac{3}{2}(5\lambda+8)+1\le10\lambda$.
     Since $\maxr>1$, we have $1-\advrone/\maxr\ge1-\advrone\ge\theta$, so
     $r'\ge r+u(r,D)$ gives $r''=r'-D\ge r+13\lambda\ge r_1+3\lambda$. Also
-    $r_1\ge u_V\ge2k_0/f=4(\lambda+2)$. So $r_1>\lambda$, $r''>\lambda$, and the
-    set $S=[r_1+1,r''-1]$ has at least $\lambda$ rounds.
+    $r_1\ge u_V\ge2k_0/f>\lambda$. So $r_1>\lambda$, $r''>r_1$, and the set
+    $S=[r_1+1,r''-1]$ has at least $\lambda$ rounds.
 
-    Next, we bound the heights. The honest validator that adopted $\ch_1$ at
-    round $r_1$ has at round $r_1+1$ a chain at least as long as $\ch_1$. Since
-    $r''\ge r_1+1$, \Cref{lem.growth,def.typical} give
+    Next, we compare the lengths of $\ch''$ and $\ch_1$. The honest validator
+    that adopted $\ch_1$ at round $r_1$ has at round $r_1+1$ a chain at least as
+    long as $\ch_1$. Since $r''\ge r_1+1$,
+    \Cref{lem.growth,def.typical} give
     \[
-        \hgt''\ \ge\ \len{\ch_1}-1+X(S)\ >\ \len{\ch_1}-1+(1-\epsilon)f(r''-r_1-1) .
+        \len{\ch''}\ \ge\ \len{\ch_1}+X(S)\ >\ \len{\ch_1}+(1-\epsilon)f(r''-r_1-1) .
     \]
-    In particular $\len{\ch''}\ge\len{\ch_1}$. Since $r_1>\lambda$ and
-    $r''>\lambda$, \Cref{lem.length} gives $\len{\ch_1}-1>(1-\epsilon)f(r_1-1)$
-    and $\hgt''>(1-\epsilon)f(r''-1)$.
+    Also $\len{\ch_1}-1>(1-\epsilon)f(r_1-1)$ by \Cref{lem.length}, since
+    $r_1>\lambda$.
 
-    Put $h(r')=\advrone f(r'+\lambda)+2f+1$. Since $\maxr-\advrone=1-\ftwo/f$,
-    \Cref{eq.depth} gives
-    \[
-        \hgt''-\prn(r',\hgt'')=\min\big\{\hgt''-k_0,\ B(\hgt''-h(r'))\big\} .
-    \]
-    We show that the first term exceeds $2$, and that the second is at least
-    $\len{\ch_1}$, which exceeds $2$ too.
-
-    For the first term, $r''-1\ge r_1+3\lambda-1\ge7\lambda+7$. Since
-    $2/f\le\lambda$ and $1/(1-\epsilon)<3/2$, we have
-    $(k_0+2)/((1-\epsilon)f)=(2\lambda+4+2/f)/(1-\epsilon)<\tfrac{3}{2}(3\lambda+4)\le7\lambda+7$.
-    So $\hgt''>(1-\epsilon)f(r''-1)>k_0+2$.
-
-    For the second term, $1/B=1-\advrone/\maxr$, so
-    $B(\hgt''-h(r'))\ge\len{\ch_1}$ holds if
-    $\hgt''-h(r')\ge\len{\ch_1}-(\advrone/\maxr)\len{\ch_1}$. By the bounds on
-    $\hgt''$ and $\len{\ch_1}$ above, this holds if
+    We now show that $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$,
+    that is, that the client prunes at most
+    $\len{\ch''}-\len{\ch_1}+\lceil k_0\rceil$ blocks. If
+    $\prn(r',\hgt'')=k_0$, this follows from $\len{\ch''}\ge\len{\ch_1}$.
+    Otherwise, put $h(r')=\advrone f(r'+\lambda)+2f+1$. Since
+    $\maxr-\advrone=1-\ftwo/f$, \Cref{eq.depth} gives
+    $\hgt''-\prn(r',\hgt'')=B(\hgt''-h(r'))$. Since
+    $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')$, it
+    suffices that $B(\hgt''-h(r'))\ge\len{\ch_1}$. As $1/B=1-\advrone/\maxr$,
+    this reads $\hgt''-h(r')\ge\len{\ch_1}-(\advrone/\maxr)\len{\ch_1}$. By the
+    two bounds on $\len{\ch''}$ and $\len{\ch_1}$ above, it holds if
     \[
         (1-\epsilon)f(r''-r_1-1)+\frac{\advrone}{\maxr}(1-\epsilon)f(r_1-1)\ \ge\ h(r')+1 .
     \]
@@ -630,21 +628,12 @@ do.
     Since $1-\epsilon\le1$, $\advrone/\maxr<1$, $\advrone<1$, $2/f\le\lambda$ and
     $4\le\lambda$, the right-hand side is at most
     $(1-\advrone/\maxr)(r+u_V)+D+2\lambda+4\le(1-\advrone/\maxr)r+D+13\lambda$,
-    which is at most $\theta r'$ because $r'\ge r+u(r,D)$. Also,
-    $\len{\ch_1}>(1-\epsilon)f(r_1-1)+1\ge(1-\epsilon)fu_V+1\ge2k_0+1>2$.
+    which is at most $\theta r'$ because $r'\ge r+u(r,D)$.
 
-    So both terms of the minimum exceed $2$. Hence
-    $\lceil\prn(r',\hgt'')\rceil\le\hgt''-2$, and $\ch'$ has
-    $\hgt''+1-\lceil\prn(r',\hgt'')\rceil\ge3$ blocks.
-
-    Finally, $\prune{\ch_1}{k_0}\preceq\ch'$. By \Cref{lem.commonprefix} with
-    $k=k_0\ge2\lambda f$ and $r_1<r''$, $\prune{\ch_1}{k_0}\preceq\ch''$, and
-    $\ch'\preceq\ch''$, so the shorter of the two is a prefix of the other. It
-    remains to show $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$. If
-    $\prn(r',\hgt'')=k_0$, then
-    $\len{\ch'}=\len{\ch''}-\lceil k_0\rceil\ge\len{\ch_1}-\lceil k_0\rceil$.
-    Otherwise the minimum above is its second term, and
-    $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')=B(\hgt''-h(r'))\ge\len{\ch_1}$.
+    Finally, by \Cref{lem.commonprefix} with $k=k_0\ge2\lambda f$ and
+    $r_1<r''$, $\prune{\ch_1}{k_0}\preceq\ch''$. Also $\ch'\preceq\ch''$ and
+    $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil=\len{\prune{\ch_1}{k_0}}$, so
+    $\prune{\ch_1}{k_0}\preceq\ch'$.
 \end{proofof}
 
 \begin{proofof}{\Cref{cor.ledgerliveness}}
@@ -660,15 +649,18 @@ do.
 \section{Proofs for tightness}
 \label{appendix.tightness}
 
-Throughout, $\advr>0$ and $t=\advr(n-t)$, as in \Cref{sec.tightness}. A block
+Throughout, $\advr=t/(n-t)>0$, as in \Cref{sec.tightness}. A block
 computed at round $r$ may be extended by a query made in the same round.
 \Cref{lem.length} counts adversarial blocks by $Z$, which counts queries, so it
 already allows this.
 
-\begin{proofof}{\Cref{thm.attack}}
-    Write $S_1=[1,r_0]$, $S_2=[r_0+1,r]$ and $\ell_0=\len{\ch_0}$. We first
-    establish three facts that hold in every typical execution, and then bound
-    the random variables in them.
+\begin{proofof}{\Cref{lem.attack}}
+    Write $S_1=[1,r_0]$, $S_2=[r_0+1,r]$ and $\ell_0=\len{\ch_0}$. In the
+    rounds of $S_1$ the public chain gains one block in every successful round
+    and one block for every adversarial block. In the rounds of $S_2$ only the
+    private branch of the adversary grows on top of $\ch_0$. We first establish
+    three facts, and then bound the random variables in them. The first two
+    hold in every execution, and the third in every typical one.
 
     First, $\ell_0=1+X(S_1)+Z(S_1)$. We show by induction on $r'\in[1,r_0+1]$ that
     every honest validator adopts at round $r'$ a chain of length
@@ -684,73 +676,90 @@ already allows this.
     $L_{r'}+X_{r'}$ long, so it adopts a chain of length $L_{r'+1}$. The case
     $r'=r_0+1$ is the claim.
 
-    Second, in the rounds of $S_2$ the adversary queries only on the private
-    branch, so $\len{\ch}=\ell_0+Z(S_2)$, and every block of $\ch$ was
-    computed by round $r$, so $\ch\in\bt_r$.
+    Second, $\len{\ch}=\ell_0+Z(S_2)$. In the rounds of $S_2$ the adversary
+    queries only on the private branch, and each of her blocks extends the one
+    before.
 
-    Third, the blocks the adversary computes in the rounds of $S_2$ go to
-    the client only, so none lies on $\ch'$. Hence $\ch\meet\ch'\preceq\ch_0$
-    and $\len{\ch}-\len{\ch\meet\ch'}\ge\len{\ch}-\ell_0=Z(S_2)$.
+    Third, $\ch\meet\ch'\preceq\ch_0$ for every chain $\ch'$ adopted by an
+    honest validator at round $r$. The blocks the adversary computes in the
+    rounds of $S_2$ go to the client only, and a typical execution has no
+    copies, so none lies on $\ch'$. The other blocks of $\ch$ are those of
+    $\ch_0$.
 
     Now the randomness. $X(S_1)$ is a sum of $r_0$ independent Bernoulli
     trials with success probability $f$. $Z(S_1)$ and $Z(S_2)$ are sums of
     $tqr_0$ and $tqs$ independent Bernoulli trials with success probability
     $p$. Since $t=\advr(n-t)$, \Cref{eq.rates} gives $pqtr_0>\advr fr_0$ and
-    $pqts>\advr fs$. By
-    the Chernoff bound and $\advr<1$, each of the events
-    $X(S_1)\le(1-\epsilon')fr_0$, $Z(S_1)\le(1-\epsilon')\advr fr_0$ and
-    $Z(S_2)\le(1-\epsilon')\advr fs$ has probability at most
-    $e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$. By a union bound, except with the
-    stated probability the execution is typical and none of the three events
-    occurs. Then the third fact gives \Cref{eq.attfork}, and the first two
-    facts give \Cref{eq.attheight}, since $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)$.
+    $pqts>\advr fs$. By the Chernoff bound, the event
+    $X(S_1)\le(1-\epsilon')fr_0$ has probability at most
+    $e^{-\epsilon'^2fr_0/2}$. The means of $Z(S_1)$ and $Z(S_2)$ exceed
+    $\advr fr_0$ and $\advr fs$, so the events
+    $Z(S_1)\le(1-\epsilon')\advr fr_0$ and $Z(S_2)\le(1-\epsilon')\advr fs$
+    have probability at most $e^{-\epsilon'^2\advr fr_0/2}$ and
+    $e^{-\epsilon'^2\advr fs/2}$. Since $\advr<1$, each of the three is at
+    most $e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$. By a union bound, except with
+    probability at most $\eta$ the execution is typical and none of the
+    three events occurs. Then the third fact is the first claim, the second
+    fact gives \Cref{eq.attfork}, and the first two facts give
+    \Cref{eq.attheight}, since $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)$.
+\end{proofof}
+
+\begin{proofof}{\Cref{cor.constant}}
+    Consider an execution in which the claims of \Cref{lem.attack} hold, and
+    let $\ch'$ be a chain adopted by an honest validator at round $r$. By
+    \Cref{eq.attfork} and the bound on $k$,
+    $\len{\ch}-\len{\ch_0}>(1-\epsilon')\advr fs\ge k$. So $\prune{\ch}{k}$
+    has length $\len{\ch}-k>\len{\ch_0}$. Suppose that $\prune{\ch}{k}$ is a
+    prefix of $\ch'$. It is also a prefix of $\ch$, so it is a prefix of
+    $\ch\meet\ch'$, and hence of $\ch_0$ by \Cref{lem.attack}. This
+    contradicts $\len{\prune{\ch}{k}}>\len{\ch_0}$.
+\end{proofof}
+
+\begin{proofof}{\Cref{thm.lower}}
+    The strategy $\pipriv^\hgt$ acts as $\pipriv$ in every round, and only the
+    chain that the client receives at round $r$ differs. Clients send nothing,
+    so \Cref{lem.attack} applies to the chain $\ch$ that the adversary forms
+    at round $r$. Consider an execution in which its claims hold, and let
+    $\ch'$ be a chain adopted by an honest validator at round $r$. We show in
+    three steps that the chain the client computes at round $r$ is not a
+    prefix of $\ch'$.
+
+    First, the client receives a chain of height $\hgt$. By
+    \Cref{eq.attheight} and the bound on $\hgt$, $\ch$ has height greater than
+    $\hgt$. So the adversary sends $\ch_\hgt=\ch[{:}\hgt+1]$.
+
+    Second, $\ch_0$ is short. It was adopted by an honest validator at round
+    $r_0+1$, so $\ch_0\in\bt_{r_0}$ by \Cref{lem.membership}. The execution is
+    typical and $r_0\ge\lambda$, so $\len{\ch_0}-1<\maxr fr_0$ by
+    \Cref{lem.length}.
+
+    Third, the client keeps more than $\ch_0$. It computes
+    $\prune{\ch_\hgt}{R(r,\hgt)}$. By the bound on $R(r,\hgt)$, this chain has
+    length $\hgt+1-R(r,\hgt)\ge\maxr fr_0+1$, which exceeds
+    $\len{\ch_0}$ by the second step.
+
+    Now suppose that $\prune{\ch_\hgt}{R(r,\hgt)}$ is a prefix of $\ch'$. It
+    is also a prefix of $\ch_\hgt$, and hence of $\ch$, so it is a prefix of
+    $\ch\meet\ch'$. By \Cref{lem.attack}, it is then a prefix of $\ch_0$. This
+    contradicts the third step.
 \end{proofof}
 
 \begin{proofof}{\Cref{thm.tight}}
-    For the first item, consider an execution in which \Cref{eq.attfork} holds.
-    Then $\len{\ch}-\len{\ch\meet\ch'}>(1-\epsilon')\advr fs\ge\lceil k\rceil$. The
-    chain $\ch\meet\ch'$ contains the genesis block, so
-    $\len{\ch}>\lceil k\rceil+1$ and $\prune{\ch}{k}$ has length
-    $\len{\ch}-\lceil k\rceil>\len{\ch\meet\ch'}$. Both are prefixes of $\ch$,
-    so $\prune{\ch}{k}$ is not a prefix of $\ch\meet\ch'$, and hence not of
-    $\ch'$.
+    The round $r_0$ is the earliest fork round for which \Cref{eq.attheight}
+    gives height $\hgt$. As $r\to\infty$, $\hgt/(fr)$ tends to $a$, and $r_0/r$ tends to
+    $a/(1-\epsilon')-\advr$, which is positive since $a>\advr$. Also $s/r$
+    tends to $1+\advr-a/(1-\epsilon')$, which is positive since
+    $\epsilon'<1-a/(1+\advr)$. So, for large $r$, $r_0\ge\lambda$, $s\ge1$,
+    and $(1-\epsilon')[(1+\advr)fr_0+\advr fs]=(1-\epsilon')f(r_0+\advr
+    r)\ge\hgt$ by the choice of $r_0$.
 
-    For the second item, the strategy $\pipriv^\hgt$ acts as $\pipriv$ in
-    every round, and only the chain that the client receives at round $r$
-    differs. Clients send nothing, so \Cref{thm.attack} and its proof apply to
-    the chain $\ch$ that the adversary forms at round $r$. Except with
-    probability at most $\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, the
-    execution is typical and satisfies \Cref{eq.attheight}. So, by the
-    hypothesis on $R$, some typical execution satisfies \Cref{eq.attheight},
-    and in it the chain the client computes at round $r$ is a prefix of every
-    chain adopted by an honest validator at round $r$. Fix such an execution
-    and such a chain $\ch'$. By \Cref{eq.attheight}, $\ch$ has height greater
-    than $(1-\epsilon')[(1+\advr)fr_0+\advr fs]\ge\hgt$, so the client receives
-    $\ch_\hgt=\ch[{:}\hgt+1]$, of height $\hgt$. By the third fact in the proof
-    of \Cref{thm.attack}, $\ch\meet\ch'\preceq\ch_0$, so
-    $\len{\ch_\hgt\meet\ch'}\le\len{\ch\meet\ch'}\le\len{\ch_0}$. The chain
-    $\ch_0$ was adopted by an honest validator at round $r_0+1$, so
-    $\ch_0\in\bt_{r_0}$ by \Cref{lem.membership}, and
-    $\len{\ch_0}-1<\maxr f\max\{r_0,\lambda\}$ by \Cref{lem.length}. The client
-    computes $\prune{\ch_\hgt}{R(r,\hgt)}$, which is a prefix of $\ch_\hgt$ and
-    of $\ch'$, and hence of $\ch_\hgt\meet\ch'$. If
-    $\lceil R(r,\hgt)\rceil\le\hgt$, its length is
-    $\hgt+1-\lceil R(r,\hgt)\rceil$, so
-    $\hgt+1-\lceil R(r,\hgt)\rceil\le\len{\ch_0}<\maxr f\max\{r_0,\lambda\}+1$,
-    which is the claim. Otherwise $\lceil R(r,\hgt)\rceil>\hgt$, and the claim
-    holds too.
+    For the first limit, the quotient tends to
+    $a-\maxr\,(a/(1-\epsilon')-\advr)$ as $r\to\infty$. As $f$, $\epsilon$
+    and $\epsilon'$ tend to $0$, $\maxr$ tends to $1+\advr$, so this tends to
+    $a-(1+\advr)(a-\advr)=\advr(1+\advr-a)$.
 
-    For the third item, as $r\to\infty$, $\hgt/(fr)$ tends to $a$, and $r_0/r$
-    tends to $a/(1-\epsilon')-\advr$, which is positive since $a>\advr$. Also
-    $s/r$ tends to $1+\advr-a/(1-\epsilon')$, which is positive since
-    $\epsilon'<1-a/(1+\advr)$. So, for large $r$, $r_0,s\ge1$,
-    $\max\{r_0,\lambda\}=r_0$, and
-    $(1-\epsilon')[(1+\advr)fr_0+\advr fs]=(1-\epsilon')f(r_0+\advr r)\ge\hgt$
-    by the choice of $r_0$. The first quotient then tends to
-    $a-\maxr\,(a/(1-\epsilon')-\advr)$. As $f$, $\epsilon$ and $\epsilon'$ tend
-    to $0$, $\maxr$ tends to $1+\advr$, so this tends to
-    $a-(1+\advr)(a-\advr)=\advr(1+\advr-a)$. By \Cref{eq.depth},
-    $\prn(r,\hgt)/(fr)$ is the maximum of $k_0/(fr)$, which tends to $0$, and
+    For the second limit, by \Cref{eq.depth}, $\prn(r,\hgt)/(fr)$ is the
+    maximum of $k_0/(fr)$, which tends to $0$, and
     \[
         \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{(1-\ftwo/f)\,fr},
     \]

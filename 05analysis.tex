@@ -63,14 +63,14 @@ When an honest chain does arrive, even a stale one, the client confirms every
 transaction that the honest validators have had long enough.
 
 \begin{theorem}[Liveness]\label{thm.liveness}
-    In a typical execution, let an honest transaction be given as input to
-    every honest validator at every round from $r$ on, and let $D\ge0$. Every
-    client running \Cref{alg.client} that receives a $D$-stale chain at a round
-    $r'\ge r+u(r,D)$, where
+    In a typical execution, let an honest transaction be given as input to every
+    honest validator at every round from $r$ on, and let $D\ge0$. Every client
+    running \Cref{alg.client} that receives a $D$-stale chain at a round $r'\ge
+    r+u(r,D)$ outputs a chain that contains the transaction at every round from
+    $r'$ on, where
     \[
         u(r,D)=\frac{(1-\advrone/\maxr)\,r+D+13\lambda}{1-\epsilon-\advrone}-r ,
     \]
-    outputs a chain that contains the transaction at every round from $r'$ on.
 \end{theorem}
 
 Liveness in the sense of \Cref{def.liveness} asks every client to confirm the
