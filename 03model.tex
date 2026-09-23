@@ -2,8 +2,8 @@
 \label{sec.model}
 
 We work in the static synchronous setting of~\cite{gkl24} and we keep some of
-its notation. This section fixes the notation, states the assumptions, and
-restates the facts about typical executions that the analysis uses.
+its notation. This section fixes the notation and states the assumptions. The
+parts of the model that only the proofs use are in \Cref{appendix.model}.
 
 \paragraph{Validators}
 
@@ -101,55 +101,22 @@ at round $0$.
     $\bt_r$.
 \end{definition}
 
-No copies occur in a typical execution, which we define below. So every block of
-$\bt_r$ has a unique height and $\bt_r$ is a tree. Two facts about the block
-tree follow from the protocol alone, and we use them throughout. The proofs are
-in \Cref{appendix.model}.
-
-\begin{lemma}[Membership]\label{lem.membership}
-    Every chain held by a client at round $r$ is in $\bt_r$. Every chain
-    adopted by an honest validator at round $r$ is in $\bt_{r-1}$.
-\end{lemma}
-
-\begin{lemma}[Fork choice]\label{lem.fork}
-    Let $B$ be an honest block at height $i$, computed at round $r$. Then some
-    honest validator has a chain of length greater than $i$ at round $r+1$.
-    Every honest validator adopts a chain of length greater than $i$ at every
-    round $r'>r$.
-\end{lemma}
+In a typical execution, defined below, no copies occur, so every block of
+$\bt_r$ has a unique height and $\bt_r$ is a tree.
 
 \begin{definition}[Common prefix of two chains]\label{def.meet}
     For chains $\ch_1$ and $\ch_2$, let $\ch_1\meet\ch_2$ be the longest chain
     that is a prefix of both.
 \end{definition}
 
-\paragraph{Random variables}
+\paragraph{Parameters}
 
-Fix a round $r$. Let $X_r=1$ if some honest validator computes a block at round
-$r$, and $X_r=0$ otherwise. Let $Y_r=1$ if exactly one honest validator computes
-a block at round $r$, and $Y_r=0$ otherwise. Let $Z_r$ be the number of
-successful adversarial queries at round $r$. A round with $X_r=1$ is successful
-and a round with $Y_r=1$ is a convergence opportunity. For a set of rounds $S$
-we write $X(S)=\sum_{r\in S}X_r$ and define $Y(S)$ and $Z(S)$ in the same way.
-We set $X_0=Y_0=Z_0=0$, so that a set of rounds containing the index $0$
-contributes nothing at that index. The parameter $f=\mathbb{E}[X_r]$ is the
-probability that a round is successful. From~\cite[Equation~(1)]{gkl24},
-\begin{equation}\label{eq.rates}
-    (1-f)\,pq(n-t) < f < pq(n-t) .
-\end{equation}
-Let $W_r=X_r-Y_r$, which is $1$ if two or more honest validators compute a block
-at round $r$ and $0$ otherwise. Let $f_2=\mathbb{E}[W_r]$, and for a set of
-rounds $S$ let $W(S)=\sum_{r\in S}W_r=X(S)-Y(S)$, with $W_0=0$. It is of order
-$f^2$, so it is small compared with $f$. The proof is in \Cref{appendix.model}.
-
-\begin{lemma}\label{lem.fsq}
-    $f_2 < \dfrac{f^2}{2(1-f)^2}$.
-\end{lemma}
-
-\paragraph{Assumptions}
-
-We write $\advr=t/(n-t)$ for the ratio of the adversarial to the honest query
-budget, and we note that $1+\advr=n/(n-t)$.
+A round is \emph{successful} if some honest validator computes a block in it.
+We write $f$ for the probability that a round is successful, and $f_2$ for the
+probability that two or more honest validators compute a block in the same
+round. The second is of order $f^2$ (\Cref{lem.fsq}), so it is small compared
+with $f$. We write $\advr=t/(n-t)$ for the ratio of the adversarial to the
+honest query budget, and we note that $1+\advr=n/(n-t)$.
 
 \begin{assumption}[Honest majority]\label{asm.majority}
     There exist $\epsilon,\delta,f\in(0,1]$ such that $t\le(1-\delta)(n-t)$ and
@@ -161,70 +128,11 @@ honest majority assumption of~\cite{gkl24}.
 
 \paragraph{Typical executions}
 
-Let $\lambda\ge2/f$ be an integer.
-
-\begin{definition}[Typical execution]\label{def.typical}
-    An execution is $(\epsilon,\lambda)$-typical if two conditions hold.
-    First, every set $S$ of at least $\lambda$ consecutive rounds satisfies
-    \[
-        \begin{gathered}
-            (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
-            \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
-            Z(S) < \left(\frac{\advr}{1-f}+\epsilon\right)f|S|,
-            \qquad W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
-        \end{gathered}
-    \]
-    Second, no insertion, copy, prediction or guess occurs, in the sense
-    of~\cite[Definition 4.3]{gkl24}.
-\end{definition}
-
-The upper bounds also hold for a set $[0,r]$ with $r\ge\lambda$, because
-$X([0,r])=X([1,r])$, and likewise for $Y$, $Z$ and $W$, while the right-hand
-sides increase with $|S|$. The definition is that of~\cite[Definition
-4.4]{gkl24}, in the form of~\cite[Lemma 4.6]{gkl24}, with one bound added, the
-bound on $W(S)$. Over any window of $\lambda$ or more rounds, every count stays
-close to its expectation, within a margin set by $\epsilon$. Moreover, the hash
-function behaves like a random function: nobody predicts a block, produces two
-of the same, or inserts one into a chain it does not extend. Executions that
-fail either condition are rare.
-
-\begin{theorem}[Typicality]\label{thm.typical}
-    An execution is $(\epsilon,\lambda)$-typical except with probability at
-    most
-    \(
-        \typ=5L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu},
-    \)
-    where $L$ is the total run time of the system, $Q$ bounds the number of
-    oracle queries, and $\nu$ is the min-entropy of the input contribution
-    function.
-\end{theorem}
-
-For $\lambda=\Omega(\log^2\kappa)$ the probability $\typ$ is negligible in
-$\kappa$. The theorem is~\cite[Theorem 4.5]{gkl24} with one Chernoff bound
-added for $W(S)$, which is where its first coefficient is $5$ rather than $4$;
-the proof is in \Cref{appendix.model}. All statements below are about typical
-executions. The remaining facts of this section are restated
-from~\cite{gkl24} without proof.
-
-\begin{lemma}[{Pairing Lemma, \cite[Lemma 4.1]{gkl24}}]\label{lem.unique}
-    Let $B$ be the block at height $i$ of a chain $\ch$, computed by an honest
-    validator in a convergence opportunity. Then the block at height $i$ of
-    any chain is either $B$ or adversarial.
-\end{lemma}
-
-\begin{lemma}[{Chain Growth Lemma, \cite[Lemma 4.2]{gkl24}}]\label{lem.growth}
-    If at round $r$ an honest validator has a chain of length $m$, then at
-    every round $r'\ge r$ every honest validator adopts a chain of length at
-    least $m+X([r,r'-1])$.
-\end{lemma}
-
-\begin{lemma}[{Common Prefix, \cite[Theorem 4.10]{gkl24}}]\label{lem.commonprefix}
-    Let $\ch_1$ and $\ch_2$ be chains adopted by honest validators at rounds
-    $r_1$ and $r_2$ with $r_1\le r_2$. Then $\prune{\ch_1}{k}\preceq\ch_2$ for
-    every $k\ge2\lambda f$.
-\end{lemma}
-
-\begin{lemma}[{\cite[Lemma 4.8]{gkl24}}]\label{lem.span}
-    In a typical execution, any $k\ge2\lambda f$ consecutive blocks of a chain
-    have been computed in more than $k/(2f)$ consecutive rounds.
-\end{lemma}
+Let $\lambda\ge2/f$ be an integer. All our statements are about
+$(\epsilon,\lambda)$-typical executions, as defined in~\cite{gkl24}
+(\Cref{def.typical}). Over any window of $\lambda$ or more rounds, every count
+of blocks in such an execution stays close to its expectation, within a margin
+set by $\epsilon$. Moreover, the hash function behaves like a random function:
+nobody predicts a block, produces two of the same, or inserts one into a chain
+it does not extend. An execution is typical except with a probability that is
+negligible in $\kappa$ for $\lambda=\Omega(\log^2\kappa)$ (\Cref{thm.typical}).

@@ -1,0 +1,66 @@
+\begin{figure}[!t]
+\centering
+\colorlet{cadv}{red!80!black}
+% Blocks sit 0.52 apart in height, k = 4. The trunk runs from the genesis
+% block (height 0) to height 9. Two honest chains leave it: one ends at height
+% 13, the other at height 12. Two adversarial chains: one leaves after the
+% second block (height 1) and has 7 blocks (heights 2..8), the other leaves
+% after height 4 and has 5 blocks (heights 5..9). Parties stand right of tips.
+\begin{tikzpicture}[font=\footnotesize]
+  \tikzset{adv/.style={blk, draw=cadv}, advcut/.style={cut, draw=cadv}}
+  \def\yU{0.8}    % upper honest chain
+  \def\yA{-1.3}   % lower adversarial chain
+  \def\yB{1.75}   % upper adversarial chain
+
+  % height axis and the estimate of the client
+  \draw[->] (-0.3,-2.35) -- (8.2,-2.35) node[right] {height};
+  \draw[lim] (7.6,-2.35) -- (7.6,2.75)
+    node[above,align=center] {honest length\\at round $r$};
+
+  % trunk, the common prefix: heights 0..9. Height 9 is among the last k
+  % blocks of the shorter honest chain, so it is shaded.
+  \foreach \i in {0,...,8} { \blk{0.52*\i}{0} }
+  \blk[cut]{4.68}{0}
+  \foreach \i in {0,...,8} { \lnk{0.52*\i}{0}{0.52*\i+0.52}{0} }
+  \node[below=3pt] at (0,-0.21) {genesis};
+
+  % longer honest chain: heights 10..13 on the trunk line
+  \foreach \i in {10,...,13} { \blk[cut]{0.52*\i}{0} }
+  \lnk{4.68}{0}{5.2}{0}
+  \foreach \i in {10,...,12} { \lnk{0.52*\i}{0}{0.52*\i+0.52}{0} }
+  \pic at (7.18,-0.3) {person};
+  \draw[brc] (5.03,-0.26) -- (6.93,-0.26) node[midway,below=4pt] {$k$};
+
+  % shorter honest chain: heights 10..12
+  \foreach \i in {10,...,12} { \blk[cut]{0.52*\i}{\yU} }
+  \lnk{4.68}{0}{5.2}{\yU}
+  \foreach \i in {10,...,11} { \lnk{0.52*\i}{\yU}{0.52*\i+0.52}{\yU} }
+  \pic at (6.66,\yU-0.3) {person};
+
+  % first adversarial chain: leaves after height 1, heights 2..8
+  \draw[ink,cadv] (0.69,0) -- (0.87,\yA);
+  \foreach \i in {2,...,4} { \blk[adv]{0.52*\i}{\yA} }
+  \foreach \i in {5,...,8} { \blk[advcut]{0.52*\i}{\yA} }
+  \foreach \i in {2,...,7} { \draw[ink,cadv] (0.52*\i+0.17,\yA) -- (0.52*\i+0.35,\yA); }
+  \pic[cadv] at (4.58,\yA-0.3) {devil};
+  \draw[brc] (0.87,\yA-0.26) -- (4.33,\yA-0.26)
+    node[midway,below=4pt] {more than $k$};
+
+  % second adversarial chain: leaves after height 4, heights 5..9
+  \draw[ink,cadv] (2.25,0) -- (2.43,\yB);
+  \blk[adv]{2.6}{\yB}
+  \foreach \i in {6,...,9} { \blk[advcut]{0.52*\i}{\yB} }
+  \foreach \i in {5,...,8} { \draw[ink,cadv] (0.52*\i+0.17,\yB) -- (0.52*\i+0.35,\yB); }
+  \pic[cadv] at (5.1,\yB-0.3) {devil};
+  \draw[brc] (4.85,\yB+0.26) -- (2.43,\yB+0.26)
+    node[midway,above=4pt] {more than $k$};
+\end{tikzpicture}
+\caption{The block tree at round $r$, drawn by height. The dashed line is the
+height that the client estimates, from its clock, for the chains of the honest
+validators. Two honest validators hold chains of different lengths that end
+next to it and share every block up to a short fork. The last $k$ blocks of
+each are shaded. The adversary, in red, holds two much shorter chains. Each
+leaves the chain of the honest validators more than $k$ blocks below its tip.
+Their last $k$ blocks are shaded too, and the rest of each lies off the chain
+of the honest validators.}\label{fig.tree}
+\end{figure}

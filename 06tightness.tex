@@ -1,14 +1,14 @@
 \section{Tightness}
 \label{sec.tightness}
 
-We show three things. The coefficient $\frac{t}{n-2t}$ of \Cref{thm.prefix}
-cannot be lowered. No constant confirmation depth is sound. And the depth
-$\prn(r,\hgt)$ that \Cref{def.client} prunes is, in the limit, no more than it has
-to be. One attack gives all three. The adversary follows the honest chain for
-$r_0$ rounds, so that the chain it holds is as long as any chain the
-validators hold. Then it stops publishing, mines for $s$ more rounds in
-private, and hands the client what it has. The blocks it kept private are on
-no honest chain, and there are about $\advr fs$ of them.
+We show two things. No constant confirmation depth is sound. And the depth
+$\prn(r,\hgt)$ that \Cref{alg.client} prunes is, in the limit, no more than it
+has to be. One attack gives both. The adversary follows the honest chain for
+$r_0$ rounds, so that the chain it holds is as long as any chain the validators
+hold. Then it stops publishing, mines for $s$ more rounds in private, and hands
+the client what it has. The blocks it kept private are on no honest chain, and
+there are about $\advr fs$ of them. The proofs of this section are in
+\Cref{appendix.tightness}.
 
 \begin{definition}[Private mining]\label{def.private}
     The strategy $\pipriv$ with parameters $r_0\ge1$ and $s\ge1$ is the
@@ -29,172 +29,25 @@ no honest chain, and there are about $\advr fs$ of them.
     \end{enumerate}
 \end{definition}
 
-A block computed at round $r$ may be extended by a query made in the same
-round. \Cref{lem.length} counts adversarial blocks by $Z$, which counts
-queries, so it already allows this.
-
-\begin{theorem}[Private mining]\label{thm.attack}
-    Let $r_0,s\ge1$, let $r=r_0+s$ and let $\epsilon'\in(0,1)$. In an
-    execution against $\pipriv$, except with probability at most
-    $\typ+8e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, the chain $\ch$ sent to
-    the client is in $\bt_r$, and every chain $\ch'$ adopted by an honest
-    validator at round $r$ satisfies
-    \begin{align}
-        \len{\ch}-\len{\ch\meet\ch'} &> (1-\epsilon')\advr fs,
-            \label{eq.attfork}\\
-        \len{\ch'}-\len{\ch} &< \left[(1+\epsilon')-(1-\epsilon')\advr\right]fs,
-            \label{eq.attupper}\\
-        \len{\ch'}-\len{\ch} &> \left[(1-\epsilon')-(1+\epsilon')\tfrac{\advr}{1-f}\right]fs-1,
-            \label{eq.attlower}\\
-        (1-\epsilon')\left[(1+\advr)fr_0+\advr fs\right] < \len{\ch}-1
-            &< (1+\epsilon')\left[\Big(1+\tfrac{\advr}{1-f}\Big)fr_0+\tfrac{\advr}{1-f}fs\right].
-            \label{eq.attheight}
-    \end{align}
+\begin{theorem}[Tightness, informal]\label{thm.tight}
+    Let the client receive at round $r$ the chain $\ch$ that $\pipriv$ sends it.
+    \begin{enumerate}
+        \item For every constant $k$, once $s$ exceeds about $k/(\advr f)$,
+            $\prune{\ch}{k}$ is a prefix of no chain adopted by an honest
+            validator at round $r$, with overwhelming probability in
+            $\min\{r_0,s\}$.
+        \item With $s=\advr r$, the chain $\ch$ is about as tall as an honest
+            chain, about $fr$, and about $\advr^2fr$ of its blocks are on no
+            honest chain. This is what the client prunes from it.
+    \end{enumerate}
 \end{theorem}
-\begin{proof}
-    Write $S_1=[1,r_0]$, $S_2=[r_0+1,r]$ and $\ell_0=\len{\ch_0}$. We first
-    establish four facts that hold in every typical execution, and then bound
-    the random variables in them.
 
-    First, $\ell_0=1+X(S_1)+Z(S_1)$, and every chain sent by round $r_0$ has
-    length at most $\ell_0$. We show by induction on $r'\in[1,r_0+1]$ that
-    every honest validator adopts at round $r'$ a chain of length
-    $L_{r'}=1+X([1,r'-1])+Z([1,r'-1])$, and that the longest chain among the
-    genesis chain and the chains sent by round $r'-1$ has length $L_{r'}$.
-    Both hold at round $1$. Assume both at a round $r'\le r_0$. Honest
-    validators send at round $r'$ chains of length at most $L_{r'}+X_{r'}$,
-    and one of length $L_{r'}+1$ if $X_{r'}=1$. So, before the adversary acts,
-    the longest chain among the genesis chain and the chains sent at rounds up
-    to $r'$ has length $L_{r'}+X_{r'}$. The adversary extends it by $Z_{r'}$
-    blocks and sends the result, of length $L_{r'+1}$. At round $r'+1$ every
-    honest validator receives it, and the chain it has is at most
-    $L_{r'}+X_{r'}$ long, so it adopts a chain of length $L_{r'+1}$. The case
-    $r'=r_0+1$ is the claim.
-
-    Second, in the rounds of $S_2$ the adversary queries only on the private
-    branch, so $\len{\ch}=\ell_0+Z(S_2)$, and every block of $\ch$ was
-    computed by round $r$, so $\ch\in\bt_r$.
-
-    Third, the blocks the adversary computes in the rounds of $S_2$ go to
-    the client only, so none lies on $\ch'$. Hence $\ch\meet\ch'\preceq\ch_0$
-    and $\len{\ch}-\len{\ch\meet\ch'}\ge\len{\ch}-\ell_0=Z(S_2)$.
-
-    Fourth, $\ell_0+X(S_2)-1\le\len{\ch'}\le\ell_0+X(S_2)$. The blocks of
-    $\ch'$ computed in rounds of $S_2$ are honest and, by
-    \Cref{lem.honestone}, at most $X(S_2)$ in number. The other blocks of
-    $\ch'$ form a prefix of $\ch'$, since no predictions occur, and that
-    prefix is the genesis chain or a prefix of a chain sent at the round its
-    tip was computed, so it has length at most $\ell_0$ by the first fact.
-    This gives the upper bound. For the lower bound, if $s=1$ then
-    $\len{\ch'}=\ell_0$ by the first fact and $X(S_2)\le1$. If $s\ge2$, some
-    honest validator has a chain of length at least $\ell_0+X_{r_0+1}$ at
-    round $r_0+2$, and \Cref{lem.growth} from round $r_0+2$ to round $r$ gives
-    $\len{\ch'}\ge\ell_0+X([r_0+1,r-1])\ge\ell_0+X(S_2)-1$.
-
-    Now the randomness. $X(S_1)$ and $X(S_2)$ are sums of $r_0$ and $s$
-    independent Bernoulli trials with success probability $f$. $Z(S_1)$ and
-    $Z(S_2)$ are sums of $tqr_0$ and $tqs$ independent Bernoulli trials with
-    success probability $p$, and \Cref{eq.rates} gives
-    $\advr fr_0<pqtr_0<\frac{\advr}{1-f}fr_0$ and
-    $\advr fs<pqts<\frac{\advr}{1-f}fs$. By the Chernoff bounds and
-    $\advr<1$, each of the events
-    \[
-        \begin{gathered}
-            X(S_2)\le(1-\epsilon')fs,\qquad X(S_2)\ge(1+\epsilon')fs,\\
-            Z(S_2)\le(1-\epsilon')\advr fs,\qquad
-            Z(S_2)\ge(1+\epsilon')\tfrac{\advr}{1-f}fs
-        \end{gathered}
-    \]
-    has probability at most $e^{-\epsilon'^2\advr fs/3}$, and each of the four
-    corresponding events for $X(S_1)$ and $Z(S_1)$, with $r_0$ in place of
-    $s$, has probability at most $e^{-\epsilon'^2\advr fr_0/3}$. By a union
-    bound, except with the stated probability the execution is typical and
-    none of the eight events occurs. Then the third and fourth facts give
-    \Cref{eq.attfork,eq.attupper,eq.attlower}, and the first two facts give
-    \Cref{eq.attheight}, since $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)$.
-\end{proof}
-
-\begin{corollary}[Tightness]\label{cor.tight}
-    Let $0\le c<\frac{t}{n-2t}$ and $b\ge0$. There are $\epsilon'\in(0,1)$ and
-    $s_0$, depending only on $c$, $b$, $\advr$ and $f$, such that for every
-    $r_0\ge1$ and $s\ge s_0$, in an execution against $\pipriv$, except with
-    probability at most $\typ+8e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, every
-    chain $\ch'$ adopted by an honest validator at round $r$ satisfies
-    $\len{\ch'}>\len{\ch}$ and
-    \[
-        \len{\ch}-\len{\ch\meet\ch'} > c\left(\len{\ch'}-\len{\ch}\right)+b .
-    \]
-\end{corollary}
-\begin{proof}
-    Since $c<\advr/(1-\advr)$, we have $\advr(1+c)>c$. From \Cref{lem.rho},
-    $\advr/(1-f)<1$. Choose $\epsilon'\in(0,1)$ small enough that
-    \[
-        \delta_1=(1-\epsilon')\advr(1+c)-c(1+\epsilon')>0
-        \quad\text{and}\quad
-        \delta_2=(1-\epsilon')-(1+\epsilon')\frac{\advr}{1-f}>0 .
-    \]
-    Consider an execution in which
-    \Cref{eq.attfork,eq.attupper,eq.attlower} hold. From
-    \Cref{eq.attfork,eq.attupper},
-    \[
-        \len{\ch}-\len{\ch\meet\ch'}-c\left(\len{\ch'}-\len{\ch}\right)
-        > (1-\epsilon')\advr fs-c\left[(1+\epsilon')-(1-\epsilon')\advr\right]fs
-        = \delta_1fs .
-    \]
-    From \Cref{eq.attlower}, $\len{\ch'}-\len{\ch}>\delta_2fs-1$. Take
-    $s_0\ge\max\{b/(\delta_1f),\ 1/(\delta_2f)\}$. For $s\ge s_0$ the two
-    right-hand sides are at least $b$ and $0$.
-\end{proof}
-
-\begin{corollary}[No constant depth]\label{cor.noconstant}
-    Let $k\ge0$, let $\epsilon'\in(0,1)$, let $r_0\ge1$ and let
-    $s\ge\lceil k\rceil/\left[(1-\epsilon')\advr f\right]$. In an execution
-    against $\pipriv$, except with probability at most
-    $\typ+8e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, the chain $\ch$ the
-    client receives at round $r$ satisfies $\prune{\ch}{k}\not\preceq\ch'$
-    for every chain $\ch'$ adopted by an honest validator at round $r$.
-\end{corollary}
-\begin{proof}
-    In an execution in which \Cref{eq.attfork} holds,
-    $\len{\ch}-\len{\ch\meet\ch'}>(1-\epsilon')\advr fs\ge\lceil k\rceil$. The
-    chain $\ch\meet\ch'$ contains the genesis block, so
-    $\len{\ch}>\lceil k\rceil+1$ and $\prune{\ch}{k}$ has length
-    $\len{\ch}-\lceil k\rceil>\len{\ch\meet\ch'}$. Both are prefixes of $\ch$,
-    so $\prune{\ch}{k}$ is not a prefix of $\ch\meet\ch'$, and hence not of
-    $\ch'$.
-\end{proof}
-
-A client that prunes a fixed number of blocks is therefore unsafe once the
-adversary has mined in private for long enough. A client running
-\Cref{def.client} prunes $\prn(r,\hgt)$, which grows with the round. The last
-corollary says that it does not grow more than it must.
-
-\begin{corollary}[The rule is tight]\label{cor.ruletight}
-    Fix $\sigma\in(0,1)$, let $s=\sigma r$ and $r_0=(1-\sigma)r$, and let
-    $\ch$ be the chain $\pipriv$ sends the client at round $r$. In an
-    execution in which \Cref{eq.attfork,eq.attheight} hold,
-    \[
-        \lim_{f,\epsilon,\epsilon'\to0}\ \lim_{r\to\infty}\
-        \frac{\prn(r,\len{\ch})}{\len{\ch}-\len{\ch\meet\ch'}} = 1
-    \]
-    for every chain $\ch'$ adopted by an honest validator at round $r$.
-\end{corollary}
-\begin{proof}
-    The ratio is above $1$ by \Cref{thm.round}, which gives
-    $\len{\ch}-\len{\ch\meet\ch'}<\prn(r,\len{\ch})$. For the other direction, divide
-    \Cref{eq.attheight} by $fr$ and let $r\to\infty$ and then $f,\epsilon'\to0$:
-    the height of $\ch$ in units of $fr$ tends to
-    $(1+\advr)(1-\sigma)+\advr\sigma=1+\advr-\sigma$. By \Cref{cor.limit},
-    $\prn(r,\len{\ch})/(fr)$ then tends to $\advr(1+\advr-\rate)=\advr\sigma$. By
-    \Cref{eq.attfork}, $(\len{\ch}-\len{\ch\meet\ch'})/(fr)>(1-\epsilon')\advr\sigma$,
-    which tends to $\advr\sigma$. So the ratio tends to at most $1$.
-\end{proof}
-
-Take $\sigma=\advr$. The attack chain then has height about $fr$, which is
-the height of an honest chain in an execution where the adversary does not
-mine at all, and the client prunes about $\advr^2fr$ from it. A rule that
-reads only the round and the height cannot tell the two executions apart, so
-it prunes $\advr^2fr$ from the honest chain too. That is the lag
-\Cref{thm.liveness} charges an honest sender, and for rules of this kind it is
-necessary. A rule that reads timestamps, the target, or the contents of blocks
-is outside the model of \Cref{sec.model}, and we make no claim about it.
+\Cref{cor.noconstant,cor.ruletight} in \Cref{appendix.tightness} state both
+items precisely. The second item matters for honest chains too. The attack chain has height
+about $fr$, which is the height of an honest chain in an execution where the
+adversary does not mine at all. A rule that reads only the round and the height
+cannot tell the two executions apart, so it prunes about $\advr^2fr$ from the
+honest chain too. That is the lag behind the honest chain in \Cref{thm.liveness},
+and for rules of this kind it is necessary. A rule that reads timestamps, the
+target, or the contents of blocks is outside the model of \Cref{sec.model}, and
+we make no claim about it.

@@ -1,62 +1,24 @@
 \section{Discussion}
 \label{sec.discussion}
 
-\paragraph{Confirmation rate}
-
-The pruning depth grows with the round. The fraction of the chain it removes
-does not. For a chain $\ch$ of height $\rate fr$, \Cref{cor.limit} gives
-$\prn(r,\hgt)/\hgt\to\advr(1+\advr-\rate)/\rate$, which does not depend on $r$. At
-$\rate=1$ the fraction is $\advr^2$. So a client that receives an honest chain
-at round $r$ keeps a prefix of height about $(1-\advr^2)fr$, and one that
-receives an honest chain at a later round keeps strictly more. The confirmed
-height grows at rate $(1-\advr^2)f$. Confirmation does not deteriorate as the
-chain ages. Only the depth measured in blocks does, and
-\Cref{cor.noconstant} shows that it must.
-
-\paragraph{Idempotence}
-
-\Cref{def.client} is applied to a chain as it is received, never to an output
-of a previous application. Applying it twice at the same round is sound and
-lossy. It is sound because the output is a chain of $\bt_r$ like any other, so
-\Cref{thm.round} applies to it. It is lossy because, in the normalised form of
-\Cref{cor.limit}, a second application sends $\rate$ to
-$(1+\advr)(\rate-\advr)$. This map has the single fixed point $1+\advr$ and
-slope $1+\advr>1$ there, so the fixed point repels and every
-$\rate<1+\advr$ falls below $\advr$ after enough applications, at which point
-the client outputs $\bot$. Nothing is gained by the repetition:
-\Cref{thm.safety} confirms each output for every later round, so an output
-never has to be pruned again.
-
-\paragraph{Client knowledge}
-
-\Cref{def.client} uses $n$, $t$, $f$, $\epsilon$ and $\lambda$, and we give the
-client all of them. Suppose it gets them wrong. If it prunes more than
-$\prn(r,\hgt)$ it still outputs a prefix of every honest chain, since a prefix of a
-prefix is a prefix. If it prunes less, \Cref{thm.round} says nothing. So an
-error that raises the depth costs liveness and an error that lowers it costs
-safety. We do not study how a client comes by the parameters.
-
 \paragraph{Variable difficulty}
 
-The analysis assumes a static population and a fixed target $T$. Under those
-assumptions the height of a chain stands in for the work inside it, which is
-what \Cref{eq.early} needs. Variable difficulty breaks that. An adversary that
-controls the timestamps of its own blocks can stretch the apparent time between
-difficulty adjustments, trigger the largest drop in target the rule allows, and
-reach a given height for far less work.
-\cite{bitvm3} reports that about a fifth of the hashing power suffices to keep
-pace with the honest validators in this way, against an on-chain client that
-checks height alone. It repairs the client by binding the committed timestamps
-to the consensus time of the chain. \Cref{def.client} reads height against the round, so the same substitution
-works against it. A version for variable difficulty would have to compare
-accumulated work against the round instead of height against the round. We do
-not do that here.
+The analysis assumes a static population and a fixed target, under which the
+height of a chain stands in for the work inside it. Variable difficulty breaks
+that. An adversary that controls the timestamps of its own blocks can trigger
+the largest drop in target the rule allows, and reach a given height for far
+less work. BitVM3~\cite{bitvm3} reports that about a fifth of the hashing power
+suffices for this against an on-chain client that checks height alone, and
+repairs it by binding timestamps to the consensus time of the chain. A version
+of our rule for variable difficulty would compare accumulated work, rather than
+height, against the round. We leave it open.
 
-\paragraph{Open questions}
+\paragraph{Other longest chain protocols}
 
-The additive terms of \Cref{thm.prefix,thm.round} are of order $\lambda f$,
-the order of the common prefix parameter of~\cite{gkl24}. We do not claim
-that they are optimal. The analysis is for the synchronous network
-of~\cite{gkl24}. In the bounded delay model of~\cite{gkl24,pss16} the rate
-$f$ is replaced by a rate that depends on the delay $\Delta$, and we expect
-$t/(n-2t)$ to be replaced by the corresponding ratio of rates.
+Our analysis is for the synchronous network of~\cite{gkl24}. In the bounded
+delay model~\cite{gkl24,pss16} the honest chain grows at a rate that depends on
+the delay. We expect the same construction to work with that rate in place of
+$f$, and with $t/(n-2t)$ replaced by the corresponding ratio of rates. Longest
+chain protocols based on proof of stake~\cite{sleepy,genesis} have the same
+structure of rates, with slots in place of rounds, and we expect the rule to
+carry over. We do not prove either here.

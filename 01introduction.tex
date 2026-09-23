@@ -42,59 +42,27 @@ transactions, even if their communication with the rest of the network is
 unstable. We put forth a construction that allows for this, and prove it safe
 and live.
 
+\input{figures/fig.tree}
+
 When a client wakes up, it asks the network for a chain and waits until it
 receives one. It has access to a trusty clock and knows the round $r$ when it
 received the chain $\ch$. From the received chain, it will prune a suffix in
-order to compute a confirmed prefix of $\ch$. In contrast to the confirmation
-rule under a synchronous network, our client does not prune a constant number of
-blocks, but computes a function $\prn(r, \hgt)$ of the round $r$ and the length
-$\hgt$ of the chain $\ch$ that arrived. If the chain is much shorter than
+order to compute a confirmed prefix of $\ch$. From the round alone, the client
+can estimate how long the chains of the honest validators are. Chains close to
+that length share a long common prefix, and pruning $k$ blocks from their tip
+leaves a stable chain, as in bitcoin. The adversary, however, can hand the
+client a shorter chain, which left the honest chain much more than $k$ blocks
+before its tip (\Cref{fig.tree}). In contrast to the confirmation rule under a
+synchronous network, our client therefore does not prune a constant number of
+blocks, but computes a function $\prn(r,\hgt)$ of the round $r$ and the height
+$\hgt$ of the chain $\ch$ that arrived. The shorter the chain is for the current
+round, the more blocks the client prunes. If the chain is much shorter than
 expected for the current round, the client discards all of it. Otherwise, it
-keeps $\prune{\ch}{\prn(r, \hgt)}$. A client that stays connected to the network
+keeps $\prune{\ch}{\prn(r,\hgt)}$. A client that stays connected to the network
 and receives honest chains round after round will confirm a prefix that grows
-lineraly with the round number. However, the pruning function $\prn(r, \hgt)$
+linearly with the round number. However, the pruning function $\prn(r,\hgt)$
 also grows linearly with the height of the chain. This gives our construction a
 constant throughput, but a deteriorating liveness.
-
-\input{figures/fig.rates}
-
-We give some intuition on why such a construction is possible. Every validator
-makes a fixed number of attempts per round, and each attempt finds a block with
-a fixed probability. So the honest validators together find blocks at a known
-rate, which we call the honest rate. The adversary finds blocks at $\advr$
-times the honest rate, where $\advr=t/(n-t)$ and $t$ of the $n$ validators are
-adversarial. Everybody together finds blocks at $1+\advr$ times the honest
-rate. We measure rates in units of the honest rate from now on, so the
-adversary mines at rate $\advr$ and everybody together at rate $1+\advr$. These
-rates bound how chains grow. The chain of an honest validator grows at least at
-the honest rate, because honest validators build on the longest chain they see.
-No chain grows faster than rate $1+\advr$, because every block is somebody's
-work. The client knows the rates before it sees a single block, and
-\Cref{fig.rates} draws them as three lines. Now look at the chain the client
-received at round $r$. It has two parts. The first is a prefix that the honest
-validators also hold. The second is a tail that they do not hold: the adversary
-mined it in private, after it left the honest chain. The client wants to keep
-the prefix and prune the tail. It cannot see where one ends and the other
-begins. What it can do is bound the length of the tail, and prune that many
-blocks. A first bound is simple. The tail is the adversary's own work, and the
-adversary has mined for at most $r$ rounds. So the tail is at most what the
-adversary alone mines in $r$ rounds, and a client that prunes that many blocks
-is safe. \Cref{fig.rates}(a) draws this rule. It is safe, and it prunes far
-more than it needs to. The reason is that the tail could not have started at
-round $0$. The prefix came first, and it had to be mined too. Even at rate
-$1+\advr$, a prefix of a given height takes a certain number of rounds to
-build. The tail only gets the rounds that remain. So the taller the chain, the
-more rounds its prefix took, the later its tail began, and the shorter the tail
-is. \Cref{fig.rates}(b) draws the worst case: a prefix that grows at rate
-$1+\advr$, and then a tail that grows at rate $\advr$, until it reaches the
-height of the chain. No tail is longer than that one. Our rule prunes exactly
-that tail. Three heights fix the rule. The tallest chain that can exist has no
-tail, and the client keeps all of it\footnote{With the exception of the common
-prefix parameter $k$.}. A chain as tall as an honest chain has a tail that is a
-$\advr^2$ fraction of it, and the client prunes that fraction. The first rule
-prunes a $\advr < \advr^2$ fraction. A chain that the adversary alone could have
-mined may be all tail, and the client keeps nothing. Between these heights the
-pruning depth is linear.
 
 \paragraph{Contributions}
 
@@ -112,8 +80,34 @@ clients that have an asynchronous connection to the network.
         that attains it, and we show that no constant confirmation depth is
         sound (\Cref{sec.tightness}).
 \end{enumerate}
-\Cref{sec.related} places the work among existing client protocols.
 \Cref{sec.model} fixes the model, \Cref{sec.construction} gives the
 construction, \Cref{sec.analysis} proves it safe and live,
 \Cref{sec.tightness} proves it tight, and \Cref{sec.discussion} collects the
 remarks.
+
+
+\paragraph{Related work}
+
+No protocol stays live under dynamic participation and safe under network
+partitions, which is the availability-finality dilemma~\cite{ebbflow}, and the
+same tension holds between availability and accountable
+safety~\cite{accountability}. We keep synchrony for the validators, where these
+results need it, and drop it only for the clients. The client model itself is
+made explicit in~\cite{cuamdr}, which separates clients that sleep from clients
+that are always on, and clients that only listen from clients that also speak.
+Longest chain consensus reaches its optimal resilience there for sleepy clients
+that only listen. A sleepy client knows when it slept and assumes synchrony
+while it is awake. Our client is the opposite: it keeps its clock and loses the
+delay bound. The same work shows that under adversary majority no constant
+depth is safe for a client. We show the same under honest majority, once the
+link of the client is asynchronous, and we say how fast the depth must grow.
+
+Work on longest chain clients has aimed at what the client downloads.
+NIPoPoWs~\cite{nipopow} and FlyClient~\cite{flyclient} bring it down to
+polylogarithmic in the length of the chain, and Blink~\cite{blink} to a
+constant, with an interactive protocol. Each of them picks the longest chain
+among those its peers present, and each assumes that at least one peer is
+honest and heard in time. They tell the client which chain is the longest. Our
+rule tells it how much of a chain to keep when no peer can be trusted and no
+delay is bounded. The two compose, since a succinct client can apply our rule
+to the chain it picks.

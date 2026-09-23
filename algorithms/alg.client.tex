@@ -1,13 +1,13 @@
 \begin{algorithm}
-\caption{The pruning client of \Cref{def.client}.}\label{alg.client}
+\caption{The client. It outputs $\ch'$ at every round.}\label{alg.client}
 \begin{algorithmic}[1]
-\Procedure{Client}{$\ch, r$}\Comment{$\ch$ is the chain received at round $r$}
-    \State $k \gets \prn(r,\len{\ch})$
-        \Comment{\Cref{eq.depth}} \label{line.depth}
-    \State $P \gets \prune{\ch}{k}$ \label{line.prune}
-    \If{$\len{P} > 1$} \State \Return $P$ \label{line.output}
-    \Else \State \Return $\bot$ \label{line.bot}
+\State $\ch' \gets \bot$ \label{line.init}
+\For{every chain $\ch$ received, at the round $r$ of its receipt}
+    \State $k \gets \prn(r,\len{\ch}-1)$ \Comment{\Cref{eq.depth}} \label{line.depth}
+    \State $\ch \gets \prune{\ch}{k}$ \label{line.prune}
+    \If{$\len{\ch} > 1$ \textbf{and} ($\ch' = \bot$ \textbf{or} $\len{\ch} > \len{\ch'}$)} \label{line.compare}
+        \State $\ch' \gets \ch$ \label{line.keep}
     \EndIf
-\EndProcedure
+\EndFor
 \end{algorithmic}
 \end{algorithm}
