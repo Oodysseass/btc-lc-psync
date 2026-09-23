@@ -15,21 +15,22 @@ Bitcoin is a \emph{synchronous} proof of work consensus protocol. Its security
 against a minority adversary rests on the synchrony among the validators, and
 that assumption is known to be necessary. Bitcoin clients have inherited it:
 every client construction to date assumes that messages arrive on time and that
-at least one of its peers is honest. We show that a client needs neither.  We
-keep the validators synchronous and give the client an asynchronous link to
-them, over which the adversary may delay or drop any message and may itself
+at least one of its peers is honest. We show that a client needs neither. We
+keep the validators synchronous and give the client an asynchronous connection
+to them, over which the adversary may delay or drop any message and may herself
 answer. The client holds a clock and nothing else. Bitcoin confirms a block once
 it is $k$ blocks deep in the chain, for a constant $k$. Our client confirms a
 block once it is deep enough for the current round and for the height of the
-chain it received. We prove the rule safe and live in the Bitcoin backbone
-model: what the client confirms is a prefix of every honest chain, at the round
-of receipt and at every round after, and the confirmed prefix grows at a
-constant rate. Asynchrony costs latency. A client that receives an honest chain
-at round $r$ discards a $t^2/(n-t)^2$ fraction of it, where $t$ of the $n$
-validators are adversarial. It discards $\Theta(r)$ blocks where a synchronous
-client discards a constant, and it confirms a block $\Theta(r)$ rounds after the
-honest validators do. We prove this tight: a private mining adversary forces
-every safe rule to discard as much, and no constant depth is safe.
+chain it received. We prove the rule safe and live in the bitcoin backbone
+model: the client confirms a prefix of every honest chain, and the confirmed
+prefix grows at a constant rate. Asynchrony costs latency. A client that
+receives an honest chain at round $r$ discards a $\advr^2$ fraction of it,
+where $\advr$ bounds the mining power of the adversary relative to the honest
+validators. It discards $\Theta(r)$ blocks
+where a synchronous client discards a constant, and it confirms a block
+$\Theta(r)$ rounds after the honest validators do. We prove this tight:
+against a private mining adversary, every safe rule that reads only the round and
+the height discards asymptotically as much, and no constant depth is safe.
 \end{abstract}
 
 \input{01introduction}
