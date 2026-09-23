@@ -238,23 +238,8 @@ the round, and every block of that chain was mined in an earlier round.
     assumption that $\ch[i]$ was computed at round $r$.
 \end{proofof}
 
-The third lemma bounds the height of a chain from both sides. No chain grows
-faster than all validators mining together, so no chain of the block tree at
-round $r$ is taller than about $\maxr fr$. Honest validators always extend the
-longest chain they see, so a chain that an honest validator adopts at round
-$r$ is at least about $fr$ tall. The client has no such lower bound for the
-chain it receives, because the adversary may send it any chain of the block
-tree.
-
-\begin{lemma}[Growth bounds]\label{lem.length}
-    In a typical execution the following hold for every round $r\ge0$.
-    \begin{enumerate}
-        \item Every chain $\ch\in\bt_r$ satisfies
-            $\len{\ch}-1<\maxr f\max(r,\lambda)$.
-        \item If $r>\lambda$, every chain $\ch$ adopted by an honest validator
-            at round $r$ satisfies $\len{\ch}-1>(1-\epsilon)f(r-1)$.
-    \end{enumerate}
-\end{lemma}
+The growth bounds of \Cref{lem.length} follow from the typical bounds and
+\Cref{lem.honestone}.
 
 \begin{proofof}{\Cref{lem.length}}
     Let $r'=\max(r,\lambda)$ and let $\ch\in\bt_r$. The blocks of $\ch[1{:}]$

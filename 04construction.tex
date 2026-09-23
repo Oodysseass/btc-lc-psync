@@ -47,9 +47,8 @@ fraction of it. For $\advr=\frac{1}{2}$, that is half the chain.
 Instead of assuming that the adversary has been mining a fork since genesis, we
 can compute with much better precision the number of blocks the adversary could
 have mined if we take into account the height $\hgt$ of the received chain.
-The tail could not have started at round $0$. The prefix came first, and it had
-to be mined too. If $\hgt>\advr fr$, the adversary cannot have mined the whole
-chain by herself, and the chain is the result of two different mining processes.
+If $\hgt>\advr fr$, the adversary cannot have mined the whole chain by herself,
+and the chain is the result of two different mining processes.
 Up to a fork point, honest and adversarial blocks extend it together, at a rate
 of about $(1+\advr)f$. After the fork point, only the adversary extends it, at a
 rate of about $\advr f$. This gives us a simple intuition: if a chain is long
@@ -118,25 +117,45 @@ and
 \(
     k_0 = 2(\lambda+2)f .
 \)
+The next lemma bounds the height of every chain from above, at the rate $\maxr f$,
+and the height of every honest chain from below, at the rate $(1-\epsilon)f$.
+
+\begin{lemma}[Growth bounds]\label{lem.length}
+    In a typical execution the following hold for every round $r\ge0$.
+    \begin{enumerate}
+        \item Every chain $\ch\in\bt_r$ satisfies
+            $\len{\ch}-1<\maxr f\max(r,\lambda)$.
+        \item If $r>\lambda$, every chain $\ch$ adopted by an honest validator
+            at round $r$ satisfies $\len{\ch}-1>(1-\epsilon)f(r-1)$.
+    \end{enumerate}
+\end{lemma}
+
 The intuition behind this rule is the following: no chain grows faster than
 $\maxr f$ blocks per round (\Cref{lem.length}), so $\maxr f$ takes the place of
 $(1+\advr)f$ in the bound on the fork point. A chain gains at most $\advrone f$
 blocks per round above its fork point with an honest chain
 (\Cref{lem.count,def.typical}), so $\advrone f$ takes the place of $\advr f$ in
-the bound on $d$. Its term $\ftwo/f$ pays for natural forks. Both rates exceed
-their ideal values by terms of order $f$ and $\epsilon$, so $\maxr$ tends to
-$1+\advr$ and $\advrone$ tends to $\advr$ as $f$ and $\epsilon$ tend to $0$. The
-denominator is $\maxr-\advrone=1-\ftwo/f$, which plays the role of
-$(1+\advr)-\advr=1$ in the derivation of \Cref{eq.idealdepth}. It is positive by
-\Cref{lem.fsq} and \Cref{asm.majority}. The terms $\lambda$ and $2f+1$ are
-corrections for short windows of rounds and for the rounds at the two ends of
-the fork.
+the bound on $d$. The term $\ftwo/f$ accounts for natural forks that may happen
+between honest parties. The constants $\maxr$ and $\advrone$ exceed $1+\advr$
+and $\advr$ only by terms of order $f$ and $\epsilon$, and tend to them as $f$
+and $\epsilon$ tend to $0$. With these rates, the two bounds of the derivation
+of \Cref{eq.idealdepth} become $\hgt-d<\maxr f(\rst+\lambda)$ and
+$d<\advrone f(r-\rst)+2f+1$. The term $\lambda$ is there because the bounds of
+\Cref{def.typical} hold only over windows of at least $\lambda$ rounds. So
+\Cref{lem.length} bounds the height of the fork point by
+$\maxr f\max(\rst,\lambda)$, which is at most $\maxr f(\rst+\lambda)$. The term
+$2f+1$ accounts for the blocks computed in the rounds $\rst$ and $r$, at the
+two ends of the fork. The same steps as for \Cref{eq.idealdepth} then give
+\Cref{eq.depth}. Its denominator is $\maxr-\advrone$, which equals
+$1-\ftwo/f$. It is positive, since \Cref{asm.majority} gives $f<1/3$, and then
+$\ftwo/f=f/(2(1-f)^2)<1$.
 
 The floor $k_0$ is of the order of the common prefix parameter
 of~\cite{gkl24}. It separates short forks from long ones. A fork with fewer
-than $k_0$ blocks above its fork point is pruned by the floor itself. A fork
-with more spans more than $\lambda$ rounds (\Cref{lem.span}), which is long
-enough for the bounds of \Cref{def.typical} to apply to it.
+than $k_0$ blocks above its fork point is pruned by the floor itself. The
+blocks of a fork with $k_0$ blocks or more above its fork point were computed in
+more than $\lambda$ consecutive rounds (\Cref{lem.span}). This is long enough
+for the bounds of \Cref{def.typical} to apply to the fork.
 
 \input{algorithms/alg.client}
 
