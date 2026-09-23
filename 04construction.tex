@@ -25,11 +25,11 @@ and no chain grows faster because every block is somebody's work. The client
 knows these rates before it sees a single block, and \Cref{fig.rates} draws them
 as three lines. \Cref{lem.length} makes them exact.
 
-\paragraph{Simple rule}
+\paragraph{Simple rule.}
 
 Now look at the chain $\ch$ the client received at round $r$. It has two parts.
 The first is a prefix that the honest validators also hold. The second is a
-tail that they do not hold: the adversary mined it in private, after it left
+tail that they do not hold: the adversary mined it in private, after she left
 the honest chain. The client wants to keep the prefix and prune the tail. It
 cannot see where one ends and the other begins, but it can bound the length of
 the tail. Based on the adversarial chain growth, we can make a simple
@@ -42,14 +42,14 @@ This is indeed true, but the rule prunes much more than it has to. A chain as
 tall as an honest chain has height about $fr$, and the rule prunes a $\advr$
 fraction of it. For $\advr=\frac{1}{2}$, that is half the chain.
 
-\paragraph{Pruning depth}
+\paragraph{Pruning depth.}
 
 Instead of assuming that the adversary has been mining a fork since genesis, we
 can compute with much better precision the number of blocks the adversary could
 have mined if we take into account the height $\hgt$ of the received chain.
 The tail could not have started at round $0$. The prefix came first, and it had
 to be mined too. If $\hgt>\advr fr$, the adversary cannot have mined the whole
-chain by itself, and the chain is the result of two different mining processes.
+chain by herself, and the chain is the result of two different mining processes.
 Up to a fork point, honest and adversarial blocks extend it together, at a rate
 of about $(1+\advr)f$. After the fork point, only the adversary extends it, at a
 rate of about $\advr f$. This gives us a simple intuition: if a chain is long
@@ -87,7 +87,7 @@ the chain, instead of the half that the simple rule prunes. A chain of height
 $\advr fr$ or less could have been mined by the adversary alone, so it may be
 all tail, and the client prunes all of it.
 
-\paragraph{Client}
+\paragraph{Client.}
 
 \Cref{alg.client} gives the client. It keeps asking the network for chains,
 and it keeps one chain as its output, which is $\bot$ until it confirms

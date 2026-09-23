@@ -4,9 +4,9 @@
 We show two things. No constant confirmation depth is sound. And the depth
 $\prn(r,\hgt)$ that \Cref{alg.client} prunes is, in the limit, no more than it
 has to be. One attack gives both. The adversary follows the honest chain for
-$r_0$ rounds, so that the chain it holds is as long as any chain the validators
-hold. Then it stops publishing, mines for $s$ more rounds in private, and hands
-the client what it has. The blocks it kept private are on no honest chain, and
+$r_0$ rounds, so that the chain she holds is as long as any chain the validators
+hold. Then she stops publishing, mines for $s$ more rounds in private, and hands
+the client what she has. The blocks she kept private are on no honest chain, and
 there are about $\advr fs$ of them. The proofs of this section are in
 \Cref{appendix.tightness}.
 
@@ -17,15 +17,15 @@ there are about $\advr fs$ of them. The proofs of this section are in
         \item In every round of $[1,r_0]$, after the honest validators have
             sent their messages, the adversary spends every query on
             extending a longest chain among the genesis chain and the chains
-            sent by any validator so far. Each block it computes extends the
-            block it computed before in the same round. It sends every block
+            sent by any validator so far. Each block she computes extends the
+            block she computed before in the same round. She sends every block
             at once.
         \item Let $\ch_0$ be a longest chain adopted by an honest validator at
             round $r_0+1$. In every round of $[r_0+1,r]$ the adversary spends
             every query on extending $\ch_0$, each block extending the one
             before, and sends nothing to the validators.
-        \item At round $r$ it sends the client the chain $\ch$ formed by
-            $\ch_0$ and every block it computed in the rounds of $[r_0+1,r]$.
+        \item At round $r$ she sends the client the chain $\ch$ formed by
+            $\ch_0$ and every block she computed in the rounds of $[r_0+1,r]$.
     \end{enumerate}
 \end{definition}
 

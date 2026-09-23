@@ -5,33 +5,33 @@ We work in the static synchronous setting of~\cite{gkl24} and we keep some of
 its notation. This section fixes the notation and states the assumptions. The
 parts of the model that only the proofs use are in \Cref{appendix.model}.
 
-\paragraph{Validators}
+\paragraph{Validators.}
 
 There are $n$ parties called validators. Up to $t$ may be Byzantine and
 arbitrarily deviate from the protocol.
 
-\paragraph{Rounds}
+\paragraph{Rounds.}
 
 Time proceeds in rounds. Rounds are numbered $1,2,\dots$. For $r\le r'$, we
 write $[r,r']$ for the set of rounds $\{r,\dots,r'\}$, and $[r,r']=\emptyset$
 when $r'<r$.
 
-\paragraph{Network}
+\paragraph{Network.}
 
 We assume a synchronous network among the validators. A message sent by an
 honest validator at round $r$ is received by every other validator at the
 beginning of round $r+1$. The adversary can see the messages of honest parties
-at any point of a round. At the end of each round it fixes the messages
-delivered in the next round and their order. It may reorder messages, spoof
-their source or add messages of its own, but it cannot drop a message.
+at any point of a round. At the end of each round she fixes the messages
+delivered in the next round and their order. She may reorder messages, spoof
+their source or add messages of her own, but she cannot drop a message.
 
-\paragraph{Adversary}
+\paragraph{Adversary.}
 
-We assume a \emph{Byzantine, rushing} adversary, which may corrupt up to $t$
+We assume a \emph{Byzantine, rushing} adversary, who may corrupt up to $t$
 parties. A rushing adversary sees every message sent by an honest validator
 before it is delivered to any other party.
 
-\paragraph{Random oracle}
+\paragraph{$q$-bounded random oracle.}
 
 We assume access to a random oracle $H \colon \{0,1\}^* \to \{0,1\}^\kappa$,
 where $\kappa$ is the security parameter. Each validator is allowed $q$ queries
@@ -40,7 +40,7 @@ query is successful if its output is below the target $T$. A single query is
 successful with probability $p=T/2^\kappa$. A successful query made at round $r$
 yields a block. We say that this block was \emph{computed at round $r$}.
 
-\paragraph{Protocol}
+\paragraph{Protocol.}
 
 Validators run the Bitcoin backbone protocol of~\cite{gkl24}. Every validator
 keeps a local chain, initialized with the genesis block $\gen$. At round $r$ a
@@ -57,7 +57,7 @@ $r$ is at least as long as the chain it has at round $r$. The chain it has at
 round $r+1$ is the chain it adopted at round $r$, extended by at most one block
 if the validator was successful at round $r$.
 
-\paragraph{Clients}
+\paragraph{Clients.}
 
 Clients are parties that do not participate in the consensus protocol. A client
 is only interested in confirming a ledger that is derived from the chain the
@@ -73,7 +73,7 @@ genesis block $\gen$, the number of validators $n$, the number of Byzantine
 validators $t$, the probability that a round is successful $f$, the Chernoff
 error parameter $\epsilon$ and the Chernoff concentration parameter $\lambda$.
 
-\paragraph{Chains and the block tree}
+\paragraph{Chains and the block tree.}
 
 A chain is a sequence of blocks, each of which contains the hash of its
 predecessor. Every chain begins with the genesis block $\gen$. We write $\ch[i]$
@@ -109,7 +109,7 @@ $\bt_r$ has a unique height and $\bt_r$ is a tree.
     that is a prefix of both.
 \end{definition}
 
-\paragraph{Parameters}
+\paragraph{Parameters.}
 
 A round is \emph{successful} if some honest validator computes a block in it.
 We write $f$ for the probability that a round is successful, and $f_2$ for the
@@ -126,7 +126,7 @@ honest query budget, and we note that $1+\advr=n/(n-t)$.
 We call $\delta$ the honest majority advantage. \Cref{asm.majority} is the
 honest majority assumption of~\cite{gkl24}.
 
-\paragraph{Typical executions}
+\paragraph{Typical executions.}
 
 Let $\lambda\ge2/f$ be an integer. All our statements are about
 $(\epsilon,\lambda)$-typical executions, as defined in~\cite{gkl24}
