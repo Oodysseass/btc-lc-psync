@@ -1,24 +1,28 @@
 \section{Discussion}
 \label{sec.discussion}
 
-\paragraph{Variable difficulty}
-
+\paragraph{Variable difficulty.}
+% mention that you should have some sort of knowledge on the mining power and difficulty to make it work
 The analysis assumes a static population and a fixed target, under which the
 height of a chain stands in for the work inside it. Variable difficulty breaks
-that. An adversary that controls the timestamps of its own blocks can trigger
-the largest drop in target the rule allows, and reach a given height for far
-less work. BitVM3~\cite{bitvm3} reports that about a fifth of the hashing power
-suffices for this against an on-chain client that checks height alone, and
-repairs it by binding timestamps to the consensus time of the chain. A version
-of our rule for variable difficulty would compare accumulated work, rather than
-height, against the round. We leave it open.
+that. An adversary who controls the timestamps of her own blocks can trigger
+the largest rise in target that the difficulty adjustment allows, and reach a
+given height for far less work. BitVM3~\cite{bitvm3} reports that about a fifth
+of the hashing power suffices for this against an on-chain client that checks
+height alone, and repairs it by binding timestamps to the consensus time of the
+chain. A version of our rule for variable difficulty would compare accumulated
+work, rather than height, against the round. Variable difficulty exists because
+the total mining power is not known in advance. In that setting, Lewis-Pye and
+Roughgarden~\cite{lpr21} show that a live protocol cannot produce certificates,
+messages whose existence alone proves that a block is confirmed. We therefore
+posit that such a rule needs some synchrony. We leave it open.
 
-\paragraph{Other longest chain protocols}
+\paragraph{Other longest chain protocols.}
 
-Our analysis is for the synchronous network of~\cite{gkl24}. In the bounded
-delay model~\cite{gkl24,pss16} the honest chain grows at a rate that depends on
-the delay. We expect the same construction to work with that rate in place of
-$f$, and with $t/(n-2t)$ replaced by the corresponding ratio of rates. Longest
-chain protocols based on proof of stake~\cite{sleepy,genesis} have the same
-structure of rates, with slots in place of rounds, and we expect the rule to
-carry over. We do not prove either here.
+Our analysis is for the synchronous network of~\cite{gkl24} with $\Delta = 1$.
+In the bounded delay model~\cite{gkl24,pss16} the honest chain grows at a rate
+that depends on the delay. Our construction works if the chain growth rates are
+adjusted accordingly.  Longest chain protocols based on proof of
+stake~\cite{sleepy,genesis} have the same structure of rates, with slots in
+place of rounds, and we expect the rule to carry over. We leave this for future
+work.
