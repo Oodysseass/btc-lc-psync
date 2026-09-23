@@ -69,9 +69,8 @@ rounds. We say that a client \emph{receives a chain at round $r$} when the
 adversary delivers that chain to it during round $r$.
 
 Clients have access to a wall clock. They know the current round $r$, the
-genesis block $\gen$, the number of validators $n$, the number of Byzantine
-validators $t$, the probability that a round is successful $f$, the Chernoff
-error parameter $\epsilon$ and the Chernoff concentration parameter $\lambda$.
+genesis block $\gen$, and the public parameters $f$, $\advr$, $\epsilon$ and
+$\lambda$ that we introduce below.
 
 \paragraph{Chains and the block tree.}
 
@@ -112,19 +111,23 @@ $\bt_r$ has a unique height and $\bt_r$ is a tree.
 \paragraph{Parameters.}
 
 A round is \emph{successful} if some honest validator computes a block in it.
-We write $f$ for the probability that a round is successful, and $f_2$ for the
-probability that two or more honest validators compute a block in the same
-round. The second is of order $f^2$ (\Cref{lem.fsq}), so it is small compared
-with $f$. We write $\advr=t/(n-t)$ for the ratio of the adversarial to the
-honest query budget, and we note that $1+\advr=n/(n-t)$.
+We write $f$ for the probability that a round is successful. It is public: it
+is the rate at which the honest validators extend their chain. We write $f_2$
+for the probability that two or more honest validators compute a block in the
+same round. It depends on the number of honest validators, so the client uses
+instead the bound $\ftwo=f^2/(2(1-f)^2)$, which is at least $f_2$
+(\Cref{lem.fsq}) and small compared with $f$. Nobody knows $n$ or $t$. What is
+public is the bound $\advr$ of the next assumption on their ratio,
+$t/(n-t)\le\advr$. It bounds the mining power of the adversary relative to that
+of the honest validators, and $1+\advr$ bounds the mining power of all
+validators relative to the honest ones.
 
 \begin{assumption}[Honest majority]\label{asm.majority}
-    There exist $\epsilon,\delta,f\in(0,1]$ such that $t\le(1-\delta)(n-t)$ and
-    $3f+3\epsilon<\delta$.
+    There exist $\epsilon,f\in(0,1]$ and $\advr\in[0,1)$ such that
+    $t\le\advr(n-t)$ and $3f+3\epsilon<1-\advr$.
 \end{assumption}
 
-We call $\delta$ the honest majority advantage. \Cref{asm.majority} is the
-honest majority assumption of~\cite{gkl24}.
+\Cref{asm.majority} is the honest majority assumption of~\cite{gkl24}.
 
 \paragraph{Typical executions.}
 

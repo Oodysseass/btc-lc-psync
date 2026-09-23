@@ -40,7 +40,7 @@ $S$ let $W(S)=\sum_{r\in S}W_r=X(S)-Y(S)$, with $W_0=0$.
         \begin{gathered}
             (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
             \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
-            Z(S) < \left(\frac{\advr}{1-f}+\epsilon\right)f|S|,
+            Z(S) < \left(\frac{t}{(n-t)(1-f)}+\epsilon\right)f|S|,
             \qquad W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
         \end{gathered}
     \]
@@ -52,7 +52,9 @@ The upper bounds also hold for a set $[0,r]$ with $r\ge\lambda$, because
 $X([0,r])=X([1,r])$, and likewise for $Y$, $Z$ and $W$, while the right-hand
 sides increase with $|S|$. The definition is that of~\cite[Definition
 4.4]{gkl24}, in the form of~\cite[Lemma 4.6]{gkl24}, with one bound added, the
-bound on $W(S)$.
+bound on $W(S)$. Since $t/(n-t)\le\advr$ and $f_2<\ftwo$ (\Cref{lem.fsq}), the
+bounds on $Z(S)$ and $W(S)$ also hold with $\advr$ in place of $t/(n-t)$ and
+$\ftwo$ in place of $f_2$. The proofs use them in this form.
 
 \begin{theorem}[Typicality]\label{thm.typical}
     An execution is $(\epsilon,\lambda)$-typical except with probability at
@@ -188,17 +190,17 @@ first lemma uses honest majority to show that it stays below $1$.
 
 \begin{proofof}{\Cref{lem.rho}}
     By definition, $\advrtwo<1$ is equivalent to
-    $\frac{\advr}{1-f}+\frac{f_2}{f}<1-3\epsilon$. From \Cref{asm.majority},
-    $\advr\le1-\delta$ and $f<1/3$, and $f_2/f<f/(2(1-f)^2)$ by
-    \Cref{lem.fsq}. So it suffices to show
+    $\frac{\advr}{1-f}+\frac{\ftwo}{f}<1-3\epsilon$. Here
+    $\ftwo/f=f/(2(1-f)^2)$, and $f<1/3$ by \Cref{asm.majority}. So we must
+    show
     \[
-        \frac{1-\delta}{1-f}+\frac{f}{2(1-f)^2} < 1-3\epsilon .
+        \frac{\advr}{1-f}+\frac{f}{2(1-f)^2} < 1-3\epsilon .
     \]
     Multiplying by $(1-f)^2$, this is
-    $1-\tfrac{f}{2}-\delta(1-f)<(1-3\epsilon)(1-f)^2$, that is,
-    $\delta(1-f)>\tfrac{3f}{2}-f^2+3\epsilon(1-f)^2$. Since $f<1/3$, the right
-    side is at most $(1-f)(2f+3\epsilon)$. So $\delta>2f+3\epsilon$ suffices,
-    and it follows from $3f+3\epsilon<\delta$.
+    $\advr(1-f)+\tfrac{f}{2}<(1-3\epsilon)(1-f)^2$, that is,
+    $(1-\advr)(1-f)>\tfrac{3f}{2}-f^2+3\epsilon(1-f)^2$. Since $f<1/3$, the
+    right side is at most $(1-f)(2f+3\epsilon)$. So $1-\advr>2f+3\epsilon$
+    suffices, and it follows from $3f+3\epsilon<1-\advr$.
 \end{proofof}
 
 The second lemma says that a chain holds at most one honest block from any
@@ -379,7 +381,7 @@ every block by which it is shorter, plus a constant.
     From \Cref{lem.count,def.typical},
     \[
         d < \left(\frac{\advr}{1-f}+\epsilon\right)f(|S|+2)
-        + \left(\frac{f_2}{f}+\epsilon\right)f|S| + 1 .
+        + \left(\frac{\ftwo}{f}+\epsilon\right)f|S| + 1 .
     \]
     From \Cref{lem.rho}, $\frac{\advr}{1-f}+\epsilon<1$, so the first term is
     smaller than $\left(\frac{\advr}{1-f}+\epsilon\right)f|S|+2f$. Therefore
@@ -397,7 +399,7 @@ every block by which it is shorter, plus a constant.
     \Cref{lem.rho}, so $d<\frac{\advrtwo(\len{\ch'}-\len{\ch})+2f+1}{1-\advrtwo}$.
 \end{proofof}
 
-The coefficient $\advrtwo/(1-\advrtwo)$ tends to $\advr/(1-\advr)=t/(n-2t)$.
+The coefficient $\advrtwo/(1-\advrtwo)$ tends to $\advr/(1-\advr)$.
 The client cannot
 use \Cref{thm.prefix} as it stands, because it does not know $\len{\ch'}$. The
 second step replaces $\len{\ch'}$ by the round, with the argument of
@@ -411,7 +413,7 @@ each.
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
         \len{\ch\meet\ch'} > \len{\ch} - \max\left\{k_0,\
-        \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{1-f_2/f}\right\}.
+        \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{1-\ftwo/f}\right\}.
     \]
 \end{lemma}
 
@@ -441,7 +443,7 @@ each.
         d < \frac{\advrone\left[\maxr f(r+\lambda)-\len{\ch}+1\right]+\maxr(2f+1)}{\maxr-\advrone},
     \]
     and the definitions of $\maxr$ and $\advrone$ give
-    $\maxr-\advrone=1-f_2/f$.
+    $\maxr-\advrone=1-\ftwo/f$.
 \end{proofof}
 
 The maximum in \Cref{thm.round} is the pruning depth $\prn(r,\len{\ch}-1)$ of
@@ -553,7 +555,7 @@ do.
 \subsection{Liveness}
 
 \begin{proofof}{\Cref{thm.liveness}}
-    Write $D=1-\epsilon-\advrone$ and $B=\maxr/(1-f_2/f)$. By \Cref{lem.rho},
+    Write $D=1-\epsilon-\advrone$ and $B=\maxr/(1-\ftwo/f)$. By \Cref{lem.rho},
     $\advrone=(1-\epsilon)\advrtwo<1-\epsilon$, so $D>0$ and $\advrone<1$.
     Since $\lambda\ge2/f$ and $f<1/3$ by \Cref{asm.majority}, we have
     $1/f\le\lambda/2$ and $\lambda\ge6$. Let $\ch''$ be the chain the client
@@ -572,10 +574,10 @@ do.
     $4\le2\lambda/3$ and $1\le\lambda/6$, its right-hand side is at most
     $4\lambda/(1-\epsilon)\le5\lambda/D$. For the second, write
     $(1-\epsilon)f(r-1)-h(r)=Dfr-c$ with
-    $c=(1-\epsilon)f+\advrone f\lambda+2f+1$. Since $\maxr/B=1-f_2/f$, the
+    $c=(1-\epsilon)f+\advrone f\lambda+2f+1$. Since $\maxr/B=1-\ftwo/f$, the
     second inequality is equivalent to
     \[
-        r\ \ge\ \kappa(r_1+\lambda)+\frac{1}{D}\Big(\frac{1-f_2/f}{\maxr f}
+        r\ \ge\ \kappa(r_1+\lambda)+\frac{1}{D}\Big(\frac{1-\ftwo/f}{\maxr f}
         +(1-\epsilon)+2+\advrone\lambda+\frac{1}{f}\Big) .
     \]
     Since $\maxr>1$ and $\advrone<1$, the first group in the parentheses is
@@ -586,7 +588,7 @@ do.
 
     Next, $\ch'$ has more than one block. Since $r\ge5\lambda/D>\lambda$,
     \Cref{lem.length}
-    gives $\hgt''>(1-\epsilon)f(r-1)$. Since $\maxr-\advrone=1-f_2/f$,
+    gives $\hgt''>(1-\epsilon)f(r-1)$. Since $\maxr-\advrone=1-\ftwo/f$,
     \Cref{eq.depth} gives
     \[
         \hgt''-\prn(r,\hgt'')=\min\big\{\hgt''-k_0,\ B(\hgt''-h(r))\big\} .
@@ -664,7 +666,8 @@ queries, so it already allows this.
     Now the randomness. $X(S_1)$ is a sum of $r_0$ independent Bernoulli
     trials with success probability $f$. $Z(S_1)$ and $Z(S_2)$ are sums of
     $tqr_0$ and $tqs$ independent Bernoulli trials with success probability
-    $p$, and \Cref{eq.rates} gives $pqtr_0>\advr fr_0$ and $pqts>\advr fs$. By
+    $p$. Since $t=\advr(n-t)$, \Cref{eq.rates} gives $pqtr_0>\advr fr_0$ and
+    $pqts>\advr fs$. By
     the Chernoff bound and $\advr<1$, each of the events
     $X(S_1)\le(1-\epsilon')fr_0$, $Z(S_1)\le(1-\epsilon')\advr fr_0$ and
     $Z(S_2)\le(1-\epsilon')\advr fs$ has probability at most
@@ -718,13 +721,13 @@ The second item is the case $\sigma=\advr$ of the following.
     $\prn(r,\len{\ch}-1)\le\prn(r,\hgt_0)$. By \Cref{eq.depth},
     $\prn(r,\hgt_0)/(fr)$ is the maximum of $k_0/(fr)$ and
     \[
-        \frac{\advrone\left[\maxr f(r+\lambda)-\hgt_0\right]+\maxr(2f+1)}{(1-f_2/f)\,fr} .
+        \frac{\advrone\left[\maxr f(r+\lambda)-\hgt_0\right]+\maxr(2f+1)}{(1-\ftwo/f)\,fr} .
     \]
     Here $\hgt_0/(fr)=(1-\epsilon')(1+\advr-\sigma)$. As $r\to\infty$, the
     first term tends to $0$ and the second to
-    $\advrone\left[\maxr-(1-\epsilon')(1+\advr-\sigma)\right]/(1-f_2/f)$. As
+    $\advrone\left[\maxr-(1-\epsilon')(1+\advr-\sigma)\right]/(1-\ftwo/f)$. As
     $f$, $\epsilon$ and $\epsilon'$ tend to $0$, $\advrone$ tends to $\advr$,
-    $\maxr$ to $1+\advr$ and $f_2/f$ to $0$, so this tends to $\advr\sigma$. By
+    $\maxr$ to $1+\advr$ and $\ftwo/f$ to $0$, so this tends to $\advr\sigma$. By
     \Cref{eq.attfork},
     $(\len{\ch}-\len{\ch\meet\ch'})/(fr)>(1-\epsilon')\advr\sigma$, which tends
     to $\advr\sigma$. So the ratio tends to at most $1$.

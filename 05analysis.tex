@@ -60,7 +60,7 @@ honest validators have long settled.
     In a typical execution, let $\ch_1$ be a chain adopted by an honest
     validator at a round $r_1>\lambda$, and let
     $u(r_1)=(\kappa-1)r_1+5\lambda/(1-\epsilon-\advrone)$, where
-    $\kappa=(1-f_2/f)/(1-\epsilon-\advrone)$. Every client running
+    $\kappa=(1-\ftwo/f)/(1-\epsilon-\advrone)$. Every client running
     \Cref{alg.client} that receives, at a round $r\ge r_1+u(r_1)$, a chain
     adopted by an honest validator at round $r$ has an output other than $\bot$,
     and $\prune{\ch_1}{k_0}$ is a prefix of that output.
@@ -72,7 +72,7 @@ by an honest validator at round $r$ has height at least $(1-\epsilon)f(r-1)$
 such a chain the client prunes at most $\prn(r,(1-\epsilon)f(r-1))$ blocks. By
 \Cref{eq.depth}, this is about $\advr^2fr$ for large $r$ and small $f$ and
 $\epsilon$. As $f$ and $\epsilon$ tend to $0$, $\kappa-1$ tends to
-$\advr/(1-\advr)=t/(n-2t)$, so a block that is $k_0$ deep in an honest chain at
-round $r_1$ is confirmed about $\frac{t}{n-2t}r_1$ rounds later. In Bitcoin
+$\advr/(1-\advr)$, so a block that is $k_0$ deep in an honest chain at
+round $r_1$ is confirmed about $\frac{\advr}{1-\advr}r_1$ rounds later. In Bitcoin
 this delay is a constant. For the client it grows with the round, and
 \Cref{sec.tightness} shows that this is necessary.

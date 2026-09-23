@@ -18,7 +18,7 @@ We follow the idea of \Cref{fig.rates}, which rests on the different chain
 growth rates. Every validator makes a fixed number of attempts per round, and
 each attempt finds a block with a fixed probability. In the terms of
 \Cref{sec.model}, the chain of the honest validators grows by about $f$ blocks
-per round, the adversary mines about $\advr f$ blocks per round and no chain
+per round, the adversary mines at most about $\advr f$ blocks per round and no chain
 grows faster than about $(1+\advr)f$ blocks per round. The honest chain grows at
 least that fast because honest validators build on the longest chain they see,
 and no chain grows faster because every block is somebody's work. The client
@@ -34,7 +34,7 @@ the honest chain. The client wants to keep the prefix and prune the tail. It
 cannot see where one ends and the other begins, but it can bound the length of
 the tail. Based on the adversarial chain growth, we can make a simple
 observation: in the worst case the adversary has been mining in private for all
-$r$ rounds and has produced about $\advr fr$ blocks. That means a client that
+$r$ rounds and has produced at most about $\advr fr$ blocks. That means a client that
 prunes $\advr fr$ blocks from any chain received at round $r$ should be safe.
 \Cref{fig.rates}(a) draws this rule.
 
@@ -105,14 +105,14 @@ received at round $r$, it is
 \begin{equation}\label{eq.depth}
     \prn(r,\hgt)
     = \max\left\{k_0,\
-    \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{1-f_2/f}\right\},
+    \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{1-\ftwo/f}\right\},
 \end{equation}
 where
 \(
     \maxr = 1+\advr+2\epsilon+\frac{\advr f}{1-f},
 \)
 \(
-    \advrone = \frac{\advr}{1-f}+\frac{f_2}{f}+2\epsilon,
+    \advrone = \frac{\advr}{1-f}+\frac{\ftwo}{f}+2\epsilon,
 \)
 and
 \(
@@ -123,10 +123,10 @@ $\maxr f$ blocks per round (\Cref{lem.length}), so $\maxr f$ takes the place of
 $(1+\advr)f$ in the bound on the fork point. A chain gains at most $\advrone f$
 blocks per round above its fork point with an honest chain
 (\Cref{lem.count,def.typical}), so $\advrone f$ takes the place of $\advr f$ in
-the bound on $d$. Its term $f_2/f$ pays for natural forks. Both rates exceed
+the bound on $d$. Its term $\ftwo/f$ pays for natural forks. Both rates exceed
 their ideal values by terms of order $f$ and $\epsilon$, so $\maxr$ tends to
 $1+\advr$ and $\advrone$ tends to $\advr$ as $f$ and $\epsilon$ tend to $0$. The
-denominator is $\maxr-\advrone=1-f_2/f$, which plays the role of
+denominator is $\maxr-\advrone=1-\ftwo/f$, which plays the role of
 $(1+\advr)-\advr=1$ in the derivation of \Cref{eq.idealdepth}. It is positive by
 \Cref{lem.fsq} and \Cref{asm.majority}. The terms $\lambda$ and $2f+1$ are
 corrections for short windows of rounds and for the rounds at the two ends of

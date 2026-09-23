@@ -7,8 +7,9 @@ has to be. One attack gives both. The adversary follows the honest chain for
 $r_0$ rounds, so that the chain she holds is as long as any chain the validators
 hold. Then she stops publishing, mines for $s$ more rounds in private, and hands
 the client what she has. The blocks she kept private are on no honest chain, and
-there are about $\advr fs$ of them. The proofs of this section are in
-\Cref{appendix.tightness}.
+there are about $\advr fs$ of them. Throughout this section the adversary has the
+largest power that \Cref{asm.majority} allows, $t=\advr(n-t)$. The proofs are
+in \Cref{appendix.tightness}.
 
 \begin{definition}[Private mining]\label{def.private}
     The strategy $\pipriv$ with parameters $r_0\ge1$ and $s\ge1$ is the
