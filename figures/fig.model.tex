@@ -1,11 +1,114 @@
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.94\textwidth]{figures/network-model.pdf}
+\colorlet{cadv}{red!80!black}
+\colorlet{crkt}{blue!45!black}
+\colorlet{cfin}{red!75!black}
+% Earth is the disk on the left. Six validators stand on it, feet on the rim,
+% one of them the adversary in red; the thin mesh between their feet is the
+% synchronous network, with its delay bound on one edge. The client sits in a
+% rocket on its way to alpha Centauri, with a clock that shows the round. The
+% dotted arrow is a chain on its way to the client.
+\begin{tikzpicture}[font=\footnotesize]
+  \def\R{1.05}
+  % Earth
+  \draw[ink,fill=gray!8] (0,0) circle[radius=\R];
+  \begin{scope}
+    \clip (0,0) circle[radius=\R];
+    % continents, sketched: the Americas, then Eurasia with Africa, then a
+    % small Australia
+    \fill[gray!28] plot[smooth cycle,tension=0.7] coordinates
+      {(-0.75,0.8) (-0.35,0.85) (-0.25,0.55) (-0.45,0.35) (-0.3,0.15)
+       (-0.15,-0.1) (-0.2,-0.5) (-0.35,-0.85) (-0.45,-0.55) (-0.55,-0.2)
+       (-0.7,0.1) (-0.9,0.45)};
+    \fill[gray!28] plot[smooth cycle,tension=0.7] coordinates
+      {(0.2,0.9) (0.6,0.95) (1.0,0.7) (1.1,0.3) (0.8,0.2) (0.6,-0.05)
+       (0.55,-0.5) (0.35,-0.75) (0.15,-0.45) (0.1,-0.05) (0.3,0.25)
+       (0.15,0.55)};
+    \fill[gray!28] (0.82,-0.6) ellipse[x radius=0.16,y radius=0.1];
+  \end{scope}
+  % the synchronous network: every validator talks to every other
+  \foreach \a in {0,60,...,300} {
+    \foreach \b in {0,60,...,300} {
+      \draw[gray!65,line width=0.35pt] (\a:\R) -- (\b:\R);
+    }
+  }
+  \node[fill=gray!8,inner sep=1pt,font=\scriptsize] at (90:0.91) {$\Delta$};
+  % validators, feet on the rim, standing radially
+  \foreach \a in {0,60,120,180,240} {
+    \pic[shift={(\a:\R)}, rotate=\a-90] {person};
+  }
+  \pic[cadv, shift={(300:\R)}, rotate=210] {devil};
+  \node[align=center,anchor=north] at (0,-1.75)
+    {Earth\\[-1pt]\scriptsize\color{gray}synchronous};
+
+  % the client, in a rocket on its way to alpha Centauri
+  \def\cx{7.0}
+  \def\cy{0.2}
+  \begin{scope}[shift={(\cx,\cy)}]
+    % nozzle and flame, behind the body
+    \draw[ink,draw=crkt,fill=gray!55] (-0.84,0.13) -- (-0.98,0.19)
+      -- (-0.98,-0.19) -- (-0.84,-0.13) -- cycle;
+    \fill[orange!90!red] (-0.97,0.15)
+      .. controls (-1.25,0.22) and (-1.45,0.06) .. (-1.7,0)
+      .. controls (-1.45,-0.06) and (-1.25,-0.22) .. (-0.97,-0.15) -- cycle;
+    \fill[yellow!85!orange] (-0.97,0.08)
+      .. controls (-1.15,0.1) and (-1.28,0.03) .. (-1.38,0)
+      .. controls (-1.28,-0.03) and (-1.15,-0.1) .. (-0.97,-0.08) -- cycle;
+    % fins
+    \draw[ink,draw=crkt,shade,top color=cfin!60!white,bottom color=cfin]
+      (-0.3,0.2) -- (-0.6,0.62) -- (-0.82,0.15) -- cycle;
+    \draw[ink,draw=crkt,shade,top color=cfin,bottom color=cfin!70!black]
+      (-0.3,-0.2) -- (-0.6,-0.62) -- (-0.82,-0.15) -- cycle;
+    % body, shaded like a cylinder, then the nose cone in red
+    \draw[ink,draw=crkt,shade,top color=white,bottom color=gray!40] (-0.6,0.27) -- (0.35,0.27)
+      .. controls (0.85,0.27) and (1.05,0.1) .. (1.15,0)
+      .. controls (1.05,-0.1) and (0.85,-0.27) .. (0.35,-0.27) -- (-0.6,-0.27)
+      arc[start angle=-90,end angle=-270,radius=0.27];
+    \draw[ink,draw=crkt,shade,top color=cfin!55!white,bottom color=cfin!80!black] (0.35,0.27)
+      .. controls (0.85,0.27) and (1.05,0.1) .. (1.15,0)
+      .. controls (1.05,-0.1) and (0.85,-0.27) .. (0.35,-0.27)
+      arc[start angle=-90,end angle=90,x radius=0.12,y radius=0.27];
+    % stripes on the body
+    \begin{scope}
+      \clip (-0.6,0.27) -- (0.35,0.27) -- (0.35,-0.27) -- (-0.6,-0.27)
+        arc[start angle=-90,end angle=-270,radius=0.27];
+      \fill[cfin] (-0.62,-0.3) rectangle (-0.52,0.3);
+      \fill[crkt] (-0.5,-0.3) rectangle (-0.46,0.3);
+      \fill[crkt] (0.18,-0.3) rectangle (0.22,0.3);
+    \end{scope}
+    % window, rimmed, with the client inside and a glint on the glass
+    \fill[crkt] (-0.15,0) circle[radius=0.22];
+    \fill[cyan!20!white] (-0.15,0) circle[radius=0.17];
+    \begin{scope}
+      \clip (-0.15,0) circle[radius=0.17];
+      \pic[shift={(-0.15,-0.17)},scale=0.55] {person};
+    \end{scope}
+    \draw[white,line width=0.9pt,line cap=round]
+      (-0.15,0) ++(120:0.125) arc[start angle=120,end angle=165,radius=0.125];
+    % the clock, showing the round
+    \draw[ink,fill=white] (0.05,0.64) circle[radius=0.13];
+    \draw[ink] (0.05,0.64) -- +(90:0.09) (0.05,0.64) -- +(0:0.07);
+    \node[anchor=west,inner sep=1pt] at (0.2,0.64) {$r$};
+    % alpha Centauri
+    \draw[ink] (2.0,0.55) circle[radius=0.2];
+    \foreach \a in {0,45,...,315} {
+      \draw[ink] (2.0,0.55) ++(\a:0.28) -- ++(\a:0.14);
+    }
+    \node[anchor=north,font=\scriptsize] at (2.0,0.1) {$\alpha$ Centauri};
+  \end{scope}
+  \node[anchor=north] at (\cx,\cy-0.7) {client};
+
+  % the asynchronous link
+  \draw[ink,dotted,-{Stealth[length=4pt]}]
+    (0:\R) ++(0.45,0.2) .. controls (3,1.4) and (5.2,1.3) .. (\cx-0.85,\cy+0.6);
+  \node[text=gray] at (3.7,1.6) {asynchronous};
+\end{tikzpicture}
 \caption{The network model. The validators are on Earth, and they are
 synchronous with one another: a message from one of them reaches all the others
-within a bounded delay that everybody knows. The client is on $\alpha$ Centauri,
-and its communication with earth is asynchronous: a message may take any amount
-of time to arrive, or it may never arrive, and the client cannot tell which.
-What the client does have is a clock, so it knows the current round, and the
-parameters of the protocol, which are public.}\label{fig.model}
+within a bounded delay $\Delta$ that everybody knows. One of them, in red, is
+adversarial. The client is on its way to $\alpha$ Centauri, and its
+communication with Earth is asynchronous: a chain sent to it may take any amount of time to
+arrive, or may never arrive, and the client cannot tell which. What the client
+does have is a clock, so it knows the current round $r$, and the parameters of
+the protocol, which are public.}\label{fig.model}
 \end{figure}
