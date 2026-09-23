@@ -96,11 +96,13 @@ added for $W(S)$, which is where its first coefficient is $5$ rather than $4$.
 
 \subsection{The block tree}
 
-Two facts about the block tree follow from the protocol alone.
+Two facts about the block tree follow from the protocol and from
+\Cref{def.typical}.
 
 \begin{lemma}[Membership]\label{lem.membership}
-    Every chain held by a client at round $r$ is in $\bt_r$. Every chain
-    adopted by an honest validator at round $r$ is in $\bt_{r-1}$.
+    In a typical execution, every valid chain that a client receives at round
+    $r$ is in $\bt_r$. Every chain adopted by an honest validator at round $r$
+    is in $\bt_{r-1}$.
 \end{lemma}
 
 \begin{lemma}[Fork choice]\label{lem.fork}
@@ -111,8 +113,10 @@ Two facts about the block tree follow from the protocol alone.
 \end{lemma}
 
 \begin{proofof}{\Cref{lem.membership}}
-    The blocks of a chain held by a client at round $r$ exist at round $r$, so
-    each was computed in a round of $[0,r]$. For the second claim, let $B$ be a
+    Every block of a valid chain, other than the genesis block, passes a
+    verification query to $H$. No guess occurs (\Cref{def.typical}), so a
+    computation query for the block came first, and the block was computed in a
+    round of $[0,r]$. For the second claim, let $B$ be a
     block of a chain adopted by an honest validator at round $r$, other than the
     genesis block. If the validator received $B$, it received it at a round at
     most $r$, so $B$ was sent, and hence computed, at a round at most $r-1$.

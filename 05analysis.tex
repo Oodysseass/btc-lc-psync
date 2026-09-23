@@ -25,7 +25,7 @@ for the validator.
 
 \begin{theorem}[Safety]\label{thm.safety}
     In a typical execution, let a client running \Cref{alg.client} receive a
-    chain $\ch$ of height $\hgt$ at round $r$, and let
+    valid chain $\ch$ of height $\hgt$ at round $r$, and let
     $\ch'=\prune{\ch}{\prn(r,\hgt)}$ be the chain it computes from it. Then
     $\ch'\preceq\ch''$ for every chain $\ch''$ adopted by an honest validator at
     any round $r''\ge r$.

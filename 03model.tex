@@ -78,7 +78,9 @@ adversary delivers that chain to it during round $r$.
 
 Clients have access to a wall clock. They know the current round $r$, the
 genesis block $\gen$, and the public parameters $f$, $\advr$, $\epsilon$ and
-$\lambda$ that we introduce below.
+$\lambda$ that we introduce below. Like every party of~\cite{gkl24}, a client
+knows the target $T$ and makes unlimited verification queries to $H$, so it can
+check that a chain is valid, as $\fn{maxvalid}$ does.
 
 The ledger of a chain is the sequence of transactions in its blocks. For a
 client $P$ and a round $r$, we write $\ledger^P_r$ for the ledger of the chain

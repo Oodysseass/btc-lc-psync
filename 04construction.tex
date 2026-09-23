@@ -90,8 +90,8 @@ all tail, and the client prunes all of it.
 
 \Cref{alg.client} gives the client. It keeps asking the network for chains,
 and it keeps one chain as its output, which is $\bot$ until it confirms
-something (\Cref{line.init}). Every time it receives a chain $\ch$, at some
-round $r$, it computes the pruning depth $\prn(r,\len{\ch}-1)$ from the round
+something (\Cref{line.init}). Every time it receives a valid chain $\ch$, at
+some round $r$, it computes the pruning depth $\prn(r,\len{\ch}-1)$ from the round
 and the height of $\ch$ (\Cref{line.depth}). It prunes that many blocks from
 the end of $\ch$ (\Cref{line.prune}). If what remains has more than one block
 and is longer than the current output, it becomes the new output

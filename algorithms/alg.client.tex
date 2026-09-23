@@ -2,7 +2,7 @@
 \caption{The client. It outputs $\ch'$ at every round.}\label{alg.client}
 \begin{algorithmic}[1]
 \State $\ch' \gets \bot$ \label{line.init}
-\For{every chain $\ch$ received, at the round $r$ of its receipt}
+\For{every valid chain $\ch$ received, at the round $r$ of its receipt}
     \State $k \gets \prn(r,\len{\ch}-1)$ \Comment{\Cref{eq.depth}} \label{line.depth}
     \State $\ch \gets \prune{\ch}{k}$ \label{line.prune}
     \If{$\len{\ch} > 1$ \textbf{and} ($\ch' = \bot$ \textbf{or} $\len{\ch} > \len{\ch'}$)} \label{line.compare}
