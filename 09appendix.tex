@@ -156,13 +156,13 @@ We restate the following facts from~\cite{gkl24} without proof.
     least $m+X([r,r'-1])$.
 \end{lemma}
 
-\begin{lemma}[{Common Prefix, \cite[Theorem 4.10]{gkl24}}]\label{lem.commonprefix}
-    Let $\ch_1$ and $\ch_2$ be chains adopted by honest validators at rounds
-    $r_1$ and $r_2$ with $r_1\le r_2$. Then $\prune{\ch_1}{k}\preceq\ch_2$ for
-    every $k\ge2\lambda f$.
+\begin{lemma}[{Common Prefix Theorem, \cite[Theorem 4.10]{gkl24}}]\label{lem.commonprefix}
+    In a typical execution, let $\ch_1$ and $\ch_2$ be chains adopted by honest
+    validators at rounds $r_1$ and $r_2$ with $r_1\le r_2$. Then
+    $\prune{\ch_1}{k}\preceq\ch_2$ for every $k\ge2\lambda f$.
 \end{lemma}
 
-\begin{lemma}[{\cite[Lemma 4.8]{gkl24}}]\label{lem.span}
+\begin{lemma}[{Patience Lemma, \cite[Lemma 4.8]{gkl24}}]\label{lem.span}
     In a typical execution, any $k\ge2\lambda f$ consecutive blocks of a chain
     have been computed in more than $k/(2f)$ consecutive rounds.
 \end{lemma}
