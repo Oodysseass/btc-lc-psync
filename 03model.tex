@@ -55,7 +55,10 @@ with. The validator \emph{adopts a chain at round $r$} if this was the return
 value of $\fn{maxvalid}$ at round $r$. The chain a validator adopts at round
 $r$ is at least as long as the chain it has at round $r$. The chain it has at
 round $r+1$ is the chain it adopted at round $r$, extended by at most one block
-if the validator was successful at round $r$.
+if the validator was successful at round $r$. Blocks carry transactions. As in
+the ledger protocol of~\cite[Section~6]{gkl24}, an honest validator puts into
+the blocks it computes the transactions it is given as input. We call a
+transaction \emph{honest} in the sense of~\cite[Definition~6.1]{gkl24}.
 
 \paragraph{Clients.}
 
@@ -68,9 +71,36 @@ going to receive a message from an honest party within a certain number of
 rounds. We say that a client \emph{receives a chain at round $r$} when the
 adversary delivers that chain to it during round $r$.
 
+\begin{definition}[Stale chain]\label{def.stale}
+    Let $D\ge0$. A chain that a client receives at round $r$ is
+    \emph{$D$-stale} if an honest validator adopted it at round $r-D$.
+\end{definition}
+
 Clients have access to a wall clock. They know the current round $r$, the
 genesis block $\gen$, and the public parameters $f$, $\advr$, $\epsilon$ and
 $\lambda$ that we introduce below.
+
+The ledger of a chain is the sequence of transactions in its blocks. For a
+client $P$ and a round $r$, we write $\ledger^P_r$ for the ledger of the chain
+$P$ outputs at round $r$. It is empty while $P$ outputs $\bot$. We write
+$\ledger\preceq\ledger'$ when the ledger $\ledger$ is a prefix of the ledger
+$\ledger'$. A client must keep its ledger safe and live, in the following
+sense.
+
+\begin{definition}[Ledger safety]\label{def.safety}
+    Clients are \emph{safe} if, for any two clients $P_1$ and $P_2$, not
+    necessarily distinct, and any two rounds $r_1$ and $r_2$,
+    $\ledger^{P_1}_{r_1}\preceq\ledger^{P_2}_{r_2}$ or
+    $\ledger^{P_2}_{r_2}\preceq\ledger^{P_1}_{r_1}$.
+\end{definition}
+
+\begin{definition}[Ledger liveness]\label{def.liveness}
+    Clients are \emph{live} if, for every round $r$, there exists a number of
+    rounds $u$ such that the following holds for every honest transaction
+    $\tx$. If $\tx$ is given as input to every honest validator at every round
+    from $r$ on, then $\tx\in\ledger^P_{r'}$ for every client $P$ and every
+    round $r'\ge r+u$.
+\end{definition}
 
 \paragraph{Chains and the block tree.}
 

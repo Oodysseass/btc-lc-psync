@@ -48,31 +48,60 @@ The two clients never communicate, and either one may receive every chain from
 the adversary. A client that hears only the adversary may confirm nothing, but
 it never confirms a block that is off the honest chain.
 
+The ledger of a client is read off the chain it outputs, and ledgers of chains
+that are prefixes of one another are prefixes of one another.
+
+\begin{corollary}[Ledger safety]\label{cor.ledgersafety}
+    In a typical execution, clients running \Cref{alg.client} are safe.
+\end{corollary}
+
 \subsection{Liveness}
 \label{sec.liveness}
 
 Liveness needs a chain to arrive. The adversary controls the link of the client
 and may never deliver an honest chain, and then the client confirms nothing.
-When a fresh honest chain does arrive, the client confirms every block that the
-honest validators have long settled.
+When an honest chain does arrive, even a stale one, the client confirms every
+transaction that the honest validators have had long enough.
 
 \begin{theorem}[Liveness]\label{thm.liveness}
-    In a typical execution, let $\ch_1$ be a chain adopted by an honest
-    validator at a round $r_1>\lambda$, and let
-    $u(r_1)=(\kappa-1)r_1+5\lambda/(1-\epsilon-\advrone)$, where
-    $\kappa=(1-\ftwo/f)/(1-\epsilon-\advrone)$. Every client running
-    \Cref{alg.client} that receives, at a round $r\ge r_1+u(r_1)$, a chain
-    adopted by an honest validator at round $r$ has an output other than $\bot$,
-    and $\prune{\ch_1}{k_0}$ is a prefix of that output.
+    In a typical execution, let an honest transaction be given as input to
+    every honest validator at every round from $r$ on, and let $D\ge0$. Every
+    client running \Cref{alg.client} that receives a $D$-stale chain at a round
+    $r'\ge r+u(r,D)$, where
+    \[
+        u(r,D)=\frac{(1-\advrone/\maxr)\,r+D+13\lambda}{1-\epsilon-\advrone}-r ,
+    \]
+    outputs a chain that contains the transaction at every round from $r'$ on.
 \end{theorem}
+
+Liveness in the sense of \Cref{def.liveness} asks every client to confirm the
+transaction, so it needs every client to receive chains. If each receives a
+$D$-stale chain at every round, it follows from \Cref{thm.liveness}.
+
+\begin{corollary}[Ledger liveness]\label{cor.ledgerliveness}
+    In a typical execution, let $D\ge0$ and let every client receive a
+    $D$-stale chain at every round after round $D$. Then clients running
+    \Cref{alg.client} are live, with $u=u(r,D)$ as in \Cref{thm.liveness}.
+\end{corollary}
 
 The client prunes only a $\advr^2$ fraction of an honest chain. A chain adopted
 by an honest validator at round $r$ has height at least $(1-\epsilon)f(r-1)$
 (\Cref{lem.length}), and the pruning depth falls as the height grows, so from
 such a chain the client prunes at most $\prn(r,(1-\epsilon)f(r-1))$ blocks. By
 \Cref{eq.depth}, this is about $\advr^2fr$ for large $r$ and small $f$ and
-$\epsilon$. As $f$ and $\epsilon$ tend to $0$, $\kappa-1$ tends to
-$\advr/(1-\advr)$, so a block that is $k_0$ deep in an honest chain at
-round $r_1$ is confirmed about $\frac{\advr}{1-\advr}r_1$ rounds later. In Bitcoin
+$\epsilon$. For small $f$ and $\epsilon$, $\advrone/\maxr$ is about
+$\advr/(1+\advr)$ and $1-\epsilon-\advrone$ is about $1-\advr$, so $u(r,D)$ is
+about $\frac{\advr^2}{1-\advr^2}r+\frac{D+13\lambda}{1-\advr}$. A transaction
+given to the honest validators at round $r$ is confirmed at most about
+$\frac{\advr^2}{1-\advr^2}r$ rounds later, and every round by which the chain
+the client receives is stale costs at most $\frac{1}{1-\advr}$ more. In bitcoin
 this delay is a constant. For the client it grows with the round, and
 \Cref{sec.tightness} shows that this is necessary.
+
+\Cref{thm.liveness} also shows that the confirmed prefix grows at a constant
+rate. Solving $r'\ge r+u(r,D)$ for $r$, a client that receives a $D$-stale chain
+at round $r'$ outputs every honest transaction that the honest validators have
+been given since a round
+$r\le\big((1-\epsilon-\advrone)r'-D-13\lambda\big)/(1-\advrone/\maxr)$. This
+round grows linearly with $r'$, at a rate of about $1-\advr^2$ for small $f$ and
+$\epsilon$.

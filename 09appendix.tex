@@ -163,6 +163,21 @@ We restate the following facts from~\cite{gkl24} without proof.
     have been computed in more than $k/(2f)$ consecutive rounds.
 \end{lemma}
 
+\begin{lemma}[{Ledger liveness of the validators, after \cite[Lemma~6.3]{gkl24}}]\label{lem.gklliveness}
+    In a typical execution, let an honest transaction be given as input to
+    every honest validator at every round from $r$ on. Then the transaction is
+    in $\prune{\ch}{k_0}$ for every chain $\ch$ adopted by an honest validator
+    at any round $r_1\ge r+u_V$, where
+    $u_V=\lceil2\lceil k_0\rceil/((1-\epsilon)f)\rceil$.
+\end{lemma}
+
+\cite[Lemma~6.3]{gkl24} states this at depth $\lceil2\lambda f\rceil$, with
+$\lceil4\lambda/(1-\epsilon)\rceil$ rounds. Its proof uses chain growth and
+chain quality over $\lceil2\lambda f\rceil$ consecutive blocks. Both apply at
+depth $\lceil k_0\rceil\ge2\lambda f$, so the proof goes through with $u_V$ as
+above. \Cref{lem.commonprefix,lem.growth} carry the conclusion from round
+$r+u_V$ to every later round.
+
 \section{Proofs for security}
 \label{appendix.analysis}
 
@@ -552,66 +567,105 @@ do.
     \Cref{thm.safety} applies to it.
 \end{proofof}
 
+\begin{proofof}{\Cref{cor.ledgersafety}}
+    By \Cref{cor.consistency}, any two chains that clients output, at any two
+    rounds, are prefixes of one another, unless one of them is $\bot$. The
+    ledgers of two chains one of which is a prefix of the other are prefixes of
+    one another, and the empty ledger is a prefix of every ledger.
+\end{proofof}
+
+
 \subsection{Liveness}
 
 \begin{proofof}{\Cref{thm.liveness}}
-    Write $D=1-\epsilon-\advrone$ and $B=\maxr/(1-\ftwo/f)$. By \Cref{lem.rho},
-    $\advrone=(1-\epsilon)\advrtwo<1-\epsilon$, so $D>0$ and $\advrone<1$.
-    Since $\lambda\ge2/f$ and $f<1/3$ by \Cref{asm.majority}, we have
-    $1/f\le\lambda/2$ and $\lambda\ge6$. Let $\ch''$ be the chain the client
-    receives at round $r$, of height $\hgt''$, and let
-    $\ch'=\prune{\ch''}{\prn(r,\hgt'')}$ be the chain it computes from it. Put
-    $h(r)=\advrone f(r+\lambda)+2f+1$.
+    Write $\theta=1-\epsilon-\advrone$ and $B=\maxr/(1-\ftwo/f)$. By
+    \Cref{lem.rho}, $\advrone=(1-\epsilon)\advrtwo<1-\epsilon$, so $\theta>0$ and
+    $\advrone<1$. \Cref{asm.majority} gives $f<1/3$ and $\epsilon<1/3$, so
+    $1/f\le\lambda/2$, $\lambda\ge6$ and $1-\epsilon>2/3$, since
+    $\lambda\ge2/f$.
 
-    We first show that
-    \[
-        (1-\epsilon)f(r-1)\ge k_0+2
-        \qquad\text{and}\qquad
-        B\big((1-\epsilon)f(r-1)-h(r)\big)\ge\maxr f(r_1+\lambda)+1 .
-    \]
-    Both follow from $r\ge r_1+u(r_1)=\kappa r_1+5\lambda/D$. The first is
-    equivalent to $r\ge1+(2\lambda+4+2/f)/(1-\epsilon)$. Since $2/f\le\lambda$,
-    $4\le2\lambda/3$ and $1\le\lambda/6$, its right-hand side is at most
-    $4\lambda/(1-\epsilon)\le5\lambda/D$. For the second, write
-    $(1-\epsilon)f(r-1)-h(r)=Dfr-c$ with
-    $c=(1-\epsilon)f+\advrone f\lambda+2f+1$. Since $\maxr/B=1-\ftwo/f$, the
-    second inequality is equivalent to
-    \[
-        r\ \ge\ \kappa(r_1+\lambda)+\frac{1}{D}\Big(\frac{1-\ftwo/f}{\maxr f}
-        +(1-\epsilon)+2+\advrone\lambda+\frac{1}{f}\Big) .
-    \]
-    Since $\maxr>1$ and $\advrone<1$, the first group in the parentheses is
-    less than $1/f\le\lambda/2$, the next two are less than $3\le\lambda/2$,
-    the fourth is less than $\lambda$, and the last is at most $\lambda/2$. So
-    the parentheses are less than $5\lambda/2$. Also $\kappa\lambda\le\lambda/D$.
-    So the right-hand side is less than $\kappa r_1+7\lambda/(2D)\le r$.
+    Let $r_1=r+u_V$, with $u_V$ as in \Cref{lem.gklliveness}, and let $\ch_1$
+    be a chain adopted by an honest validator at round $r_1$. By
+    \Cref{lem.gklliveness}, the transaction is in $\prune{\ch_1}{k_0}$. Let
+    $\ch''$ be the $D$-stale chain the client receives at round $r'$, adopted
+    by an honest validator at round $r''=r'-D$, let $\hgt''$ be its height, and
+    let $\ch'=\prune{\ch''}{\prn(r',\hgt'')}$ be the chain the client computes
+    from it. We show that $\ch'$ has more than one block and that
+    $\prune{\ch_1}{k_0}\preceq\ch'$. By \Cref{cor.consistency}, the output of
+    the client then has $\ch'$ as a prefix at every round from $r'$ on, and so
+    it contains the transaction.
 
-    Next, $\ch'$ has more than one block. Since $r\ge5\lambda/D>\lambda$,
-    \Cref{lem.length}
-    gives $\hgt''>(1-\epsilon)f(r-1)$. Since $\maxr-\advrone=1-\ftwo/f$,
+    First, $r'$ is large enough. Since $\lceil k_0\rceil\le2(\lambda+2)f+1$
+    and $2/f\le\lambda$, we have
+    $u_V\le(5\lambda+8)/(1-\epsilon)+1<\tfrac{3}{2}(5\lambda+8)+1\le10\lambda$.
+    Since $\maxr>1$, we have $1-\advrone/\maxr\ge1-\advrone\ge\theta$, so
+    $r'\ge r+u(r,D)$ gives $r''=r'-D\ge r+13\lambda\ge r_1+3\lambda$. Also
+    $r_1\ge u_V\ge2k_0/f=4(\lambda+2)$. So $r_1>\lambda$, $r''>\lambda$, and the
+    set $S=[r_1+1,r''-1]$ has at least $\lambda$ rounds.
+
+    Next, we bound the heights. The honest validator that adopted $\ch_1$ at
+    round $r_1$ has at round $r_1+1$ a chain at least as long as $\ch_1$. Since
+    $r''\ge r_1+1$, \Cref{lem.growth,def.typical} give
+    \[
+        \hgt''\ \ge\ \len{\ch_1}-1+X(S)\ >\ \len{\ch_1}-1+(1-\epsilon)f(r''-r_1-1) .
+    \]
+    In particular $\len{\ch''}\ge\len{\ch_1}$. Since $r_1>\lambda$ and
+    $r''>\lambda$, \Cref{lem.length} gives $\len{\ch_1}-1>(1-\epsilon)f(r_1-1)$
+    and $\hgt''>(1-\epsilon)f(r''-1)$.
+
+    Put $h(r')=\advrone f(r'+\lambda)+2f+1$. Since $\maxr-\advrone=1-\ftwo/f$,
     \Cref{eq.depth} gives
     \[
-        \hgt''-\prn(r,\hgt'')=\min\big\{\hgt''-k_0,\ B(\hgt''-h(r))\big\} .
+        \hgt''-\prn(r',\hgt'')=\min\big\{\hgt''-k_0,\ B(\hgt''-h(r'))\big\} .
     \]
-    By the two inequalities, both terms exceed $2$, since
-    $\maxr f(r_1+\lambda)>f\lambda\ge2$. So
-    $\lceil\prn(r,\hgt'')\rceil\le\hgt''-2$, and $\ch'$ has
-    $\hgt''+1-\lceil\prn(r,\hgt'')\rceil\ge3$ blocks. By
-    \Cref{cor.consistency}, the output of the client is then at least as long as
-    $\ch'$ and has $\ch'$ as a prefix, so it suffices to show
-    $\prune{\ch_1}{k_0}\preceq\ch'$.
+    We show that the first term exceeds $2$, and that the second is at least
+    $\len{\ch_1}$, which exceeds $2$ too.
 
-    From \Cref{lem.commonprefix} with $k=k_0\ge2\lambda f$,
-    $\prune{\ch_1}{k_0}\preceq\ch''$, and $\ch'\preceq\ch''$ by construction,
-    so the shorter of the two is a prefix of the other. It remains to show
-    $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$. Since $r>r_1$,
-    \Cref{lem.growth} gives $\len{\ch''}\ge\len{\ch_1}$. If
-    $\prn(r,\hgt'')=k_0$, then
+    For the first term, $r''-1\ge r_1+3\lambda-1\ge7\lambda+7$. Since
+    $2/f\le\lambda$ and $1/(1-\epsilon)<3/2$, we have
+    $(k_0+2)/((1-\epsilon)f)=(2\lambda+4+2/f)/(1-\epsilon)<\tfrac{3}{2}(3\lambda+4)\le7\lambda+7$.
+    So $\hgt''>(1-\epsilon)f(r''-1)>k_0+2$.
+
+    For the second term, $1/B=1-\advrone/\maxr$, so
+    $B(\hgt''-h(r'))\ge\len{\ch_1}$ holds if
+    $\hgt''-h(r')\ge\len{\ch_1}-(\advrone/\maxr)\len{\ch_1}$. By the bounds on
+    $\hgt''$ and $\len{\ch_1}$ above, this holds if
+    \[
+        (1-\epsilon)f(r''-r_1-1)+\frac{\advrone}{\maxr}(1-\epsilon)f(r_1-1)\ \ge\ h(r')+1 .
+    \]
+    Substituting $r''=r'-D$ and dividing by $f$, this reads
+    \[
+        \theta r'\ \ge\ (1-\epsilon)\Big(1-\frac{\advrone}{\maxr}\Big)r_1
+        +(1-\epsilon)\Big(D+1+\frac{\advrone}{\maxr}\Big)+\advrone\lambda+2+\frac{2}{f} .
+    \]
+    Since $1-\epsilon\le1$, $\advrone/\maxr<1$, $\advrone<1$, $2/f\le\lambda$ and
+    $4\le\lambda$, the right-hand side is at most
+    $(1-\advrone/\maxr)(r+u_V)+D+2\lambda+4\le(1-\advrone/\maxr)r+D+13\lambda$,
+    which is at most $\theta r'$ because $r'\ge r+u(r,D)$. Also,
+    $\len{\ch_1}>(1-\epsilon)f(r_1-1)+1\ge(1-\epsilon)fu_V+1\ge2k_0+1>2$.
+
+    So both terms of the minimum exceed $2$. Hence
+    $\lceil\prn(r',\hgt'')\rceil\le\hgt''-2$, and $\ch'$ has
+    $\hgt''+1-\lceil\prn(r',\hgt'')\rceil\ge3$ blocks.
+
+    Finally, $\prune{\ch_1}{k_0}\preceq\ch'$. By \Cref{lem.commonprefix} with
+    $k=k_0\ge2\lambda f$ and $r_1<r''$, $\prune{\ch_1}{k_0}\preceq\ch''$, and
+    $\ch'\preceq\ch''$, so the shorter of the two is a prefix of the other. It
+    remains to show $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$. If
+    $\prn(r',\hgt'')=k_0$, then
     $\len{\ch'}=\len{\ch''}-\lceil k_0\rceil\ge\len{\ch_1}-\lceil k_0\rceil$.
     Otherwise the minimum above is its second term, and
-    $\hgt''-\prn(r,\hgt'')=B(\hgt''-h(r))>\maxr f(r_1+\lambda)+1>\len{\ch_1}$,
-    where the last step is \Cref{lem.length} for $\ch_1\in\bt_{r_1}$. Then
-    $\len{\ch'}=\hgt''+1-\lceil\prn(r,\hgt'')\rceil>\hgt''-\prn(r,\hgt'')>\len{\ch_1}$.
+    $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')=B(\hgt''-h(r'))\ge\len{\ch_1}$.
+\end{proofof}
+
+\begin{proofof}{\Cref{cor.ledgerliveness}}
+    Let an honest transaction $\tx$ be given as input to every honest validator
+    at every round from $r$ on, let $P$ be a client, and let
+    $r'=\lceil r+u(r,D)\rceil$. Since $1-\epsilon-\advrone<1$, we have
+    $r+u(r,D)>D$, so $P$ receives a $D$-stale chain at round $r'$. By
+    \Cref{thm.liveness}, the chain $P$ outputs contains $\tx$ at every round
+    from $r'$ on. So $\tx\in\ledger^P_{r''}$ for every round
+    $r''\ge r+u(r,D)$.
 \end{proofof}
 
 \section{Proofs for tightness}
