@@ -25,9 +25,9 @@ pruning $k_0$ blocks is enough, as it is for the validator.
 \begin{theorem}[Safety]\label{thm.safety}
     In a typical execution, let a client running \Cref{alg.client} receive a
     valid chain $\ch$ of height $\hgt$ at round $r$, and let
-    $\ch'=\prune{\ch}{\prn(r,\hgt)}$ be the chain it computes from it. Then
-    $\ch'\preceq\ch''$ for every chain $\ch''$ adopted by an honest validator at
-    any round $r''\ge r$.
+    $\ch'=\prune{\ch}{\prn(r,\hgt)}$ be the chain it computes from it. Then,
+    for every round $r''\ge r$ and every chain $\ch''$ adopted by an honest
+    validator at round $r''$, $\ch'\preceq\ch''$.
 \end{theorem}
 
 Safety is a property of each chain the client computes, so it extends at once
@@ -60,17 +60,18 @@ that are prefixes of one another are prefixes of one another.
 Liveness needs a chain to arrive. The adversary controls the link of the client
 and may never deliver an honest chain, and then the client confirms nothing.
 When an honest chain does arrive, even a stale one, the client confirms every
-transaction that the honest validators have had long enough.
+transaction that the honest validators have had long enough. The next theorem
+says how long is long enough. For a round $r$ and an integer $D\ge0$, let
+\begin{equation}\label{eq.u}
+    u(r,D)=\frac{(1-\advrone/\maxr)\,r+D+13\lambda}{1-\epsilon-\advrone}-r .
+\end{equation}
 
 \begin{theorem}[Liveness]\label{thm.liveness}
-    In a typical execution, let an honest transaction be given as input to every
-    honest validator at every round from $r$ on, and let $D\ge0$. Every client
-    running \Cref{alg.client} that receives a $D$-stale chain at a round $r'\ge
-    r+u(r,D)$ outputs a chain that contains the transaction at every round from
-    $r'$ on, where
-    \[
-        u(r,D)=\frac{(1-\advrone/\maxr)\,r+D+13\lambda}{1-\epsilon-\advrone}-r ,
-    \]
+    In a typical execution, let $r$ be a round and $D\ge0$ an integer, and let
+    an honest transaction be given as input to every honest validator at every
+    round from $r$ on. Every client running \Cref{alg.client} that receives a
+    $D$-stale chain at a round $r'\ge r+u(r,D)$ outputs a chain that contains
+    the transaction at every round from $r'$ on.
 \end{theorem}
 
 Liveness in the sense of \Cref{def.liveness} asks every client to confirm the
@@ -78,9 +79,10 @@ transaction, so it needs every client to receive chains. If each receives a
 $D$-stale chain at every round, it follows from \Cref{thm.liveness}.
 
 \begin{corollary}[Ledger liveness]\label{cor.ledgerliveness}
-    In a typical execution, let $D\ge0$ and let every client receive a
-    $D$-stale chain at every round after round $D$. Then clients running
-    \Cref{alg.client} are live, with $u=u(r,D)$ as in \Cref{thm.liveness}.
+    In a typical execution, let $D\ge0$ be an integer and let every client
+    receive a $D$-stale chain at every round after round $D$. Then clients
+    running \Cref{alg.client} are live: for every round $r$, the number of
+    rounds $u(r,D)$ of \Cref{eq.u} satisfies \Cref{def.liveness}.
 \end{corollary}
 
 The client prunes only a $\advr^2$ fraction of an honest chain. A chain adopted

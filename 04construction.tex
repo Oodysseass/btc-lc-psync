@@ -99,24 +99,23 @@ and is longer than the current output, it becomes the new output
 keeps.
 
 The pruning depth is \Cref{eq.idealdepth} with every approximate rate replaced
-by a bound that holds in every typical execution. For a chain of height $\hgt$
-received at round $r$, it is
-\begin{equation}\label{eq.depth}
-    \prn(r,\hgt)
-    = \max\left\{k_0,\
-    \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{1-\ftwo/f}\right\},
-\end{equation}
-where
+by a bound that holds in every typical execution. Let
 \(
     \maxr = 1+\advr+2\epsilon+\frac{\advr f}{1-f},
 \)
 \(
-    \advrone = \frac{\advr}{1-f}+\frac{\ftwo}{f}+2\epsilon,
+    \advrone = \frac{\advr}{1-f}+\frac{\ftwo}{f}+2\epsilon
 \)
 and
 \(
     k_0 = 2(\lambda+2)f .
 \)
+For a chain of height $\hgt$ received at round $r$, the pruning depth is
+\begin{equation}\label{eq.depth}
+    \prn(r,\hgt)
+    = \max\left\{k_0,\
+    \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{1-\ftwo/f}\right\}.
+\end{equation}
 The next lemma bounds the height of every chain from above, at the rate $\maxr f$,
 and the height of every honest chain from below, at the rate $(1-\epsilon)f$.
 

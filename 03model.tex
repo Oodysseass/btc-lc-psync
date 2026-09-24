@@ -72,8 +72,9 @@ rounds. We say that a client \emph{receives a chain at round $r$} when the
 adversary delivers that chain to it during round $r$.
 
 \begin{definition}[Stale chain]\label{def.stale}
-    Let $D\ge0$. A chain that a client receives at round $r$ is
-    \emph{$D$-stale} if an honest validator adopted it at round $r-D$.
+    Let $D\ge0$ be an integer and let $r$ be a round. A chain that a client
+    receives at round $r$ is \emph{$D$-stale} if an honest validator adopted it
+    at round $r-D$.
 \end{definition}
 
 Clients have access to a wall clock. They know the current round $r$, the
@@ -100,8 +101,8 @@ sense.
     Clients are \emph{live} if, for every round $r$, there exists a number of
     rounds $u$ such that the following holds for every honest transaction
     $\tx$. If $\tx$ is given as input to every honest validator at every round
-    from $r$ on, then $\tx\in\ledger^P_{r'}$ for every client $P$ and every
-    round $r'\ge r+u$.
+    from $r$ on, then, for every client $P$ and every round $r'\ge r+u$,
+    $\tx\in\ledger^P_{r'}$.
 \end{definition}
 
 \paragraph{Chains and the block tree.}
@@ -125,8 +126,8 @@ adversarial otherwise. We regard the genesis block as an honest block computed
 at round $0$.
 
 \begin{definition}[Block tree]\label{def.tree}
-    The block tree at round $r$, denoted $\bt_r$, is the set of all blocks
-    computed in a round of $[0,r]$. Its edges are the hash references between
+    For a round $r$, the block tree at round $r$, denoted $\bt_r$, is the set of
+    all blocks computed in a round of $[0,r]$. Its edges are the hash references between
     these blocks. A block computed by the adversary belongs to $\bt_r$ whether or
     not it was sent. A chain $\ch$ is in $\bt_r$ if all of its blocks are in
     $\bt_r$.
@@ -155,7 +156,7 @@ of the honest validators, and $1+\advr$ bounds the mining power of all
 validators relative to the honest ones.
 
 \begin{assumption}[Honest majority]\label{asm.majority}
-    There exist $\epsilon,f\in(0,1]$ and $\advr\in[0,1)$ such that
+    There exist $\epsilon\in(0,1]$ and $\advr\in[0,1)$ such that
     $t\le\advr(n-t)$ and $3f+3\epsilon<1-\advr$.
 \end{assumption}
 

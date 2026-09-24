@@ -57,14 +57,13 @@ bounds on $Z(S)$ and $W(S)$ also hold with $\advr$ in place of $t/(n-t)$ and
 $\ftwo$ in place of $f_2$. The proofs use them in this form.
 
 \begin{theorem}[Typicality]\label{thm.typical}
-    An execution is $(\epsilon,\lambda)$-typical except with probability at
-    most
+    Let $L$ be the total run time of the system, $Q$ a bound on the number of
+    oracle queries, and $\nu$ the min-entropy of the input contribution
+    function. An execution is $(\epsilon,\lambda)$-typical except with
+    probability at most
     \(
-        \typ=5L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu},
+        \typ=5L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}.
     \)
-    where $L$ is the total run time of the system, $Q$ bounds the number of
-    oracle queries, and $\nu$ is the min-entropy of the input contribution
-    function.
 \end{theorem}
 
 For $\lambda=\Omega(\log^2\kappa)$ the probability $\typ$ is negligible in
@@ -100,9 +99,9 @@ Two facts about the block tree follow from the protocol and from
 \Cref{def.typical}.
 
 \begin{lemma}[Membership]\label{lem.membership}
-    In a typical execution, every valid chain that a client receives at round
-    $r$ is in $\bt_r$. Every chain adopted by an honest validator at round $r$
-    is in $\bt_{r-1}$.
+    In a typical execution, for every round $r$, every valid chain that a
+    client receives at round $r$ is in $\bt_r$, and every chain adopted by an
+    honest validator at round $r$ is in $\bt_{r-1}$.
 \end{lemma}
 
 \begin{lemma}[Fork choice]\label{lem.fork}
@@ -158,8 +157,8 @@ We restate the following facts from~\cite{gkl24} without proof.
 
 \begin{lemma}[{Common Prefix Theorem, \cite[Theorem 4.10]{gkl24}}]\label{lem.commonprefix}
     In a typical execution, let $\ch_1$ and $\ch_2$ be chains adopted by honest
-    validators at rounds $r_1$ and $r_2$ with $r_1\le r_2$. Then
-    $\prune{\ch_1}{k}\preceq\ch_2$ for every $k\ge2\lambda f$.
+    validators at rounds $r_1$ and $r_2$ with $r_1\le r_2$. Then, for every
+    $k\ge2\lambda f$, $\prune{\ch_1}{k}\preceq\ch_2$.
 \end{lemma}
 
 \begin{lemma}[{Patience Lemma, \cite[Lemma 4.8]{gkl24}}]\label{lem.span}
@@ -168,11 +167,12 @@ We restate the following facts from~\cite{gkl24} without proof.
 \end{lemma}
 
 \begin{lemma}[{Ledger liveness of the validators, after \cite[Lemma~6.3]{gkl24}}]\label{lem.gklliveness}
-    In a typical execution, let an honest transaction be given as input to
-    every honest validator at every round from $r$ on. Then the transaction is
-    in $\prune{\ch}{k_0}$ for every chain $\ch$ adopted by an honest validator
-    at any round $r_1\ge r+u_V$, where
-    $u_V=\lceil2\lceil k_0\rceil/((1-\epsilon)f)\rceil$.
+    In a typical execution, let $r$ be a round, let
+    $u_V=\lceil2\lceil k_0\rceil/((1-\epsilon)f)\rceil$, and let an honest
+    transaction be given as input to every honest validator at every round from
+    $r$ on. Then, for every round $r_1\ge r+u_V$ and every chain $\ch$ adopted
+    by an honest validator at round $r_1$, the transaction is in
+    $\prune{\ch}{k_0}$.
 \end{lemma}
 
 \cite[Lemma~6.3]{gkl24} states this at depth $\lceil2\lambda f\rceil$, with
@@ -280,10 +280,12 @@ adversary mined, plus one for each round in which two or more honest validators
 found a block, plus one for round $r$.
 
 \begin{lemma}[Counting]\label{lem.count}
-    In a typical execution, let $\ch\in\bt_r$ and let $\ch'$ be a chain adopted
-    by an honest validator at round $r$. Let $\bst=\ch[\pos]=\ch'[\pos]$ be the
-    fork point of $\ch$ and $\ch'$, that is, the last honest block of
-    $\ch\meet\ch'$, and let $\rst$ be the round in which it was computed. Put
+    In a typical execution, let $r$ be a round, let $\ch\in\bt_r$, and let
+    $\ch'$ be a chain adopted by an honest validator at round $r$. Let $\bst$ be
+    the fork point of $\ch$ and $\ch'$, that is, the last honest block of
+    $\ch\meet\ch'$. Let $\pos$ be its height, so that
+    $\bst=\ch[\pos]=\ch'[\pos]$, and let $\rst$ be the round in which it was
+    computed. Put
     $S=[\rst+1,r-1]$ and $S'=[\rst,r]$. Then $\rst\le r-1$, and
     \begin{enumerate}
         \item every block of $\ch[\pos+1{:}]$ and of $\ch'[\pos+1{:}]$ was
@@ -475,10 +477,10 @@ agrees with it on all but fewer than $k_0$ of its blocks, as two honest chains
 do.
 
 \begin{lemma}[Long chains]\label{lem.persist}
-    In a typical execution, let $\ch\in\bt_r$ be at least as long as every
-    chain adopted by an honest validator at round $r$. Then
-    $\prune{\ch}{k_0}\preceq\ch''$ for every chain $\ch''$ adopted by an honest
-    validator at any round $r''\ge r$.
+    In a typical execution, let $r$ be a round, and let $\ch\in\bt_r$ be at
+    least as long as every chain adopted by an honest validator at round $r$.
+    Then, for every round $r''\ge r$ and every chain $\ch''$ adopted by an
+    honest validator at round $r''$, $\prune{\ch}{k_0}\preceq\ch''$.
 \end{lemma}
 
 \begin{proofof}{\Cref{lem.persist}}

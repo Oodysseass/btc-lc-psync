@@ -14,7 +14,7 @@ about $(1+\advr)f$. Next, she mines on this chain in private for $s$ rounds,
 and sends the result to the client. This is the chain of \Cref{fig.rates}(b).
 
 \begin{definition}[Private mining]\label{def.private}
-    Let $r_0,s\ge1$ and $r=r_0+s$. The strategy $\pipriv$ with parameters
+    Let $r_0,s\ge1$ be integers and $r=r_0+s$. The strategy $\pipriv$ with parameters
     $r_0$ and $s$ is the following.
     \begin{enumerate}
         \item In every round of $[1,r_0]$, after the honest validators have
@@ -35,11 +35,12 @@ and sends the result to the client. This is the chain of \Cref{fig.rates}(b).
 \end{definition}
 
 \begin{lemma}[Private mining]\label{lem.attack}
-    Let $r_0,s\ge1$, $r=r_0+s$, $\epsilon'\in(0,1)$ and
-    $\eta=\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$. Against $\pipriv$,
-    except with probability at most $\eta$, the execution is typical,
-    $\ch\meet\ch'\preceq\ch_0$ for every chain $\ch'$ adopted by an honest
-    validator at round $r$, and
+    Let $r_0,s\ge1$ be integers, $r=r_0+s$, $\epsilon'\in(0,1)$ and
+    $\eta=\typ+3e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$, and let $\ch_0$ and
+    $\ch$ be as in \Cref{def.private}. Against $\pipriv$, except with
+    probability at most $\eta$, the execution is typical, for every chain
+    $\ch'$ adopted by an honest validator at round $r$ we have
+    $\ch\meet\ch'\preceq\ch_0$, and
     \begin{align}
         \len{\ch}-\len{\ch_0} &> (1-\epsilon')\advr fs,
             \label{eq.attfork}\\
@@ -61,7 +62,8 @@ blocks $k$ therefore keeps a private block once $s$ is large enough.
     Let $k\ge0$ be an integer, and let $r_0$, $s$, $r$, $\epsilon'$ and
     $\eta$ be as in \Cref{lem.attack}, with $(1-\epsilon')\advr fs\ge k$.
     Against $\pipriv$, except with probability at most
-    $\eta$, a client that prunes $k$ blocks from $\ch$ computes a chain that
+    $\eta$, a client that prunes $k$ blocks from the chain $\ch$ that $\pipriv$
+    sends it at round $r$ computes a chain that
     is a prefix of no chain adopted by an honest validator at round $r$.
 \end{corollary}
 
@@ -100,8 +102,8 @@ $r$ and small $f$, $\epsilon$ and $\epsilon'$. In this limit $\maxr$ and
 $\advrone$ tend to $1+\advr$ and $\advr$.
 
 \begin{theorem}[Tightness]\label{thm.tight}
-    Let $a\in(\advr,1+\advr)$, $\hgt=\lfloor afr\rfloor$ and
-    $\epsilon'\in(0,1-a/(1+\advr))$. Let
+    Let $a\in(\advr,1+\advr)$ and $\epsilon'\in(0,1-a/(1+\advr))$. For a
+    round $r$, let $\hgt=\lfloor afr\rfloor$,
     $r_0=\lceil\hgt/((1-\epsilon')f)-\advr r\rceil$ and $s=r-r_0$. For every
     large $r$, these meet the conditions of \Cref{thm.lower} at height $\hgt$,
     and
