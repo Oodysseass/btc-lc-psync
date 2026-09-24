@@ -35,7 +35,9 @@ before it is delivered to any other party.
 
 We assume access to a random oracle $H \colon \{0,1\}^* \to \{0,1\}^\kappa$,
 where $\kappa$ is the security parameter. Each validator is allowed $q$ queries
-to the random oracle $H$ per round. The adversary is allowed $tq$ queries. A
+to the random oracle $H$ per round. The adversary is allowed $tq$ queries. We
+assume that she makes all of them in every round. This loses no generality: an
+adversary that makes fewer queries can make the rest and ignore their answers. A
 query is successful if its output is below the target $T$. A single query is
 successful with probability $p=T/2^\kappa$. A successful query made at round $r$
 yields a block. We say that this block was \emph{computed at round $r$}.

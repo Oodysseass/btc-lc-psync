@@ -8,7 +8,9 @@ This appendix collects the parts of the model that only the proofs use.
 Fix a round $r$. Let $X_r=1$ if some honest validator computes a block at round
 $r$, and $X_r=0$ otherwise. Let $Y_r=1$ if exactly one honest validator computes
 a block at round $r$, and $Y_r=0$ otherwise. Let $Z_r$ be the number of
-successful adversarial queries at round $r$. A round with $X_r=1$ is successful
+successful adversarial queries at round $r$. The adversary makes all her $tq$
+queries (\Cref{sec.model}), so $Z_r$ is the number of successes among $tq$
+independent coins with success probability $p$, and $\mathbb{E}[Z_r]=pqt$. A round with $X_r=1$ is successful
 and a round with $Y_r=1$ is a convergence opportunity. For a set of rounds $S$
 we write $X(S)=\sum_{r\in S}X_r$ and define $Y(S)$ and $Z(S)$ in the same way.
 We set $X_0=Y_0=Z_0=0$, so that a set of rounds containing the index $0$
@@ -40,8 +42,9 @@ $S$ let $W(S)=\sum_{r\in S}W_r=X(S)-Y(S)$, with $W_0=0$.
         \begin{gathered}
             (1-\epsilon)f|S| < X(S) < (1+\epsilon)f|S|,
             \qquad Y(S) > (1-\epsilon)(1-f)f|S|,\\
-            Z(S) < \left(\frac{t}{(n-t)(1-f)}+\epsilon\right)f|S|,
-            \qquad W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
+            \left(\frac{t}{n-t}-\epsilon\right)f|S| < Z(S)
+            < \left(\frac{t}{(n-t)(1-f)}+\epsilon\right)f|S|,\\
+            W(S) < \left(\frac{f_2}{f}+\epsilon\right)f|S| .
         \end{gathered}
     \]
     Second, no insertion, copy, prediction or guess occurs, in the sense
@@ -51,9 +54,9 @@ $S$ let $W(S)=\sum_{r\in S}W_r=X(S)-Y(S)$, with $W_0=0$.
 The upper bounds also hold for a set $[0,r]$ with $r\ge\lambda$, because
 $X([0,r])=X([1,r])$, and likewise for $Y$, $Z$ and $W$, while the right-hand
 sides increase with $|S|$. The definition is that of~\cite[Definition
-4.4]{gkl24}, in the form of~\cite[Lemma 4.6]{gkl24}, with one bound added, the
-bound on $W(S)$. Since $t/(n-t)\le\advr$ and $f_2<\ftwo$ (\Cref{lem.fsq}), the
-bounds on $Z(S)$ and $W(S)$ also hold with $\advr$ in place of $t/(n-t)$ and
+4.4]{gkl24}, in the form of~\cite[Lemma 4.6]{gkl24}, with two bounds added, the
+bound on $W(S)$ and the lower bound on $Z(S)$. Since $t/(n-t)\le\advr$ and
+$f_2<\ftwo$ (\Cref{lem.fsq}), the upper bounds on $Z(S)$ and $W(S)$ also hold with $\advr$ in place of $t/(n-t)$ and
 $\ftwo$ in place of $f_2$. The proofs use them in this form.
 
 \begin{theorem}[Typicality]\label{thm.typical}
@@ -62,21 +65,23 @@ $\ftwo$ in place of $f_2$. The proofs use them in this form.
     function. An execution is $(\epsilon,\lambda)$-typical except with
     probability at most
     \(
-        \typ=5L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}.
+        \typ=6L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}.
     \)
 \end{theorem}
 
 For $\lambda=\Omega(\log^2\kappa)$ the probability $\typ$ is negligible in
-$\kappa$. The theorem is~\cite[Theorem 4.5]{gkl24} with one Chernoff bound
-added for $W(S)$, which is where its first coefficient is $5$ rather than $4$.
+$\kappa$. The theorem is~\cite[Theorem 4.5]{gkl24} with two Chernoff bounds
+added, for $W(S)$ and for the lower bound on $Z(S)$, which is where its first
+coefficient is $6$ rather than $4$.
 
 \begin{proofof}{\Cref{thm.typical}}
     \Cref{def.typical} is~\cite[Definition 4.4]{gkl24}, in the form
-    of~\cite[Lemma 4.6]{gkl24}, with the bound on $W(S)$ added, and
+    of~\cite[Lemma 4.6]{gkl24}, with the bound on $W(S)$ and the lower bound on
+    $Z(S)$ added, and
     \cite[Theorem 4.5]{gkl24} bounds the probability that any of the other
     conditions fails by $4L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}$.
-    It remains to bound the probability that the added condition fails, and
-    this is a Chernoff bound. $W(S)$ is a sum of $|S|$ independent Bernoulli
+    It remains to bound the probability that an added condition fails, and
+    each is a Chernoff bound. $W(S)$ is a sum of $|S|$ independent Bernoulli
     trials with mean $\mu=f_2|S|$, the $W_r$ of distinct rounds being
     independent for the same reason as the $X_r$ in~\cite{gkl24}. For $a>0$
     the Chernoff bound gives $\Pr[W(S)\ge\mu+a]\le\exp(-a^2/(2\mu+a))$. Take
@@ -89,8 +94,26 @@ added for $W(S)$, which is where its first coefficient is $5$ rather than $4$.
     \]
     So the bound on $W(S)$ fails for a given $S$ with probability at most
     $e^{-\epsilon^2\lambda f/2}$. A union bound over the at most $L^2$ sets $S$
-    adds one term $L^2e^{-\Omega(\epsilon^2\lambda f)}$, which is why the first
-    coefficient of $\typ$ is $5$ rather than the $4$ of~\cite{gkl24}.
+    adds one term $L^2e^{-\Omega(\epsilon^2\lambda f)}$.
+
+    For the lower bound on $Z(S)$, if $t=0$ then $Z(S)=0$ and the bound holds,
+    so let $t\ge1$. $Z(S)$ counts the successes among $tq|S|$ independent coins
+    with success probability $p$, so its mean is $\mu=pqt|S|$. By
+    \Cref{eq.rates}, $\mu>\frac{t}{n-t}f|S|$ and
+    $\mu<\frac{t}{n-t}\cdot\frac{f|S|}{1-f}$. \Cref{asm.majority} gives
+    $t\le n-t$ and $f<1/3$, so $\mu<\frac{3}{2}f|S|$. For $a>0$ the Chernoff
+    bound gives $\Pr[Z(S)\le\mu-a]\le\exp(-a^2/(2\mu))$. Take
+    $a=\epsilon f|S|$. Then $\mu-a>\left(\frac{t}{n-t}-\epsilon\right)f|S|$
+    and
+    \[
+        \frac{a^2}{2\mu} > \frac{\epsilon^2f^2|S|^2}{3f|S|} = \frac{\epsilon^2f|S|}{3}
+        \ge \frac{\epsilon^2\lambda f}{3} .
+    \]
+    So the lower bound on $Z(S)$ fails for a given $S$ with probability at most
+    $e^{-\epsilon^2\lambda f/3}$, and a union bound over the at most $L^2$ sets
+    $S$ adds another term $L^2e^{-\Omega(\epsilon^2\lambda f)}$. This is why
+    the first coefficient of $\typ$ is $6$ rather than the $4$
+    of~\cite{gkl24}.
 \end{proofof}
 
 \subsection{The block tree}
@@ -651,7 +674,7 @@ client prunes.
 \section{Proofs for tightness}
 \label{appendix.tightness}
 
-Throughout, $\advr=t/(n-t)>0$, as in \Cref{sec.tightness}. A block
+Throughout, $\advr=t/(n-t)>\epsilon$, as in \Cref{sec.tightness}. A block
 computed at round $r$ may be extended by a query made in the same round.
 \Cref{lem.length} counts adversarial blocks by $Z$, which counts queries, so it
 already allows this.
@@ -661,8 +684,9 @@ already allows this.
     rounds of $S_1$ the public chain gains one block in every successful round
     and one block for every adversarial block. In the rounds of $S_2$ only the
     private branch of the adversary grows on top of $\ch_0$. We first establish
-    three facts, and then bound the random variables in them. The first two
-    hold in every execution, and the third in every typical one.
+    three facts, and then bound the random variables in them with
+    \Cref{def.typical}. The first two hold in every execution, and the third in
+    every typical one.
 
     First, $\ell_0=1+X(S_1)+Z(S_1)$. We show by induction on $r'\in[1,r_0+1]$ that
     every honest validator adopts at round $r'$ a chain of length
@@ -688,29 +712,18 @@ already allows this.
     copies, so none lies on $\ch'$. The other blocks of $\ch$ are those of
     $\ch_0$.
 
-    Now the randomness. $X(S_1)$ is a sum of $r_0$ independent Bernoulli
-    trials with success probability $f$. $Z(S_1)$ and $Z(S_2)$ are sums of
-    $tqr_0$ and $tqs$ independent Bernoulli trials with success probability
-    $p$. Since $t=\advr(n-t)$, \Cref{eq.rates} gives $pqtr_0>\advr fr_0$ and
-    $pqts>\advr fs$. By the Chernoff bound, the event
-    $X(S_1)\le(1-\epsilon')fr_0$ has probability at most
-    $e^{-\epsilon'^2fr_0/2}$. The means of $Z(S_1)$ and $Z(S_2)$ exceed
-    $\advr fr_0$ and $\advr fs$, so the events
-    $Z(S_1)\le(1-\epsilon')\advr fr_0$ and $Z(S_2)\le(1-\epsilon')\advr fs$
-    have probability at most $e^{-\epsilon'^2\advr fr_0/2}$ and
-    $e^{-\epsilon'^2\advr fs/2}$. Since $\advr<1$, each of the three is at
-    most $e^{-\epsilon'^2\advr f\min\{r_0,s\}/3}$. By a union bound, except with
-    probability at most $\eta$ the execution is typical and none of the
-    three events occurs. Then the third fact is the first claim, the second
-    fact gives \Cref{eq.attfork}, and the first two facts give
+    Now the random variables. The sets $S_1$ and $S_2$ have $r_0\ge\lambda$
+    and $s\ge\lambda$ rounds, and $t/(n-t)=\advr$, so \Cref{def.typical} gives
+    $X(S_1)>(1-\epsilon)fr_0$, $Z(S_1)>(\advr-\epsilon)fr_0$ and
+    $Z(S_2)>(\advr-\epsilon)fs$. Then the third fact is the first claim, the
+    second fact gives \Cref{eq.attfork}, and the first two facts give
     \Cref{eq.attheight}, since $\len{\ch}-1=X(S_1)+Z(S_1)+Z(S_2)$.
 \end{proofof}
 
 \begin{proofof}{\Cref{cor.constant}}
-    Consider an execution in which the claims of \Cref{lem.attack} hold, and
-    let $\ch'$ be a chain adopted by an honest validator at round $r$. By
-    \Cref{eq.attfork} and the bound on $k$,
-    $\len{\ch}-\len{\ch_0}>(1-\epsilon')\advr fs\ge k$. So $\prune{\ch}{k}$
+    Consider a typical execution, and let $\ch'$ be a chain adopted by an
+    honest validator at round $r$. By \Cref{eq.attfork} and the bound on $k$,
+    $\len{\ch}-\len{\ch_0}>(\advr-\epsilon)fs\ge k$. So $\prune{\ch}{k}$
     has length $\len{\ch}-k>\len{\ch_0}$. Suppose that $\prune{\ch}{k}$ is a
     prefix of $\ch'$. It is also a prefix of $\ch$, so it is a prefix of
     $\ch\meet\ch'$, and hence of $\ch_0$ by \Cref{lem.attack}. This
@@ -721,8 +734,8 @@ already allows this.
     The strategy $\pipriv^\hgt$ acts as $\pipriv$ in every round, and only the
     chain that the client receives at round $r$ differs. Clients send nothing,
     so \Cref{lem.attack} applies to the chain $\ch$ that the adversary forms
-    at round $r$. Consider an execution in which its claims hold, and let
-    $\ch'$ be a chain adopted by an honest validator at round $r$. We show in
+    at round $r$. Consider a typical execution, and let $\ch'$ be a chain
+    adopted by an honest validator at round $r$. We show in
     three steps that the chain the client computes at round $r$ is not a
     prefix of $\ch'$.
 
@@ -747,26 +760,55 @@ already allows this.
 \end{proofof}
 
 \begin{proofof}{\Cref{thm.tight}}
-    The round $r_0$ is the earliest fork round for which \Cref{eq.attheight}
-    gives height $\hgt$. As $r\to\infty$, $\hgt/(fr)$ tends to $a$, and $r_0/r$ tends to
-    $a/(1-\epsilon')-\advr$, which is positive since $a>\advr$. Also $s/r$
-    tends to $1+\advr-a/(1-\epsilon')$, which is positive since
-    $\epsilon'<1-a/(1+\advr)$. So, for large $r$, $r_0\ge\lambda$, $s\ge1$,
-    and $(1-\epsilon')[(1+\advr)fr_0+\advr fs]=(1-\epsilon')f(r_0+\advr
-    r)\ge\hgt$ by the choice of $r_0$.
+    \Cref{asm.majority} gives $\advr+3f+3\epsilon<1$, so $f,\epsilon<1/3$, and
+    $\lambda\ge2/f\ge6$. Hence $\advr f/(1-f)\le\frac{3}{2}f$ and
+    $\maxr\le1+\advr+2\epsilon+\frac{3}{2}f<2$. Write
+    $I=\advr((1+\advr)fr-\hgt)$. Since $\hgt\le(1+\advr)fr$, we have
+    $0\le I<2fr$.
 
-    For the first limit, the quotient tends to
-    $a-\maxr\,(a/(1-\epsilon')-\advr)$ as $r\to\infty$. As $f$, $\epsilon$
-    and $\epsilon'$ tend to $0$, $\maxr$ tends to $1+\advr$, so this tends to
-    $a-(1+\advr)(a-\advr)=\advr(1+\advr-a)$.
-
-    For the second limit, by \Cref{eq.depth}, $\prn(r,\hgt)/(fr)$ is the
-    maximum of $k_0/(fr)$, which tends to $0$, and
+    For the first item, let $r_0=\lceil(\hgt/f-(\advr-\epsilon)r)/(1-\epsilon)\rceil$
+    and $s=r-r_0$. The lower bound on $\hgt$ gives
+    $r_0\ge(\epsilon r+\lambda)/(1-\epsilon)\ge\lambda$, and the upper bound
+    gives $s\ge2\lambda/(1-\epsilon)-1\ge\lambda$. Also
+    $(1+\advr-2\epsilon)fr_0+(\advr-\epsilon)fs=f[(1-\epsilon)r_0+(\advr-\epsilon)r]\ge\hgt$.
+    So \Cref{thm.lower} applies. Typical executions against $\pipriv^\hgt$
+    exist, since $\typ<1$, and in them a client running $R$ computes at round
+    $r$ a prefix of every chain adopted by an honest validator. So
+    $R(r,\hgt)>\hgt-\maxr fr_0$. Since
+    $r_0<(\hgt-(\advr-\epsilon)fr)/((1-\epsilon)f)+1$,
     \[
-        \frac{\advrone\left[\maxr f(r+\lambda)-\hgt\right]+\maxr(2f+1)}{(1-\ftwo/f)\,fr},
+        \hgt-\maxr fr_0>\hgt-\frac{\maxr}{1-\epsilon}\big(\hgt-(\advr-\epsilon)fr\big)-\maxr f .
     \]
-    which tends to $\advrone(\maxr-a)/(1-\ftwo/f)$, a positive number since
-    $\maxr>1+\advr>a$. As $f$ and $\epsilon$ tend to $0$, $\advrone$ tends to
-    $\advr$, $\maxr$ to $1+\advr$ and $\ftwo/f$ to $0$, so this tends to
-    $\advr(1+\advr-a)$.
+    Write $\Delta=\maxr/(1-\epsilon)-(1+\advr)$. The right-hand side equals
+    $I-\Delta\big(\hgt-(\advr-\epsilon)fr\big)-\epsilon(1+\advr)fr-\maxr f$.
+    Since $\maxr-(1+\advr)(1-\epsilon)=2\epsilon+\advr f/(1-f)+(1+\advr)\epsilon\le4\epsilon+\frac{3}{2}f$
+    and $1-\epsilon>2/3$, we have $0\le\Delta\le6\epsilon+\frac{9}{4}f$. Also
+    $0\le\hgt-(\advr-\epsilon)fr\le(1+\epsilon)fr<\frac{4}{3}fr$. So
+    $\Delta\big(\hgt-(\advr-\epsilon)fr\big)\le(8\epsilon+3f)fr$, and with
+    $\epsilon(1+\advr)fr\le2\epsilon fr$ and $\maxr f<1$,
+    \[
+        R(r,\hgt)>I-(10\epsilon+3f)fr-1\ge I-10c .
+    \]
+
+    For the second item, if $\prn(r,\hgt)=k_0$, then
+    $\prn(r,\hgt)=2(\lambda+2)f\le2\lambda f+2\le I+2c$. Otherwise, write
+    $g=\ftwo/f=f/(2(1-f)^2)$. Since $f<1/3$, $g\le\frac{9}{8}f\le\frac{3}{8}$,
+    so $1/(1-g)\le\frac{8}{5}$. By \Cref{eq.depth},
+    \[
+        (1-g)\prn(r,\hgt)-I=\big(\advrone\maxr-\advr(1+\advr)\big)fr
+        -(\advrone-\advr)\hgt+\advrone\maxr f\lambda+\maxr(2f+1) .
+    \]
+    Here $\advrone-\advr=\advr f/(1-f)+g+2\epsilon\le\frac{21}{8}f+2\epsilon$,
+    which is nonnegative, and $\advrone<1$ by \Cref{lem.rho}. With
+    $\maxr-(1+\advr)\le2\epsilon+\frac{3}{2}f$ and $\maxr<2$,
+    \[
+        \advrone\maxr-\advr(1+\advr)=(\advrone-\advr)\maxr+\advr\big(\maxr-(1+\advr)\big)
+        \le\tfrac{27}{4}f+6\epsilon .
+    \]
+    So $(1-g)\prn(r,\hgt)-I\le(\frac{27}{4}f+6\epsilon)fr+2\lambda f+4$. Since
+    $gI\le\frac{9}{8}f\cdot2fr$,
+    \[
+        \prn(r,\hgt)-I=\frac{(1-g)\prn(r,\hgt)-I+gI}{1-g}
+        \le\frac{8}{5}\Big((9f+6\epsilon)fr+2\lambda f+4\Big)\le16c .
+    \]
 \end{proofof}
