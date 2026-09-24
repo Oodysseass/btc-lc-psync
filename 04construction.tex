@@ -23,7 +23,8 @@ grows faster than about $(1+\advr)f$ blocks per round. The honest chain grows at
 least that fast because honest validators build on the longest chain they see,
 and no chain grows faster because every block is somebody's work. The client
 knows these rates before it sees a single block, and \Cref{fig.rates} draws them
-as three lines. \Cref{lem.length} makes them exact.
+as three lines. The band around each line is how far a typical execution can
+stray from it, and \Cref{lem.length} makes this exact.
 
 \paragraph{Simple rule.}
 
@@ -36,7 +37,7 @@ the tail. Based on the adversarial chain growth, we can make a simple
 observation: in the worst case the adversary has been mining in private for all
 $r$ rounds and has produced at most about $\advr fr$ blocks. That means a client that
 prunes $\advr fr$ blocks from any chain received at round $r$ should be safe.
-\Cref{fig.rates}(a) draws this rule.
+\Cref{fig.rates} shows what this simple rule prunes.
 
 This is indeed true, but the rule prunes much more than it has to. A chain as
 tall as an honest chain has height about $fr$, and the rule prunes a $\advr$
@@ -55,7 +56,7 @@ rate of about $\advr f$. This gives us a simple intuition: if a chain is long
 enough, it must have forked late, and a late fork point leaves the adversary few
 rounds to mine above it. If the chain is not long enough, it must have forked
 early, and an early fork point leaves the adversary many rounds to mine above
-it. \Cref{fig.rates}(b) draws the worst case.
+it. \Cref{fig.rates} draws the worst case.
 
 We now put numbers to this. Let $\rst$ be the round in which the fork point was
 mined, and let $d$ be the number of blocks of $\ch$ above it, so that the fork
@@ -76,7 +77,7 @@ $\advr(1+\advr)f$ and rearranging gives
 \end{equation}
 
 The client prunes this many blocks. The bound is the length of the tail in the
-worst case of \Cref{fig.rates}(b), where the chain grows as fast as possible up
+worst case of \Cref{fig.rates}, where the chain grows as fast as possible up
 to the fork point and only as fast as the adversary after it. The taller the
 chain, the shorter this tail. The tallest chain that can exist, of height about
 $(1+\advr)fr$, has no room for a tail at all. A chain as tall as an honest

@@ -3,68 +3,63 @@
 \colorlet{cadv}{red!80!black}
 \colorlet{chon}{blue!70!black}
 \colorlet{call}{violet}
-% rho = 1/2, drawn with the honest rate as slope 1/2: the three rays have
-% slopes 3/4 (everybody), 1/2 (honest, dashed) and 1/4 (adversary alone).
-% The received chain is the dot at (r, honest height), r = 2.5.
-\begin{tikzpicture}[x=0.9cm,y=1.1cm,>=stealth,font=\footnotesize]
-  \def\xe{3.3}
-  \def\xr{2.5}
+% rho = 1/2. Rays of slope 3/4 (everybody), 1/2 (honest) and 1/4 (adversary),
+% each inside a band of slopes (1 +- 0.12) times its own. The client receives
+% C of height 3.2 at round r = 8. The worst case forks at round 2.4, height
+% 1.8: 0.75*2.4 = 1.8 and 1.8 + 0.25*(8-2.4) = 3.2. Our rule keeps height
+% 1.8, the simple rule keeps 3.2 - 0.25*8 = 1.2.
+\begin{tikzpicture}[x=0.83cm,y=0.7cm,>=stealth,font=\footnotesize]
+  \def\xe{8.8}
+  % Chernoff bands
+  \fill[call,opacity=0.13] (0,0) -- (\xe,0.84*\xe) -- (\xe,0.66*\xe) -- cycle;
+  \fill[chon,opacity=0.13] (0,0) -- (\xe,0.56*\xe) -- (\xe,0.44*\xe) -- cycle;
+  \fill[cadv,opacity=0.13] (0,0) -- (\xe,0.28*\xe) -- (\xe,0.22*\xe) -- cycle;
   % axes
-  \draw[->] (0,0) -- (3.7,0) node[below] {round};
-  \draw[->] (0,0) -- (0,2.65) node[left] {height};
-  % rays
-  \draw[thick,call]        (0,0) -- (\xe,2.475) node[right] {everybody};
-  \draw[thick,dashed,chon] (0,0) -- (\xe,1.65)  node[right] {honest};
-  \draw[thick,cadv]        (0,0) -- (\xe,0.825) node[right] {adversary};
-  % the simple rule: a prefix already there at round 0, then the adversary
-  % alone for all r rounds
-  \draw[very thick,call] (0,0) -- (0,0.625) node[midway,left] {prefix};
-  \draw[very thick,cadv] (0,0.625) -- (\xr,1.25) node[pos=0.3,above,sloped] {tail};
-  \draw[dotted] (\xr,0) -- (\xr,1.25);
-  \draw[dotted] (0,0.625) -- (\xr,0.625);
-  \fill (\xr,1.25) circle (1.8pt);
-  \draw[very thick] (\xr-0.07,0.625) -- (\xr+0.07,0.625);
-  \draw[<->] (\xr+0.18,0.625) -- (\xr+0.18,1.25)
-    node[pos=0.8,right,fill=white,inner sep=1pt] {prune};
-  \node[anchor=north] at (\xr,-0.06) {$r$};
-  \node at (1.6,-0.75) {(a)};
+  \draw[->] (0,0) -- (10.8,0) node[below left] {round};
+  \draw[->] (0,0) -- (0,7) node[left] {height};
+  % rates
+  \draw[thick,call] (0,0) -- (\xe,0.75*\xe)
+    node[pos=0.72,above,sloped] {everybody};
+  \draw[thick,chon] (0,0) -- (\xe,0.5*\xe)
+    node[pos=0.72,above,sloped] {honest};
+  \draw[thick,cadv] (0,0) -- (\xe,0.25*\xe)
+    node[pos=0.45,below,sloped] {adversary};
+  % guides
+  \draw[lim] (8,0) -- (8,4);
+  \draw[lim] (0,3.2) -- (8,3.2);
+  \draw[lim] (0,1.8) -- (8.95,1.8);
+  \draw[lim] (0,1.2) -- (10.75,1.2);
+  \draw[lim] (8,3.2) -- (10.75,3.2);
+  % the received chain: its prefix C_0 along the top rate, then the private tail
+  \draw[very thick,call] (0,0) -- (2.4,1.8);
+  \draw[very thick,dashed,cadv] (2.4,1.8) -- (8,3.2);
+  \fill (2.4,1.8) circle (1.8pt) node[above left] {$\ch_0$};
+  \fill (8,3.2) circle (1.8pt) node[above left] {$\ch$};
+  \fill (8,4) circle (1.8pt) node[above left] {$\ch'$};
+  \draw[very thick] (7.92,1.8) -- (8.08,1.8)
+    node[below right=-1pt] {$\prune{\ch}{\prn(r,\hgt)}$};
+  \draw[very thick] (7.92,1.2) -- (8.08,1.2)
+    node[below right=-1pt] {$\prune{\ch}{\prn(r)}$};
+  % what the two rules prune
+  \draw[brc] (9,1.8) -- (9,3.2)
+    node[midway,right=5pt,align=left] {our rule\\$\prn(r,\hgt)$};
+  \draw[brc] (10.8,1.2) -- (10.8,3.2)
+    node[midway,right=5pt,align=left] {simple rule\\$\prn(r)$};
+  % what our rule keeps
+  \draw[brc] (-0.1,1.8) -- (-0.1,0) node[midway,left=5pt,rotate=90,anchor=south]
+    {safe prefix};
+  \node[left] at (0,3.2) {$\hgt$};
+  \node[below] at (8,0) {$r$};
 \end{tikzpicture}
-\hspace{0.3cm}
-\begin{tikzpicture}[x=0.9cm,y=1.1cm,>=stealth,font=\footnotesize]
-  \def\xe{3.3}
-  \def\xr{2.5}
-  \def\xf{1.25}
-  % axes
-  \draw[->] (0,0) -- (3.7,0) node[below] {round};
-  \draw[->] (0,0) -- (0,2.65) node[left] {height};
-  % rays
-  \draw[thick,call]        (0,0) -- (\xe,2.475) node[right] {everybody};
-  \draw[thick,dashed,chon] (0,0) -- (\xe,1.65)  node[right] {honest};
-  \draw[thick,cadv]        (0,0) -- (\xe,0.825) node[right] {adversary};
-  % the worst case: prefix along the top ray, then tail at the adversary's rate
-  \draw[very thick,call] (0,0) -- (\xf,0.9375) node[midway,above,sloped] {prefix};
-  \draw[very thick,cadv] (\xf,0.9375) -- (\xr,1.25) node[midway,above=1pt,sloped] {tail};
-  \draw[dotted] (\xr,0) -- (\xr,1.25);
-  \draw[dotted] (\xf,0) -- (\xf,0.9375) -- (\xr,0.9375);
-  \fill (\xr,1.25) circle (1.8pt);
-  \draw[fill=white] (\xf,0.9375) circle (1.8pt);
-  \draw[very thick] (\xr-0.07,0.9375) -- (\xr+0.07,0.9375);
-  \draw[<->] (\xr+0.18,0.9375) -- (\xr+0.18,1.25)
-    node[midway,right,fill=white,inner sep=1pt] {prune};
-  \node[anchor=north] at (\xf,-0.06) {fork};
-  \node[anchor=north] at (\xr,-0.06) {$r$};
-  \node at (1.6,-0.75) {(b)};
-\end{tikzpicture}
-\caption{The pruning depth, drawn for $\advr=\frac{1}{2}$. Both panels show
-height against round. A vertical distance is a number of blocks, and a slope
-is a number of blocks per round. The three thin lines are the three mining
-rates: the adversary alone in red, the honest validators in blue, and
-everybody together in violet. The dot is the chain the client received at
-round $r$, here as tall as an honest chain. The thick line is one way the
-chain could have grown, with its prefix in violet and its tail in red, and the
-arrow is the number of blocks the client prunes. (a) The simple rule. The
-prefix is already there at round $0$, and the tail is what the adversary alone
-mines in $r$ rounds. (b) Our rule. The prefix
-grows at rate $1+\advr$ until the fork, and the tail grows at rate $\advr$
-after it. The attack of \Cref{sec.tightness} builds this chain.}\label{fig.rates}
+\caption{The pruning depth, drawn for $\advr=\frac{1}{2}$ as height against
+round. The three lines are the mining rates of everybody together (violet), of
+the honest validators (blue) and of the adversary alone (red). The band
+around each line is how far a typical execution can stray from it. At round
+$r$ the client receives the chain $\ch$ of height $\hgt$, while an honest
+validator holds the longer chain $\ch'$. In the worst case, $\ch$ grows at the
+top rate up to its prefix $\ch_0$, and the adversary mines the rest in
+private, along the dashed red line. Our rule prunes $\prn(r,\hgt)$ blocks,
+which takes $\ch$ down to the height of $\ch_0$. The simple rule prunes
+$\prn(r)$ blocks, all that the adversary alone could have mined in $r$
+rounds.}\label{fig.rates}
 \end{figure}

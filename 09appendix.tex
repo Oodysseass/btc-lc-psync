@@ -614,46 +614,62 @@ client prunes.
     transaction.
 
     First, $r'$ is large enough. Since $\lceil k_0\rceil\le2(\lambda+2)f+1$ and
-    $2/f\le\lambda$, we have
-    $u_V\le(5\lambda+8)/(1-\epsilon)+1<\tfrac{3}{2}(5\lambda+8)+1\le10\lambda$.
-    Since $\maxr>1$, we have $1-\advrone/\maxr\ge1-\advrone\ge\theta$, so
-    $r'\ge r+u(r,D)$ gives $r''=r'-D\ge r+13\lambda\ge r_1+3\lambda$. Also
-    $r_1\ge u_V\ge2k_0/f>\lambda$. So $r_1>\lambda$, $r''>r_1$, and the set
+    $2/f\le\lambda$,
+    \[
+        u_V\ \le\ \frac{5\lambda+8}{1-\epsilon}+1\ <\ \frac{3}{2}(5\lambda+8)+1\ \le\ 10\lambda .
+    \]
+    Since $\maxr>1$, we have $1-\advrone/\maxr\ge1-\advrone\ge\theta$. With
+    $\theta\le1$ and \Cref{eq.u}, the choice $r'\ge r+u(r,D)$ gives
+    \[
+        r''=r'-D\ \ge\ \frac{(1-\advrone/\maxr)\,r}{\theta}+\frac{D+13\lambda}{\theta}-D
+        \ \ge\ r+13\lambda\ \ge\ r_1+3\lambda .
+    \]
+    Also $r_1\ge u_V\ge2k_0/f>\lambda$. So $r_1>\lambda$, $r''>r_1$, and the set
     $S=[r_1+1,r''-1]$ has at least $\lambda$ rounds.
 
     Next, we compare the lengths of $\ch''$ and $\ch_1$. The honest validator
     that adopted $\ch_1$ at round $r_1$ has at round $r_1+1$ a chain at least as
-    long as $\ch_1$. Since $r''\ge r_1+1$,
-    \Cref{lem.growth,def.typical} give
-    \[
-        \len{\ch''}\ \ge\ \len{\ch_1}+X(S)\ >\ \len{\ch_1}+(1-\epsilon)f(r''-r_1-1) .
-    \]
-    Also $\len{\ch_1}-1>(1-\epsilon)f(r_1-1)$ by \Cref{lem.length}, since
-    $r_1>\lambda$.
+    long as $\ch_1$. Since $r''\ge r_1+1$, \Cref{lem.growth,def.typical} give
+    the first of the following bounds, and \Cref{lem.length} gives the second,
+    since $r_1>\lambda$:
+    \begin{align*}
+        \len{\ch''}\ &\ge\ \len{\ch_1}+X(S)\ >\ \len{\ch_1}+(1-\epsilon)f(r''-r_1-1),\\
+        \len{\ch_1}-1\ &>\ (1-\epsilon)f(r_1-1) .
+    \end{align*}
 
-    We now show that $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$,
-    that is, that the client prunes at most
-    $\len{\ch''}-\len{\ch_1}+\lceil k_0\rceil$ blocks. If
-    $\prn(r',\hgt'')=k_0$, this follows from $\len{\ch''}\ge\len{\ch_1}$.
+    We now show that $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$, that is, that
+    the client prunes at most $\len{\ch''}-\len{\ch_1}+\lceil k_0\rceil$ blocks.
+    If $\prn(r',\hgt'')=k_0$, this follows from $\len{\ch''}\ge\len{\ch_1}$.
     Otherwise, put $h(r')=\advrone f(r'+\lambda)+2f+1$. Since
     $\maxr-\advrone=1-\ftwo/f$, \Cref{eq.depth} gives
-    $\hgt''-\prn(r',\hgt'')=B(\hgt''-h(r'))$. Since
-    $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')$, it
-    suffices that $B(\hgt''-h(r'))\ge\len{\ch_1}$. As $1/B=1-\advrone/\maxr$,
-    this reads $\hgt''-h(r')\ge\len{\ch_1}-(\advrone/\maxr)\len{\ch_1}$. By the
-    two bounds on $\len{\ch''}$ and $\len{\ch_1}$ above, it holds if
+    \[
+        \hgt''-\prn(r',\hgt'')=B\big(\hgt''-h(r')\big) .
+    \]
+    Since $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')$,
+    it suffices that $B(\hgt''-h(r'))\ge\len{\ch_1}$. As $1/B=1-\advrone/\maxr$,
+    this reads
+    \[
+        \hgt''-h(r')\ \ge\ \Big(1-\frac{\advrone}{\maxr}\Big)\len{\ch_1} .
+    \]
+    By the two bounds on $\len{\ch''}$ and $\len{\ch_1}$ above, it holds if
     \[
         (1-\epsilon)f(r''-r_1-1)+\frac{\advrone}{\maxr}(1-\epsilon)f(r_1-1)\ \ge\ h(r')+1 .
     \]
-    Substituting $r''=r'-D$ and dividing by $f$, this reads
+    Substituting $r''=r'-D$ and the definition of $h(r')$, and dividing by $f$,
+    this reads
     \[
         \theta r'\ \ge\ (1-\epsilon)\Big(1-\frac{\advrone}{\maxr}\Big)r_1
         +(1-\epsilon)\Big(D+1+\frac{\advrone}{\maxr}\Big)+\advrone\lambda+2+\frac{2}{f} .
     \]
-    Since $1-\epsilon\le1$, $\advrone/\maxr<1$, $\advrone<1$, $2/f\le\lambda$ and
-    $4\le\lambda$, the right-hand side is at most
-    $(1-\advrone/\maxr)(r+u_V)+D+2\lambda+4\le(1-\advrone/\maxr)r+D+13\lambda$,
-    which is at most $\theta r'$ because $r'\ge r+u(r,D)$.
+    Since $1-\epsilon\le1$, $\advrone/\maxr<1$, $\advrone<1$ and $2/f\le\lambda$,
+    the right-hand side is at most
+    \[
+        \Big(1-\frac{\advrone}{\maxr}\Big)(r+u_V)+D+2\lambda+4
+        \ \le\ \Big(1-\frac{\advrone}{\maxr}\Big)r+D+13\lambda ,
+    \]
+    where the last step uses $u_V\le10\lambda$ and $4\le\lambda$. By
+    \Cref{eq.u}, the right-hand side is $\theta\,(r+u(r,D))$, which is at most
+    $\theta r'$.
 
     Finally, by \Cref{lem.commonprefix} with $k=k_0\ge2\lambda f$ and
     $r_1<r''$, $\prune{\ch_1}{k_0}\preceq\ch''$. Also $\ch'\preceq\ch''$ and
@@ -749,9 +765,11 @@ already allows this.
     \Cref{lem.length}.
 
     Third, the client keeps more than $\ch_0$. It computes
-    $\prune{\ch_\hgt}{R(r,\hgt)}$. By the bound on $R(r,\hgt)$, this chain has
-    length $\hgt+1-R(r,\hgt)\ge\maxr fr_0+1$, which exceeds
-    $\len{\ch_0}$ by the second step.
+    $\prune{\ch_\hgt}{R(r,\hgt)}$. By the bound on $R(r,\hgt)$ and the second
+    step,
+    \[
+        \len{\prune{\ch_\hgt}{R(r,\hgt)}}=\hgt+1-R(r,\hgt)\ \ge\ \maxr fr_0+1\ >\ \len{\ch_0} .
+    \]
 
     Now suppose that $\prune{\ch_\hgt}{R(r,\hgt)}$ is a prefix of $\ch'$. It
     is also a prefix of $\ch_\hgt$, and hence of $\ch$, so it is a prefix of
@@ -761,54 +779,91 @@ already allows this.
 
 \begin{proofof}{\Cref{thm.tight}}
     \Cref{asm.majority} gives $\advr+3f+3\epsilon<1$, so $f,\epsilon<1/3$, and
-    $\lambda\ge2/f\ge6$. Hence $\advr f/(1-f)\le\frac{3}{2}f$ and
-    $\maxr\le1+\advr+2\epsilon+\frac{3}{2}f<2$. Write
-    $I=\advr((1+\advr)fr-\hgt)$. Since $\hgt\le(1+\advr)fr$, we have
+    $\lambda\ge2/f\ge6$. Hence
+    \[
+        \frac{\advr f}{1-f}\ \le\ \frac{3}{2}f,
+        \qquad
+        \maxr\ \le\ 1+\advr+2\epsilon+\frac{3}{2}f\ <\ 2 .
+    \]
+    Write $I=\advr((1+\advr)fr-\hgt)$. Since $\hgt\le(1+\advr)fr$, we have
     $0\le I<2fr$.
 
-    For the first item, let $r_0=\lceil(\hgt/f-(\advr-\epsilon)r)/(1-\epsilon)\rceil$
-    and $s=r-r_0$. The lower bound on $\hgt$ gives
-    $r_0\ge(\epsilon r+\lambda)/(1-\epsilon)\ge\lambda$, and the upper bound
-    gives $s\ge2\lambda/(1-\epsilon)-1\ge\lambda$. Also
-    $(1+\advr-2\epsilon)fr_0+(\advr-\epsilon)fs=f[(1-\epsilon)r_0+(\advr-\epsilon)r]\ge\hgt$.
-    So \Cref{thm.lower} applies. Typical executions against $\pipriv^\hgt$
-    exist, since $\typ<1$, and in them a client running $R$ computes at round
-    $r$ a prefix of every chain adopted by an honest validator. So
-    $R(r,\hgt)>\hgt-\maxr fr_0$. Since
-    $r_0<(\hgt-(\advr-\epsilon)fr)/((1-\epsilon)f)+1$,
+    For the first item, let
+    $r_0=\lceil(\hgt/f-(\advr-\epsilon)r)/(1-\epsilon)\rceil$ and $s=r-r_0$.
+    The lower and the upper bound on $\hgt$ give
     \[
-        \hgt-\maxr fr_0>\hgt-\frac{\maxr}{1-\epsilon}\big(\hgt-(\advr-\epsilon)fr\big)-\maxr f .
+        r_0\ \ge\ \frac{\epsilon r+\lambda}{1-\epsilon}\ \ge\ \lambda,
+        \qquad
+        s\ \ge\ \frac{2\lambda}{1-\epsilon}-1\ \ge\ \lambda ,
     \]
-    Write $\Delta=\maxr/(1-\epsilon)-(1+\advr)$. The right-hand side equals
-    $I-\Delta\big(\hgt-(\advr-\epsilon)fr\big)-\epsilon(1+\advr)fr-\maxr f$.
-    Since $\maxr-(1+\advr)(1-\epsilon)=2\epsilon+\advr f/(1-f)+(1+\advr)\epsilon\le4\epsilon+\frac{3}{2}f$
-    and $1-\epsilon>2/3$, we have $0\le\Delta\le6\epsilon+\frac{9}{4}f$. Also
-    $0\le\hgt-(\advr-\epsilon)fr\le(1+\epsilon)fr<\frac{4}{3}fr$. So
-    $\Delta\big(\hgt-(\advr-\epsilon)fr\big)\le(8\epsilon+3f)fr$, and with
-    $\epsilon(1+\advr)fr\le2\epsilon fr$ and $\maxr f<1$,
+    and the choice of $r_0$ gives
     \[
-        R(r,\hgt)>I-(10\epsilon+3f)fr-1\ge I-10c .
+        (1+\advr-2\epsilon)fr_0+(\advr-\epsilon)fs
+        =f\big[(1-\epsilon)r_0+(\advr-\epsilon)r\big]\ \ge\ \hgt .
+    \]
+    So \Cref{thm.lower} applies. Consider a typical execution against
+    $\pipriv^\hgt$. By the hypothesis on $R$, a client running $R$ computes at
+    round $r$ a prefix of every chain adopted by an honest validator. By
+    \Cref{thm.lower}, this cannot happen if $R(r,\hgt)\le\hgt-\maxr fr_0$. So
+    $R(r,\hgt)>\hgt-\maxr fr_0$. Write
+    $\beta=\maxr/(1-\epsilon)-(1+\advr)$. Since
+    $r_0<(\hgt-(\advr-\epsilon)fr)/((1-\epsilon)f)+1$,
+    \begin{align*}
+        \hgt-\maxr fr_0
+        &> \hgt-\frac{\maxr}{1-\epsilon}\big(\hgt-(\advr-\epsilon)fr\big)-\maxr f\\
+        &= I-\beta\big(\hgt-(\advr-\epsilon)fr\big)-\epsilon(1+\advr)fr-\maxr f .
+    \end{align*}
+    We bound the three subtracted terms. First,
+    \[
+        \maxr-(1+\advr)(1-\epsilon)=2\epsilon+\frac{\advr f}{1-f}+(1+\advr)\epsilon
+        \ \le\ 4\epsilon+\frac{3}{2}f ,
+    \]
+    and $1-\epsilon>2/3$, so $0\le\beta\le6\epsilon+\frac{9}{4}f$. Since
+    $0\le\hgt-(\advr-\epsilon)fr\le(1+\epsilon)fr<\frac{4}{3}fr$,
+    \[
+        \beta\big(\hgt-(\advr-\epsilon)fr\big)\ \le\ (8\epsilon+3f)fr .
+    \]
+    Second, $\epsilon(1+\advr)fr\le2\epsilon fr$. Third, $\maxr f<1$. Hence
+    \[
+        R(r,\hgt)\ >\ I-(10\epsilon+3f)fr-1\ \ge\ I-10c .
     \]
 
     For the second item, if $\prn(r,\hgt)=k_0$, then
-    $\prn(r,\hgt)=2(\lambda+2)f\le2\lambda f+2\le I+2c$. Otherwise, write
-    $g=\ftwo/f=f/(2(1-f)^2)$. Since $f<1/3$, $g\le\frac{9}{8}f\le\frac{3}{8}$,
-    so $1/(1-g)\le\frac{8}{5}$. By \Cref{eq.depth},
+    \[
+        \prn(r,\hgt)=2(\lambda+2)f\ \le\ 2\lambda f+2\ \le\ I+2c .
+    \]
+    Otherwise, write $g=\ftwo/f=f/(2(1-f)^2)$. Since $f<1/3$,
+    \[
+        g\ \le\ \frac{9}{8}f\ \le\ \frac{3}{8},
+        \qquad
+        \frac{1}{1-g}\ \le\ \frac{8}{5} .
+    \]
+    By \Cref{eq.depth},
     \[
         (1-g)\prn(r,\hgt)-I=\big(\advrone\maxr-\advr(1+\advr)\big)fr
         -(\advrone-\advr)\hgt+\advrone\maxr f\lambda+\maxr(2f+1) .
     \]
-    Here $\advrone-\advr=\advr f/(1-f)+g+2\epsilon\le\frac{21}{8}f+2\epsilon$,
-    which is nonnegative, and $\advrone<1$ by \Cref{lem.rho}. With
-    $\maxr-(1+\advr)\le2\epsilon+\frac{3}{2}f$ and $\maxr<2$,
+    We bound the terms on the right. By the definitions of $\advrone$ and
+    $\maxr$,
+    \[
+        0\ \le\ \advrone-\advr=\frac{\advr f}{1-f}+g+2\epsilon\ \le\ \frac{21}{8}f+2\epsilon,
+        \qquad
+        \maxr-(1+\advr)\ \le\ 2\epsilon+\frac{3}{2}f ,
+    \]
+    so, with $\maxr<2$,
     \[
         \advrone\maxr-\advr(1+\advr)=(\advrone-\advr)\maxr+\advr\big(\maxr-(1+\advr)\big)
-        \le\tfrac{27}{4}f+6\epsilon .
+        \ \le\ \frac{27}{4}f+6\epsilon .
     \]
-    So $(1-g)\prn(r,\hgt)-I\le(\frac{27}{4}f+6\epsilon)fr+2\lambda f+4$. Since
-    $gI\le\frac{9}{8}f\cdot2fr$,
+    The term $-(\advrone-\advr)\hgt$ is at most $0$. By \Cref{lem.rho},
+    $\advrone<1$, so $\advrone\maxr f\lambda<2\lambda f$, and
+    $\maxr(2f+1)<4$. Hence
+    \[
+        (1-g)\prn(r,\hgt)-I\ \le\ \Big(\frac{27}{4}f+6\epsilon\Big)fr+2\lambda f+4 .
+    \]
+    Finally, $gI\le\frac{9}{8}f\cdot2fr$, so
     \[
         \prn(r,\hgt)-I=\frac{(1-g)\prn(r,\hgt)-I+gI}{1-g}
-        \le\frac{8}{5}\Big((9f+6\epsilon)fr+2\lambda f+4\Big)\le16c .
+        \ \le\ \frac{8}{5}\Big((9f+6\epsilon)fr+2\lambda f+4\Big)\ \le\ 16c .
     \]
 \end{proofof}
