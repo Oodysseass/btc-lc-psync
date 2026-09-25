@@ -40,8 +40,12 @@
   \draw[cadv] (7.7,2.09) -- (7.9,2.15) (7.7,2.18) -- (7.9,2.24);
   \fill[cadv] (8,1.3333) circle (1.5pt);
   % the received chain: its prefix C_0 along the top rate, then the private tail
-  \draw[very thick,call] (0,0) -- (3.7333,2.4889);
+  \draw[line width=1.8pt,call] (0,0) -- (3.7333,2.4889);
   \draw[very thick,dashed,cadv] (3.7333,2.4889) -- (8,3.2);
+  % the worst case of the simple rule: the prefix is there at round 0, and the
+  % adversary mines the tail over all r rounds, along the same line
+  \draw[thick,dashed,cadv] (0,1.8667) -- (3.7333,2.4889);
+  \draw[line width=1.8pt,call] (0,0) -- (0,1.8667);
   \fill (3.7333,2.4889) circle (1.8pt) node[above left] {$\ch_0$};
   \fill (8,3.2) circle (1.8pt) node[above left] {$\ch$};
   \fill (8,4) circle (1.8pt) node[above left] {$\ch'$};
@@ -68,7 +72,9 @@ $r$ the client receives the chain $\ch$ of height $\hgt$, while an honest
 validator holds the longer chain $\ch'$. In the worst case, $\ch$ grows at the
 top rate up to its prefix $\ch_0$, and the adversary mines the rest in
 private, along the dashed red line. Our rule prunes $\prn(r,\hgt)$ blocks,
-which takes $\ch$ down to the height of $\ch_0$. The simple rule prunes
-$\prn(r)$ blocks, the height of the red line at round $r$: all that the
-adversary alone could have mined in $r$ rounds.}\label{fig.rates}
+which takes $\ch$ down to the height of $\ch_0$. The simple rule assumes
+instead that the prefix was already there at round $0$, on the height axis, and
+that the adversary mined the rest over all $r$ rounds, along the dashed red line
+extended to that axis. So it prunes $\prn(r)$ blocks, the height of the red
+line at round $r$.}\label{fig.rates}
 \end{figure}
