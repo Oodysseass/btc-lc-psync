@@ -75,11 +75,9 @@ added, for $W(S)$ and for the lower bound on $Z(S)$, which is where its first
 coefficient is $6$ rather than $4$.
 
 \begin{proofof}{\Cref{thm.typical}}
-    \Cref{def.typical} is~\cite[Definition 4.4]{gkl24}, in the form
-    of~\cite[Lemma 4.6]{gkl24}, with the bound on $W(S)$ and the lower bound on
-    $Z(S)$ added, and
-    \cite[Theorem 4.5]{gkl24} bounds the probability that any of the other
-    conditions fails by $4L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}$.
+    By~\cite[Theorem 4.5]{gkl24}, the probability that some condition of
+    \Cref{def.typical} other than the two added bounds fails is at most
+    $4L^2e^{-\Omega(\epsilon^2\lambda f)}+3Q^22^{-\kappa}+[(n-t)L]^22^{-\nu}$.
     It remains to bound the probability that an added condition fails, and
     each is a Chernoff bound. $W(S)$ is a sum of $|S|$ independent Bernoulli
     trials with mean $\mu=f_2|S|$, the $W_r$ of distinct rounds being
@@ -111,9 +109,7 @@ coefficient is $6$ rather than $4$.
     \]
     So the lower bound on $Z(S)$ fails for a given $S$ with probability at most
     $e^{-\epsilon^2\lambda f/3}$, and a union bound over the at most $L^2$ sets
-    $S$ adds another term $L^2e^{-\Omega(\epsilon^2\lambda f)}$. This is why
-    the first coefficient of $\typ$ is $6$ rather than the $4$
-    of~\cite{gkl24}.
+    $S$ adds another term $L^2e^{-\Omega(\epsilon^2\lambda f)}$.
 \end{proofof}
 
 \subsection{The block tree}
@@ -384,7 +380,7 @@ most about $\advrtwo$ times the sum of $d$ and the difference in length.
 Rearranging, $\ch$ has about $\advrtwo/(1-\advrtwo)$ blocks off $\ch'$ for
 every block by which it is shorter, plus a constant.
 
-\begin{lemma}[Prefix agreement]\label{thm.prefix}
+\begin{lemma}[Prefix agreement]\label{lem.prefix}
     In a typical execution, for every round $r$, every chain $\ch\in\bt_r$ and
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
@@ -393,7 +389,7 @@ every block by which it is shorter, plus a constant.
     \]
 \end{lemma}
 
-\begin{proofof}{\Cref{thm.prefix}}
+\begin{proofof}{\Cref{lem.prefix}}
     Let $\bst$, $\pos$, $\rst$, $S$ and $S'$ be as in \Cref{lem.count}, and
     write $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$. Since $\ch\meet\ch'$
     contains $\bst$, we have $\len{\ch\meet\ch'}\ge\pos+1=\len{\ch}-d$, so it
@@ -430,14 +426,14 @@ every block by which it is shorter, plus a constant.
 
 The coefficient $\advrtwo/(1-\advrtwo)$ tends to $\advr/(1-\advr)$.
 The client cannot
-use \Cref{thm.prefix} as it stands, because it does not know $\len{\ch'}$. The
+use \Cref{lem.prefix} as it stands, because it does not know $\len{\ch'}$. The
 second step replaces $\len{\ch'}$ by the round, with the argument of
 \Cref{sec.construction}. The fork point is at height $\len{\ch}-1-d$, and no
 chain reaches that height before round about $(\len{\ch}-1-d)/(\maxr f)$. The
 fork had only the remaining rounds to grow, at most $\advrone f$ blocks in
 each.
 
-\begin{lemma}[Round form]\label{thm.round}
+\begin{lemma}[Round form]\label{lem.round}
     In a typical execution, for every round $r$, every chain $\ch\in\bt_r$ and
     every chain $\ch'$ adopted by an honest validator at round $r$,
     \[
@@ -446,10 +442,10 @@ each.
     \]
 \end{lemma}
 
-\begin{proofof}{\Cref{thm.round}}
+\begin{proofof}{\Cref{lem.round}}
     Let $\bst$, $\pos$, $\rst$ and $S$ be as in \Cref{lem.count} and write
     $d=\len{\ch[\pos+1{:}]}=\len{\ch}-\pos-1$. As in the proof of
-    \Cref{thm.prefix}, $\len{\ch\meet\ch'}\ge\pos+1=\len{\ch}-d$, so it
+    \Cref{lem.prefix}, $\len{\ch\meet\ch'}\ge\pos+1=\len{\ch}-d$, so it
     suffices to bound $d$ by the maximum in the statement, and we may assume
     $d\ge k_0$, which gives $|S|>\lambda$ and \Cref{eq.upper}.
 
@@ -475,7 +471,7 @@ each.
     $\maxr-\advrone=1-\ftwo/f$.
 \end{proofof}
 
-The maximum in \Cref{thm.round} is the pruning depth $\prn(r,\len{\ch}-1)$ of
+The maximum in \Cref{lem.round} is the pruning depth $\prn(r,\len{\ch}-1)$ of
 \Cref{eq.depth}. So the chain the client computes from $\ch$ is a prefix of
 every chain that an honest validator adopts at the round of receipt. For later
 rounds, \Cref{sec.analysis} splits into two cases. The first uses the common
@@ -484,12 +480,12 @@ for a chain that no honest validator holds, and the next lemma repeats the proof
 of~\cite[Theorem 4.10]{gkl24} for such a chain.
 
 The proof rests on a statement about a single round~\cite[Lemma
-4.9]{gkl24}. Ours is \Cref{thm.prefix} for a chain that is at least as long as
+4.9]{gkl24}. Ours is \Cref{lem.prefix} for a chain that is at least as long as
 an honest chain, where the second term of the maximum is at most
 $(2f+1)/(1-\advrtwo)$. Since $1-\advrtwo=(1-\epsilon-\advrone)/(1-\epsilon)$,
 the standing assumption on $\lambda$ reads
 $\lambda\ge\frac{2f+1}{2f(1-\advrtwo)}-2$. Then
-$k_0=2(\lambda+2)f\ge(2f+1)/(1-\advrtwo)$, and \Cref{thm.prefix} gives, for
+$k_0=2(\lambda+2)f\ge(2f+1)/(1-\advrtwo)$, and \Cref{lem.prefix} gives, for
 every round $r$, every chain $\ch_1\in\bt_r$ and every chain $\ch_2$ adopted
 by an honest validator at round $r$ with $\len{\ch_1}\ge\len{\ch_2}$,
 \begin{equation}\label{eq.longer}
@@ -502,8 +498,8 @@ do.
 \begin{lemma}[Long chains]\label{lem.persist}
     In a typical execution, let $r$ be a round, and let $\ch\in\bt_r$ be at
     least as long as every chain adopted by an honest validator at round $r$.
-    Then, for every round $r''\ge r$ and every chain $\ch''$ adopted by an
-    honest validator at round $r''$, $\prune{\ch}{k_0}\preceq\ch''$.
+    Then, for every round $r'\ge r$ and every chain $\ch'$ adopted by an
+    honest validator at round $r'$, $\prune{\ch}{k_0}\preceq\ch'$.
 \end{lemma}
 
 \begin{proofof}{\Cref{lem.persist}}
@@ -513,18 +509,18 @@ do.
     prove, so assume $k<\len{\ch}-1$, which gives
     $\len{\prune{\ch}{k}}=\len{\ch}-k$.
 
-    At round $r''=r$, the chain $\ch''$ is no longer than $\ch$, so
+    At round $r'=r$, the chain $\ch'$ is no longer than $\ch$, so
     \Cref{eq.longer} gives
-    $\len{\ch\meet\ch''}>\len{\ch}-k_0\ge\len{\prune{\ch}{k}}$. Both
-    $\prune{\ch}{k}$ and $\ch\meet\ch''$ are prefixes of $\ch$, so
-    $\prune{\ch}{k}\preceq\ch''$.
+    $\len{\ch\meet\ch'}>\len{\ch}-k_0\ge\len{\prune{\ch}{k}}$. Both
+    $\prune{\ch}{k}$ and $\ch\meet\ch'$ are prefixes of $\ch$, so
+    $\prune{\ch}{k}\preceq\ch'$.
 
     For later rounds we follow the proof of~\cite[Theorem 4.10]{gkl24}.
-    Suppose, towards a contradiction, that the claim fails. Let $r'>r$ be the first round at which an honest validator
+    Suppose, towards a contradiction, that the claim fails. Let $r_B>r$ be the first round at which an honest validator
     $V$ adopts a chain $\ch_B$ with $\prune{\ch}{k}\not\preceq\ch_B$, and let
-    $\ch_A$ be the chain $V$ adopted at round $r'-1$. Then
-    $\prune{\ch}{k}\preceq\ch_A$: by the case $r''=r$ if $r'-1=r$, by the choice
-    of $r'$ otherwise. At round $r'$ the chain $V$ has is $\ch_A$ extended by at
+    $\ch_A$ be the chain $V$ adopted at round $r_B-1$. Then
+    $\prune{\ch}{k}\preceq\ch_A$: by the case $r'=r$ if $r_B-1=r$, by the choice
+    of $r_B$ otherwise. At round $r_B$ the chain $V$ has is $\ch_A$ extended by at
     most one block. It contains $\prune{\ch}{k}$, so it differs from $\ch_B$,
     and since $\fn{maxvalid}$ returns a longest argument,
     $\len{\ch_B}\ge\len{\ch_A}$.
@@ -533,13 +529,13 @@ do.
     $\ch_B\meet\ch_A$ are prefixes of $\ch_A$ and
     $\prune{\ch}{k}\not\preceq\ch_B$, so
     $\len{\ch_B\meet\ch_A}<\len{\prune{\ch}{k}}$. On the other hand,
-    $\ch_B\in\bt_{r'-1}$ by \Cref{lem.membership} and
-    $\len{\ch_B}\ge\len{\ch_A}$, so \Cref{eq.longer} at round $r'-1$ gives
+    $\ch_B\in\bt_{r_B-1}$ by \Cref{lem.membership} and
+    $\len{\ch_B}\ge\len{\ch_A}$, so \Cref{eq.longer} at round $r_B-1$ gives
     $\len{\ch_B\meet\ch_A}>\len{\ch_B}-k_0\ge\len{\ch_B}-k$. Hence
     $\len{\ch_B}-k<\len{\ch}-k$, that is, $\len{\ch_B}<\len{\ch}$.
 
-    Now compare $\ch$ with $\ch_B$. Since $\ch\in\bt_{r'}$ and
-    $\len{\ch}>\len{\ch_B}$, \Cref{eq.longer} at round $r'$ gives
+    Now compare $\ch$ with $\ch_B$. Since $\ch\in\bt_{r_B}$ and
+    $\len{\ch}>\len{\ch_B}$, \Cref{eq.longer} at round $r_B$ gives
     $\len{\ch\meet\ch_B}>\len{\ch}-k_0\ge\len{\ch}-k=\len{\prune{\ch}{k}}$.
     Both $\prune{\ch}{k}$ and $\ch\meet\ch_B$ are prefixes of $\ch$, so
     $\prune{\ch}{k}\preceq\ch\meet\ch_B\preceq\ch_B$. This contradicts the
@@ -547,33 +543,35 @@ do.
 \end{proofof}
 
 \begin{proofof}{\Cref{thm.safety}}
-    From \Cref{lem.membership}, $\ch\in\bt_r$. If $\ch'$ has at most one block,
-    it is the genesis chain or empty, and it is a prefix of every chain.
-    Otherwise
-    $\len{\ch'}=\len{\ch}-\lceil\prn(r,\hgt)\rceil\le\len{\ch}-\lceil k_0\rceil$,
-    since $\prn(r,\hgt)\ge k_0$.
+    From \Cref{lem.membership}, $\ch\in\bt_r$. Write $k=\lceil\prn(r,\hgt)\rceil$,
+    so that $\prune{\ch}{\prn(r,\hgt)}=\prune{\ch}{k}$. If $\prune{\ch}{k}$ has
+    at most one block, it is the genesis chain or empty, and it is a prefix of
+    every chain. Otherwise
+    $\len{\prune{\ch}{k}}=\len{\ch}-k\le\len{\ch}-\lceil k_0\rceil$, since
+    $\prn(r,\hgt)\ge k_0$.
 
     Suppose first that some chain $\ch_1$ adopted by an honest validator at
-    round $r$ is longer than $\ch$. \Cref{thm.round} gives
-    $\len{\ch\meet\ch_1}>\len{\ch}-\prn(r,\hgt)\ge\len{\ch'}$, and both $\ch'$
-    and $\ch\meet\ch_1$ are prefixes of $\ch$, so $\ch'\preceq\ch_1$. Moreover
-    $\len{\ch'}\le\len{\ch}-\lceil k_0\rceil<\len{\ch_1}-\lceil k_0\rceil$, so
-    $\ch'\preceq\prune{\ch_1}{k_0}$. By \Cref{lem.commonprefix} with
-    $k=k_0\ge2\lambda f$, $\prune{\ch_1}{k_0}\preceq\ch''$ for every chain
-    $\ch''$ adopted by an honest validator at any round $r''\ge r$.
+    round $r$ is longer than $\ch$. \Cref{lem.round} gives
+    $\len{\ch\meet\ch_1}>\len{\ch}-\prn(r,\hgt)\ge\len{\prune{\ch}{k}}$, and
+    both $\prune{\ch}{k}$ and $\ch\meet\ch_1$ are prefixes of $\ch$, so
+    $\prune{\ch}{k}\preceq\ch_1$. Moreover
+    $\len{\prune{\ch}{k}}\le\len{\ch}-\lceil k_0\rceil<\len{\ch_1}-\lceil k_0\rceil$,
+    so $\prune{\ch}{k}\preceq\prune{\ch_1}{k_0}$. Since $k_0\ge2\lambda f$,
+    \Cref{lem.commonprefix} gives $\prune{\ch_1}{k_0}\preceq\ch'$ for every
+    chain $\ch'$ adopted by an honest validator at any round $r'\ge r$.
 
     Otherwise $\ch$ is at least as long as every chain adopted by an honest
     validator at round $r$. Since $\prn(r,\hgt)\ge k_0$, we have
-    $\ch'\preceq\prune{\ch}{k_0}$, and \Cref{lem.persist} gives
-    $\prune{\ch}{k_0}\preceq\ch''$. In this case \Cref{thm.round} is not needed:
-    the floor $k_0$ alone makes the client safe.
+    $\prune{\ch}{k}\preceq\prune{\ch}{k_0}$, and \Cref{lem.persist} gives
+    $\prune{\ch}{k_0}\preceq\ch'$. In this case \Cref{lem.round} is not
+    needed: the floor $k_0$ alone makes the client safe.
 \end{proofof}
 
 \begin{proofof}{\Cref{cor.consistency}}
     Exchanging the two clients if needed, assume $r_1\le r_2$. Since $t<n$, some
-    validator is honest, and it adopts a chain $\ch''$ at round $r_2$.
-    \Cref{thm.safety}, applied to each client with $r''=r_2$, gives
-    $\ch_1\preceq\ch''$ and $\ch_2\preceq\ch''$. Two prefixes of one chain are
+    validator is honest, and it adopts a chain $\ch'$ at round $r_2$.
+    \Cref{thm.safety}, applied to each client with $r'=r_2$, gives
+    $\ch_1\preceq\ch'$ and $\ch_2\preceq\ch'$. Two prefixes of one chain are
     prefixes of one another. So the chains a single client computes are pairwise
     comparable. Its output is the longest of them with more than one block, which
     is well defined, and each new output is longer than the previous one and
@@ -604,14 +602,15 @@ client prunes.
     Let $r_1=r+u_V$, with $u_V$ as in \Cref{lem.gklliveness}, and let $\ch_1$
     be a chain adopted by an honest validator at round $r_1$. By
     \Cref{lem.gklliveness}, the transaction is in $\prune{\ch_1}{k_0}$. Let
-    $\ch''$ be the $D$-stale chain the client receives at round $r'$, adopted
-    by an honest validator at round $r''=r'-D$, let $\hgt''$ be its height, and
-    let $\ch'=\prune{\ch''}{\prn(r',\hgt'')}$ be the chain the client computes
-    from it. We show that $\prune{\ch_1}{k_0}\preceq\ch'$. Then $\ch'$ contains
-    the transaction, which is not in the genesis block, so $\ch'$ has more than
-    one block. By \Cref{cor.consistency}, the output of the client then has
-    $\ch'$ as a prefix at every round from $r'$ on, and so it contains the
-    transaction.
+    $\ch$ be the $D$-stale chain the client receives at round $r'$, adopted
+    by an honest validator at round $r''=r'-D$, and let $\hgt$ be its height.
+    Write $k=\lceil\prn(r',\hgt)\rceil$, so that the client computes
+    $\prune{\ch}{k}$ from $\ch$. We show that
+    $\prune{\ch_1}{k_0}\preceq\prune{\ch}{k}$. Then $\prune{\ch}{k}$ contains
+    the transaction, which is not in the genesis block, so $\prune{\ch}{k}$ has
+    more than one block. By \Cref{cor.consistency}, the output of the client
+    then has $\prune{\ch}{k}$ as a prefix at every round from $r'$ on, and so it
+    contains the transaction.
 
     First, $r'$ is large enough. Since $\lceil k_0\rceil\le2(\lambda+2)f+1$ and
     $2/f\le\lambda$,
@@ -627,31 +626,31 @@ client prunes.
     Also $r_1\ge u_V\ge2k_0/f>\lambda$. So $r_1>\lambda$, $r''>r_1$, and the set
     $S=[r_1+1,r''-1]$ has at least $\lambda$ rounds.
 
-    Next, we compare the lengths of $\ch''$ and $\ch_1$. The honest validator
+    Next, we compare the lengths of $\ch$ and $\ch_1$. The honest validator
     that adopted $\ch_1$ at round $r_1$ has at round $r_1+1$ a chain at least as
     long as $\ch_1$. Since $r''\ge r_1+1$, \Cref{lem.growth,def.typical} give
     the first of the following bounds, and \Cref{lem.length} gives the second,
     since $r_1>\lambda$:
     \begin{align*}
-        \len{\ch''}\ &\ge\ \len{\ch_1}+X(S)\ >\ \len{\ch_1}+(1-\epsilon)f(r''-r_1-1),\\
+        \len{\ch}\ &\ge\ \len{\ch_1}+X(S)\ >\ \len{\ch_1}+(1-\epsilon)f(r''-r_1-1),\\
         \len{\ch_1}-1\ &>\ (1-\epsilon)f(r_1-1) .
     \end{align*}
 
-    We now show that $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil$, that is, that
-    the client prunes at most $\len{\ch''}-\len{\ch_1}+\lceil k_0\rceil$ blocks.
-    If $\prn(r',\hgt'')=k_0$, this follows from $\len{\ch''}\ge\len{\ch_1}$.
+    We now show that $\len{\prune{\ch}{k}}\ge\len{\ch_1}-\lceil k_0\rceil$, that
+    is, that the client prunes at most $\len{\ch}-\len{\ch_1}+\lceil k_0\rceil$
+    blocks. If $\prn(r',\hgt)=k_0$, this follows from $\len{\ch}\ge\len{\ch_1}$.
     Otherwise, put $h(r')=\advrone f(r'+\lambda)+2f+1$. Since
     $\maxr-\advrone=1-\ftwo/f$, \Cref{eq.depth} gives
     \[
-        \hgt''-\prn(r',\hgt'')=B\big(\hgt''-h(r')\big) .
+        \hgt-\prn(r',\hgt)=B\big(\hgt-h(r')\big) .
     \]
-    Since $\len{\ch'}=\hgt''+1-\lceil\prn(r',\hgt'')\rceil>\hgt''-\prn(r',\hgt'')$,
-    it suffices that $B(\hgt''-h(r'))\ge\len{\ch_1}$. As $1/B=1-\advrone/\maxr$,
+    Since $\len{\prune{\ch}{k}}=\hgt+1-k>\hgt-\prn(r',\hgt)$, it suffices
+    that $B(\hgt-h(r'))\ge\len{\ch_1}$. As $1/B=1-\advrone/\maxr$,
     this reads
     \[
-        \hgt''-h(r')\ \ge\ \Big(1-\frac{\advrone}{\maxr}\Big)\len{\ch_1} .
+        \hgt-h(r')\ \ge\ \Big(1-\frac{\advrone}{\maxr}\Big)\len{\ch_1} .
     \]
-    By the two bounds on $\len{\ch''}$ and $\len{\ch_1}$ above, it holds if
+    By the two bounds on $\len{\ch}$ and $\len{\ch_1}$ above, it holds if
     \[
         (1-\epsilon)f(r''-r_1-1)+\frac{\advrone}{\maxr}(1-\epsilon)f(r_1-1)\ \ge\ h(r')+1 .
     \]
@@ -671,10 +670,10 @@ client prunes.
     \Cref{eq.u}, the right-hand side is $\theta\,(r+u(r,D))$, which is at most
     $\theta r'$.
 
-    Finally, by \Cref{lem.commonprefix} with $k=k_0\ge2\lambda f$ and
-    $r_1<r''$, $\prune{\ch_1}{k_0}\preceq\ch''$. Also $\ch'\preceq\ch''$ and
-    $\len{\ch'}\ge\len{\ch_1}-\lceil k_0\rceil=\len{\prune{\ch_1}{k_0}}$, so
-    $\prune{\ch_1}{k_0}\preceq\ch'$.
+    Finally, since $k_0\ge2\lambda f$ and $r_1<r''$, \Cref{lem.commonprefix}
+    gives $\prune{\ch_1}{k_0}\preceq\ch$. Also $\prune{\ch}{k}\preceq\ch$ and
+    $\len{\prune{\ch}{k}}\ge\len{\ch_1}-\lceil k_0\rceil=\len{\prune{\ch_1}{k_0}}$,
+    so $\prune{\ch_1}{k_0}\preceq\prune{\ch}{k}$.
 \end{proofof}
 
 \begin{proofof}{\Cref{cor.ledgerliveness}}

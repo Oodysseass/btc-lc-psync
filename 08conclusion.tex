@@ -4,6 +4,6 @@
 A client does not need synchrony or an honest peer to confirm bitcoin
 transactions. A clock is enough, together with a rule that prunes more as the
 chain it receives falls behind the round. The client stays safe whatever it
-receives, and it stays live whenever a fresh honest chain reaches it. The price
+receives, and it stays live whenever an honest chain reaches it, stale or not. The price
 is a confirmation delay that grows with the round, and no safe rule that reads
 only the round and the height avoids it.

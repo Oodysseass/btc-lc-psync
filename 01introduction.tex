@@ -18,7 +18,7 @@ with earth.
 
 \input{figures/fig.model}
 
-The necessity of synchrony is well understood, both for Proof-of-Work consensus
+The necessity of synchrony is well understood, both for proof of work consensus
 and for dynamic availability in
 general~\cite{accountable-safety,ebbflow,cuamdr}, and the clients of a longest
 chain protocol have always inherited the assumption from the validators.
@@ -81,9 +81,9 @@ clock.
         running it return prefixes of one another (\Cref{sec.safety}).
     \item We prove it live, and we show the confirmed prefix grows at a constant
         rate (\Cref{sec.liveness}).
-    \item We prove the bound tight by exhibiting a private mining adversary
+    \item We prove the pruning depth tight by exhibiting a private mining adversary
         that attains it, and we show that no constant confirmation depth is
-        sound (\Cref{sec.tightness}).
+        safe (\Cref{sec.tightness}).
 \end{enumerate}
 \Cref{sec.model} fixes the model, \Cref{sec.construction} gives the
 construction, \Cref{sec.analysis} proves it safe and live,

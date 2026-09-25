@@ -1,12 +1,12 @@
 \begin{algorithm}
-\caption{The client. It outputs $\ch'$ at every round.}\label{alg.client}
+\caption{The client. It outputs $\ch_{\mathrm{out}}$ at every round.}\label{alg.client}
 \begin{algorithmic}[1]
-\State $\ch' \gets \bot$ \label{line.init}
+\State $\ch_{\mathrm{out}} \gets \bot$ \label{line.init}
 \For{every valid chain $\ch$ received, at the round $r$ of its receipt}
     \State $k \gets \prn(r,\len{\ch}-1)$ \Comment{\Cref{eq.depth}} \label{line.depth}
     \State $\ch \gets \prune{\ch}{k}$ \label{line.prune}
-    \If{$\len{\ch} > 1$ \textbf{and} ($\ch' = \bot$ \textbf{or} $\len{\ch} > \len{\ch'}$)} \label{line.compare}
-        \State $\ch' \gets \ch$ \label{line.keep}
+    \If{$\len{\ch} > 1$ \textbf{and} ($\ch_{\mathrm{out}} = \bot$ \textbf{or} $\len{\ch} > \len{\ch_{\mathrm{out}}}$)} \label{line.compare}
+        \State $\ch_{\mathrm{out}} \gets \ch$ \label{line.keep}
     \EndIf
 \EndFor
 \end{algorithmic}

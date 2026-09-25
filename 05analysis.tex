@@ -9,8 +9,8 @@ same order as $\lambda\ge2/f$ that the proof of safety needs. The proofs are in
 
 The proofs make the argument of \Cref{sec.construction} exact. They count the
 blocks of a received chain above its fork point with an honest chain, and
-charge each of them to an adversarial block, or a succeseful round that is not a
-convergence opportunity. For the round of receipt, this bounds the number of
+charge each of them to an adversarial block, or to a round in which two or more
+honest validators compute a block. For the round of receipt, this bounds the number of
 blocks of the received chain that are on a private fork, off the honest chain.
 Later rounds split into two cases. If the received chain is shorter than some
 honest chain, what the client keeps lies at least $k_0$ blocks deep in that
@@ -24,10 +24,10 @@ pruning $k_0$ blocks is enough, as it is for the validator.
 
 \begin{theorem}[Safety]\label{thm.safety}
     In a typical execution, let a client running \Cref{alg.client} receive a
-    valid chain $\ch$ of height $\hgt$ at round $r$, and let
-    $\ch'=\prune{\ch}{\prn(r,\hgt)}$ be the chain it computes from it. Then,
-    for every round $r''\ge r$ and every chain $\ch''$ adopted by an honest
-    validator at round $r''$, $\ch'\preceq\ch''$.
+    valid chain $\ch$ of height $\hgt$ at round $r$, and compute from it the
+    chain $\prune{\ch}{\prn(r,\hgt)}$. Then, for every round $r'\ge r$ and
+    every chain $\ch'$ adopted by an honest validator at round $r'$,
+    $\prune{\ch}{\prn(r,\hgt)}\preceq\ch'$.
 \end{theorem}
 
 Safety is a property of each chain the client computes, so it extends at once
@@ -57,8 +57,8 @@ that are prefixes of one another are prefixes of one another.
 \subsection{Liveness}
 \label{sec.liveness}
 
-Liveness needs a chain to arrive. The adversary controls the link of the client
-and may never deliver an honest chain, and then the client confirms nothing.
+Liveness needs a chain to arrive. The adversary controls the link of the client.
+If she never delivers an honest chain, the client confirms nothing.
 When an honest chain does arrive, even a stale one, the client confirms every
 transaction that the honest validators have had long enough. The next theorem
 says how long is long enough. For a round $r$ and an integer $D\ge0$, let
@@ -101,9 +101,9 @@ this delay is a constant. For the client it grows with the round, and
 the height prunes about as much.
 
 \Cref{thm.liveness} also shows that the confirmed prefix grows at a constant
-rate. Solving $r'\ge r+u(r,D)$ for $r$, a client that receives a $D$-stale chain
-at round $r'$ outputs every honest transaction that the honest validators have
-been given since a round
-$r\le\big((1-\epsilon-\advrone)r'-D-13\lambda\big)/(1-\advrone/\maxr)$. This
-round grows linearly with $r'$, at a rate of about $1-\advr^2$ for small $f$ and
-$\epsilon$.
+rate. The condition $r'\ge r+u(r,D)$ holds if and only if
+$r\le\big((1-\epsilon-\advrone)r'-D-13\lambda\big)/(1-\advrone/\maxr)$. So a
+client that receives a $D$-stale chain at round $r'$ outputs every honest
+transaction that the honest validators have been given at every round from such
+a round $r$ on. This bound on $r$ grows linearly with $r'$, at a rate of about
+$1-\advr^2$ for small $f$ and $\epsilon$.

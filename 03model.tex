@@ -20,7 +20,8 @@ when $r'<r$.
 
 We assume a synchronous network among the validators. A message sent by an
 honest validator at round $r$ is received by every other validator at the
-beginning of round $r+1$. The adversary can see the messages of honest parties
+beginning of round $r+1$. So the network delay among the validators is one
+round, $\Delta=1$. The adversary can see the messages of honest parties
 at any point of a round. At the end of each round she fixes the messages
 delivered in the next round and their order. She may reorder messages, spoof
 their source or add messages of her own, but she cannot drop a message.
@@ -135,7 +136,7 @@ at round $0$.
     $\bt_r$.
 \end{definition}
 
-In a typical execution, defined below, no copies occur, so every block of
+In a typical execution, defined in \Cref{def.typical}, no copies occur, so every block of
 $\bt_r$ has a unique height and $\bt_r$ is a tree.
 
 \begin{definition}[Common prefix of two chains]\label{def.meet}
